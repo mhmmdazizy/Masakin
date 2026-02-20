@@ -669,10 +669,15 @@ window.openPopup = (type) => {
   } else if (type === "tentang") {
     title = "Tentang Aplikasi";
     content = `
-<div style="text-align:center;">
-                <center><img src="icon/logo-tentang.png" width="250"></center>
-                
-                
+<div class="logo-tentang">
+    
+    <img src="icon/logo-tentang-terang.png"
+         class="logo-light"
+         alt="Logo Masakin">
+
+    <img src="icon/logo-tentang-gelap.png"
+         class="logo-dark"
+         alt="Logo Masakin">
                 <p style="margin:5px 0 0; color:var(--text-muted); font-size:14px;">Versi 1.0.0</p>
                 <p style="margin:0; font-size:12px; color:var(--text-muted);">Update: 19 Feb 2026</p>
             </div><br>

@@ -1068,3 +1068,16 @@ body[data-theme="dark"] .logo-dark {
 .app-logo img {
   object-fit: contain;
 }
+.logo-tentang {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* center horizontal */
+  text-align: center; /* center teks */
+  gap: 5px;
+}
+
+.logo-tentang img {
+  width: 250px;
+  max-width: 90%;
+  object-fit: contain;
+}
