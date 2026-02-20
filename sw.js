@@ -15,6 +15,10 @@ const urlsToCache = [
   "icon/cabe.png",
   "icon/kecap manis.png",
   "icon/nasi.png",
+  "icon/logo-header-gelap.png.png",
+  "icon/logo-header-terang.png",
+  "icon/logo-tentang-gelap",
+  "icon/logo-tentang-terang",
   // Kamu juga bisa menambahkan '/icon.png' jika mau logonya tersimpan offline
 ];
 
