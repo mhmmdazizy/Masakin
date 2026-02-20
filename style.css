@@ -1050,3 +1050,21 @@ header {
     margin: 0 auto !important;
   }
 }
+/* --- SULAP LOGO MODE GELAP & TERANG --- */
+/* Default (Mode Terang): Sembunyikan logo gelap */
+.logo-dark {
+  display: none;
+}
+
+/* Saat Mode Gelap (data-theme="dark"): Sembunyikan terang, munculkan gelap */
+body[data-theme="dark"] .logo-light {
+  display: none;
+}
+body[data-theme="dark"] .logo-dark {
+  display: block;
+}
+
+/* Opsional: Biar logo gak penyok kalau layar sempit */
+.app-logo img {
+  object-fit: contain;
+}

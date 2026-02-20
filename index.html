@@ -36,19 +36,29 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
   </head>
   <body>
-    <header id="main-header">
-      <div class="profile-pill" onclick="switchPage('profile-page')">
-        <div class="avatar" id="header-avatar">G</div>
-        <div class="profile-info">
-          <span class="app-name">Halo,</span>
-          <span class="user-name" id="header-username">Guest User</span>
-        </div>
+    <header id="main-header" style="display: flex; justify-content: space-between; align-items: center;">
+      
+      <div class="app-logo" style="display: flex; align-items: center;">
+        <img src="icon/logo-header-terang.png" alt="Logo Masak Apa" class="logo-light" style="height: 32px;">
+        <img src="icon/logo-header-gelap.png" alt="Logo Masak Apa" class="logo-dark" style="height: 32px;">
       </div>
 
-      <button class="notif-btn" onclick="toggleNotifSheet()">
-        <i data-feather="bell"></i>
-        <span class="notif-dot"></span>
-      </button>
+      <div class="header-actions" style="display: flex; align-items: center; gap: 12px;">
+        
+        <button class="notif-btn" onclick="toggleNotifSheet()">
+          <i data-feather="bell"></i>
+          <span class="notif-dot"></span>
+        </button>
+
+        <div class="profile-pill" onclick="switchPage('profile-page')">
+          <div class="avatar" id="header-avatar">G</div>
+          <div class="profile-info">
+            <span class="app-name">Halo,</span>
+            <span class="user-name" id="header-username">Guest User</span>
+          </div>
+        </div>
+        
+      </div>
     </header>
 
     <main>
