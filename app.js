@@ -16,12 +16,12 @@ if ("serviceWorker" in navigator) {
 // -------------------------------
 // --- 1. CONFIG FIREBASE (PASTE CONFIG KAMU DI SINI) ---
 const firebaseConfig = {
-  apiKey: "AIzaSyBIM86KidwhWLIdQkVv38xfNJUK3pmKmc8",
-  authDomain: "cookingideas-2a894.firebaseapp.com",
-  projectId: "cookingideas-2a894",
-  storageBucket: "cookingideas-2a894.firebasestorage.app",
-  messagingSenderId: "376881959519",
-  appId: "1:376881959519:web:46f75e2c840654b1ba01ea",
+  apiKey: "AIzaSyDVx1wRhRJ-UYfxEZLonx5RMkgiOOd8gB8",
+  authDomain: "masakin-id.firebaseapp.com",
+  projectId: "masakin-id",
+  storageBucket: "masakin-id.firebasestorage.app",
+  messagingSenderId: "466490310728",
+  appId: "1:466490310728:web:677901a9b8c65f63a8187d",
 };
 
 // Init Firebase & Firestore
