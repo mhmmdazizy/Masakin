@@ -1013,8 +1013,12 @@ if (installBtn) {
 
 // 3. Jika aplikasi sukses terinstall, pastikan tombol hilang
 window.addEventListener("appinstalled", () => {
+  const installBtn = document.getElementById("install-btn");
   if (installBtn) installBtn.style.display = "none";
   deferredPrompt = null;
+
+  // Munculkan toast saat berhasil diinstall!
+  showToast("Aplikasi berhasil diinstall! 🎉");
 });
 // --- FITUR NOTIFIKASI MELAYANG (TOAST) ---
 window.showToast = (message) => {
@@ -1036,15 +1040,4 @@ window.addEventListener("offline", () => {
 
 window.addEventListener("online", () => {
   showToast("Kembali online! Internet terhubung.");
-});
-
-// --- UPDATE FITUR INSTALL SEBELUMNYA ---
-// Cari kode window.addEventListener('appinstalled', ...) yang lama, lalu TIMPA dengan ini:
-window.addEventListener("appinstalled", () => {
-  const installBtn = document.getElementById("install-btn");
-  if (installBtn) installBtn.style.display = "none";
-  deferredPrompt = null;
-
-  // Munculkan toast saat berhasil diinstall!
-  showToast("Aplikasi berhasil diinstall! 🎉");
 });
