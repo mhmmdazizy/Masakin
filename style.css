@@ -1,0 +1,949 @@
+:root {
+  --primary: #e35336;
+  --primary-dark: #e35336;
+  --bg: #f9fafb;
+  --surface: #ffffff;
+  --text: #1f2937;
+  --text-muted: #6b7280;
+  --border: #e5e7eb;
+  --nav-bg: rgba(255, 255, 255, 0.95);
+  --shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] {
+  --bg: #111827;
+  --surface: #1f2937;
+  --text: #f9fafb;
+  --text-muted: #9ca3af;
+  --border: #374151;
+  --nav-bg: rgba(31, 41, 55, 0.95);
+}
+
+/* --- NATIVE APP FEEL (Request Anda) --- */
+* {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  margin: 0;
+  padding-bottom: 100px; /* Space agar konten tidak tertutup nav bawah */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* HEADER */
+header {
+  padding: 16px 20px;
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Profil Pill */
+.profile-pill {
+  display: inline-flex;
+  align-items: center;
+  background: var(--surface);
+  padding: 6px 12px 6px 6px;
+  border-radius: 40px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+.profile-pill:active {
+  transform: scale(0.96);
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  margin-right: 10px;
+  font-size: 14px;
+}
+.avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.profile-info {
+  display: flex;
+  flex-direction: column;
+}
+.app-name {
+  font-size: 10px;
+  color: var(--text-muted);
+  /* text-transform: uppercase; */
+}
+.user-name {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Notif Button */
+.notif-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  position: relative;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+}
+.notif-dot {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 8px;
+  height: 8px;
+  background: #ffd93d;
+  border-radius: 50%;
+  border: 2px solid var(--surface);
+}
+
+/* MAIN PAGES */
+.page {
+  display: none;
+  padding: 20px;
+  animation: fadeIn 0.3s;
+}
+.page.active {
+  display: block;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero h1 {
+  font-size: 22px;
+  margin-bottom: 5px;
+  margin-top: 0;
+}
+.hero p {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-top: 0;
+}
+
+/* GRID LAYOUTS (Explore & Menu) */
+.section-title {
+  margin-bottom: 20px;
+}
+.section-title h2 {
+  font-size: 20px;
+  margin: 0;
+}
+.section-title p {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 5px 0 0;
+}
+
+.masonry-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.card-item {
+  background: var(--surface);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.card-item:active {
+  transform: scale(0.96);
+}
+
+.card-thumb {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  background: #eee;
+}
+.card-info {
+  padding: 12px;
+}
+.card-tag {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--primary);
+  background: rgba(255, 107, 107, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.card-info h4 {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--text);
+}
+
+/* INGREDIENTS GRID (Home) */
+.ingredients-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 20px;
+}
+.ing-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 5px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 500;
+  display: flex;
+  flex-direction: column; /* Mengubah susunan jadi atas-bawah */
+  align-items: center; /* Center secara horizontal */
+  justify-content: center; /* Center secara vertikal */
+  text-align: center;
+  padding: 12px 8px; /* Sedikit ruang agar tidak sesak */
+  gap: 6px; /* Jarak konsisten antara gambar dan teks */
+}
+.ing-item.selected {
+  background: #fff1f1;
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.ing-item.selected i {
+  color: var(--primary);
+}
+.ing-item i {
+  display: block;
+  margin: 0 auto 6px;
+  color: var(--text-muted);
+  width: 20px;
+  height: 20px;
+}
+
+/* PROFIL PAGE */
+.profile-header-large {
+  text-align: center;
+  background: var(--surface);
+  padding: 30px 20px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+}
+.avatar-large {
+  width: 80px;
+  height: 80px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  font-weight: 700;
+  margin: 0 auto 15px;
+}
+.avatar-large img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+#profile-name-large {
+  margin: 0;
+  font-size: 18px;
+}
+#profile-email-large {
+  margin: 5px 0 15px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.menu-item {
+  background: var(--surface);
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 14px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+}
+
+/* BUTTONS */
+.find-btn {
+  background: var(--primary);
+  color: white;
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 14px;
+  font-weight: 600;
+  font-size: 16px;
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+.login-google-btn {
+  background: #fff;
+  border: 1px solid #ddd;
+  color: #333;
+  padding: 10px 20px;
+  border-radius: 50px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 14px;
+}
+.reset-btn {
+  background: #fee2e2;
+  color: #991b1b;
+  border: none;
+  padding: 14px;
+  width: 100%;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+/* NOTIF SHEET (Bottom Sheet) */
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.backdrop.active {
+  display: block;
+  opacity: 1;
+}
+
+.bottom-sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: -100%;
+  background: var(--surface);
+  border-radius: 24px 24px 0 0;
+  padding: 20px;
+  z-index: 101;
+  transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 -5px 30px rgba(0, 0, 0, 0.15);
+}
+.bottom-sheet.active {
+  bottom: 0;
+}
+.sheet-handle {
+  width: 40px;
+  height: 5px;
+  background: #ddd;
+  border-radius: 10px;
+  margin: 0 auto 20px;
+}
+
+.notif-item {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  align-items: center;
+}
+.notif-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+.bg-blue {
+  background: #3b82f6;
+}
+.bg-green {
+  background: #10b981;
+}
+.notif-item b {
+  font-size: 14px;
+  display: block;
+}
+.notif-item p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* BOTTOM NAV */
+.bottom-nav {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 400px;
+  background: var(--nav-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 50px;
+  display: flex;
+  justify-content: space-around;
+  padding: 14px 0;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  z-index: 90;
+}
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: var(--text-muted);
+  gap: 4px;
+}
+.nav-item span {
+  font-size: 10px;
+}
+.nav-item.active {
+  color: var(--primary);
+}
+.nav-item i {
+  width: 22px;
+  height: 22px;
+}
+
+/* --- POPUP JADI BOTTOM SHEET --- */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 1000; /* Z-index paling tinggi */
+  display: none;
+  align-items: flex-end; /* Supaya nempel bawah */
+  justify-content: center;
+}
+
+.popup-overlay.active {
+  display: flex-end;
+}
+
+.popup-card {
+  background: var(--surface);
+  width: 100%;
+  max-width: 100%; /* Full width di HP */
+  border-radius: 24px 24px 0 0; /* Lengkung atas saja */
+  padding: 24px;
+  position: relative;
+  max-height: 85vh; /* Jangan menuhin layar */
+  overflow-y: auto;
+  animation: slideUp 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+  align-items: flex-end;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Pastikan FAQ Answer bisa muncul (Request no 1) */
+.faq-item .faq-answer {
+  display: none;
+  padding: 10px 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  border-top: 1px dashed var(--border);
+  margin-top: 5px;
+}
+.faq-item.active .faq-answer {
+  display: block; /* Muncul saat class active ada */
+}
+.faq-item.active i {
+  transform: rotate(180deg);
+  transition: 0.2s;
+}
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+.close-popup {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: var(--text-muted);
+}
+
+/* --- DETAIL ARTICLE VIEW --- */
+.detail-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--surface);
+  z-index: 300;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.detail-overlay.active {
+  transform: translateX(0);
+}
+
+.detail-header {
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+}
+.detail-header button {
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+#detail-category {
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: bold;
+  backdrop-filter: blur(4px);
+}
+
+.detail-hero {
+  width: 100%;
+  height: 350px;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+}
+.detail-body {
+  padding: 25px;
+  background: var(--surface);
+  border-radius: 30px 30px 0 0;
+  margin-top: -40px;
+  position: relative;
+  min-height: 500px;
+}
+#detail-title {
+  font-size: 24px;
+  margin: 0 0 10px;
+  line-height: 1.3;
+}
+.detail-meta {
+  display: flex;
+  gap: 15px;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+.detail-meta span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.detail-content {
+  line-height: 1.8;
+  color: var(--text);
+  font-size: 15px;
+}
+
+/* --- ACCORDION (FAQ) --- */
+.faq-item {
+  border-bottom: 1px solid var(--border);
+  padding: 10px 0;
+}
+.faq-question {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 10px 0;
+  font-size: 14px;
+}
+.faq-answer {
+  display: none;
+  padding-bottom: 10px;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.faq-item.active .faq-answer {
+  display: block;
+  animation: fadeIn 0.3s;
+}
+.faq-item.active .faq-question i {
+  transform: rotate(180deg);
+}
+
+/* --- PRIVACY & ABOUT --- */
+.privacy-text {
+  height: 300px;
+  overflow-y: auto;
+  font-size: 12px;
+  line-height: 1.6;
+  background: var(--bg);
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  border: 1px solid var(--border);
+}
+.about-logo {
+  width: 120px;
+  height: 60px;
+  background: var(--primary);
+  margin: 0 auto 10px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+/* --- STYLE TAMBAHAN --- */
+
+/* 1. Theme Toggle Button */
+.theme-btn-active {
+  background-color: var(--text); /* Warna kontras */
+  color: var(--bg);
+  transition: all 0.3s;
+}
+
+/* 2. Favorite Button on Card */
+.card-item {
+  position: relative;
+} /* Penting agar tombol fav diam di dalam card */
+
+.fav-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10; /* Supaya di atas gambar */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s;
+}
+
+/* Pastikan ini ada di paling bawah */
+.fav-btn.active {
+  border-color: #ff4757; /* Lingkaran merah */
+}
+
+/* Mengubah warna icon di dalamnya */
+.fav-btn.active i,
+.fav-btn.active svg {
+  fill: #ff4757; /* Isi warna merah */
+  color: #ff4757; /* Garis warna merah */
+  stroke: #ff4757; /* Garis warna merah */
+}
+
+.fav-btn i {
+  width: 16px;
+  height: 16px;
+  color: #ccc; /* Warna default abu */
+  fill: none;
+  transition:
+    color 0.2s,
+    fill 0.2s;
+}
+
+/* --- RESEPKU HORIZONTAL SCROLL --- */
+.horizontal-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 15px;
+  padding-bottom: 10px; /* Ruang untuk scrollbar */
+  scroll-behavior: smooth;
+  -ms-overflow-style: none; /* Hide scrollbar IE/Edge */
+  scrollbar-width: none; /* Hide scrollbar Firefox */
+}
+.horizontal-scroll::-webkit-scrollbar {
+  display: none;
+} /* Hide Chrome */
+
+/* Card khusus Resepku (Lebih kecil) */
+.mini-card {
+  min-width: 140px;
+  width: 140px;
+  background: var(--surface);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.mini-card img {
+  width: 100%;
+  height: 90px;
+  object-fit: cover;
+}
+.mini-card-info {
+  padding: 10px;
+}
+.mini-card h4 {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+/* --- TOMBOL AKSI RESEPKU (EDIT & HAPUS) --- */
+.action-btns {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 6px;
+  z-index: 10;
+}
+
+.edit-btn,
+.del-btn {
+  position: static; /* Hilangkan absolute bawaan */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.edit-btn {
+  background: rgba(0, 0, 0, 0.6);
+}
+.del-btn {
+  background: rgba(220, 38, 38, 0.8);
+}
+
+/* Input Form Style */
+.form-input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+/* Pastikan tombol + di profil bisa diklik */
+.my-recipes-section button {
+  position: relative;
+  z-index: 10;
+}
+
+/* Pastikan Modal Form Paling Atas */
+#recipe-form {
+  z-index: 9999 !important;
+}
+
+/* Pastikan Artikel View Paling Atas */
+#article-view {
+  z-index: 9998 !important;
+}
+
+/* Style untuk Nama Penulis di Card (Request no 2) */
+.card-author {
+  font-size: 10px;
+  color: #888;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* --- FITUR SEARCH MENU --- */
+.search-box {
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  padding: 8px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+.search-box input {
+  border: none;
+  background: transparent;
+  outline: none;
+  margin-left: 8px;
+  width: 110px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 12px;
+}
+
+/* --- FAVORITE COUNT GLOBAL --- */
+.fav-container {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+}
+.fav-container .fav-btn {
+  position: static; /* Timpa absolute lama karena dibungkus container */
+}
+.fav-count {
+  font-size: 10px;
+  color: white;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-top: 4px;
+  font-weight: bold;
+  backdrop-filter: blur(2px);
+}
+/* --- TOMBOL HAPUS NOTIFIKASI --- */
+.notif-item {
+  position: relative;
+  padding-right: 30px; /* Beri ruang agar teks tidak nabrak tombol silang */
+}
+
+.del-notif-btn {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #ccc;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.del-notif-btn:active {
+  color: var(--primary);
+}
+/* --- STYLE UNTUK ICON BAHAN PNG --- */
+.ing-png-icon {
+  width: 50px; /* Sedikit dibesarkan agar proporsional di tengah */
+  height: 50px;
+  object-fit: contain;
+  margin-right: 0; /* Hapus margin-right karena tidak menyamping lagi */
+}
+
+/* Efek saat dicentang */
+.ing-item.selected .ing-png-icon {
+  transform: scale(1.15); /* Membesar sedikit lebih mantap */
+  transition: transform 0.2s ease;
+}
+
+/* --- PROTEKSI TOMBOL INSTALL PWA --- */
+/* Jika dibuka sebagai aplikasi (standalone), paksa tombol unduh hilang selamanya */
+@media all and (display-mode: standalone) {
+  #install-btn {
+    display: none !important;
+  }
+}
+/* --- NOTIFIKASI MELAYANG (TOAST) --- */
+#toast-notif {
+  visibility: hidden;
+  min-width: 250px;
+  background-color: var(--text); /* Warna kebalikan dari tema */
+  color: var(--surface);
+  text-align: center;
+  border-radius: 30px;
+  padding: 12px 20px;
+  position: fixed;
+  z-index: 99999;
+  left: 50%;
+  top: 40px;
+  transform: translateX(-50%);
+  font-size: 13px;
+  font-weight: bold;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transition:
+    opacity 0.3s,
+    bottom 0.3s;
+}
+
+#toast-notif.show {
+  visibility: visible;
+  opacity: 1;
+  bottom: 40px; /* Melayang naik sedikit saat muncul */
+}

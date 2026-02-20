@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="id" translate="no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+
+    <title>Masakin</title>
+    <meta name="google" content="notranslate" />
+    <meta property="og:title" content="Masakin - Solusi Pintar Dapurmu" />
+    <meta
+      property="og:description"
+      content="Temukan resep masakan dari bahan yang ada di kulkasmu. Bagikan resep buatanmu sendiri!"
+    />
+    <meta
+      property="og:image"
+      content="https://cooking-ideas-app.vercel.app/icon.png"
+    />
+    <meta property="og:url" content="https://cooking-ideas-app.vercel.app//" />
+    <meta property="og:type" content="website" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#ffffff" />
+    <script src="https://unpkg.com/feather-icons"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  </head>
+  <body>
+    <header id="main-header">
+      <div class="profile-pill" onclick="switchPage('profile-page')">
+        <div class="avatar" id="header-avatar">G</div>
+        <div class="profile-info">
+          <span class="app-name">Halo,</span>
+          <span class="user-name" id="header-username">Guest User</span>
+        </div>
+      </div>
+
+      <button class="notif-btn" onclick="toggleNotifSheet()">
+        <i data-feather="bell"></i>
+        <span class="notif-dot"></span>
+      </button>
+    </header>
+
+    <main>
+      <section id="home" class="page active">
+        <div class="hero">
+          <h1>Mau masak apa hari ini?</h1>
+          <p>Pilih bahan yang tersedia, kami carikan resepnya.</p>
+        </div>
+        <div class="ingredients-grid" id="ingredients-container"></div>
+
+        <div class="floating-action">
+          <button class="find-btn" onclick="findRecipes()">
+            Cari Resep <i data-feather="arrow-right"></i>
+          </button>
+        </div>
+
+        <div
+          id="recipe-results"
+          class="recipe-list"
+          style="display: none; font-size: 13px"
+        >
+          <div class="divider"></div>
+          <h2>Hasil pencarian:</h2>
+          <div id="results-container"></div>
+        </div>
+      </section>
+
+      <section id="explore" class="page">
+        <div
+          class="section-title"
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+          "
+        >
+          <div>
+            <h2 style="margin: 0">Jelajahi Tips</h2>
+            <p style="margin: 0; font-size: 12px; color: var(--text-muted)">
+              Artikel & lifehack dapur terbaru.
+            </p>
+          </div>
+          <div class="search-box">
+            <i
+              data-feather="search"
+              style="width: 16px; height: 16px; color: var(--text-muted)"
+            ></i>
+            <input
+              type="text"
+              id="explore-search"
+              onkeyup="searchGrid('explore-search', 'explore-container')"
+              placeholder="Cari artikel..."
+            />
+          </div>
+        </div>
+        <div class="masonry-grid" id="explore-container"></div>
+      </section>
+
+      <section id="menu-page" class="page">
+        <div
+          class="section-title"
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+          "
+        >
+          <div>
+            <h2 style="margin: 0">Inspirasi Menu</h2>
+            <p style="margin: 0; font-size: 12px; color: var(--text-muted)">
+              Temukan menu terbaikmu.
+            </p>
+          </div>
+          <div class="search-box">
+            <i
+              data-feather="search"
+              style="width: 16px; height: 16px; color: var(--text-muted)"
+            ></i>
+            <input
+              type="text"
+              id="menu-search"
+              onkeyup="searchGrid('menu-search', 'menu-container')"
+              placeholder="Cari resep..."
+            />
+          </div>
+        </div>
+        <div class="masonry-grid" id="menu-container"></div>
+      </section>
+
+      <section id="favorit" class="page">
+        <div
+          class="section-title"
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+          "
+        >
+          <div>
+            <h2 style="margin: 0">Favoritku</h2>
+            <p style="margin: 0; font-size: 12px; color: var(--text-muted)">
+              Semua yang kamu simpan.
+            </p>
+          </div>
+          <div class="search-box">
+            <i
+              data-feather="search"
+              style="width: 16px; height: 16px; color: var(--text-muted)"
+            ></i>
+            <input
+              type="text"
+              id="favorit-search"
+              onkeyup="searchGrid('favorit-search', 'favorit-container')"
+              placeholder="Cari favorit..."
+            />
+          </div>
+        </div>
+        <div class="masonry-grid" id="favorit-container"></div>
+      </section>
+
+      <section id="profile-page" class="page profile-container">
+        <div style="padding: 0 5px 15px">
+          <h2 style="margin: 0; font-size: 24px">Akun Saya</h2>
+          <p style="margin: 0; font-size: 14px; color: var(--text-muted)">
+            Kelola profil dan preferensi
+          </p>
+        </div>
+
+        <div class="profile-header-large">
+          <div class="avatar-large" id="profile-avatar-large">G</div>
+          <h2 id="profile-name-large">Guest User</h2>
+          <p id="profile-email-large">Belum Login</p>
+          <div id="auth-btn-container"></div>
+        </div>
+
+        <div class="my-recipes-section" style="padding: 0 20px 20px">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 15px;
+            "
+          >
+            <h4 style="margin: 0; font-size: 16px">Resepku</h4>
+            <button
+              onclick="openRecipeForm()"
+              style="
+                background: var(--primary);
+                color: white;
+                border: none;
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                font-size: 18px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 20;
+              "
+            >
+              <i data-feather="plus" style="width: 16px; height: 16px"></i>
+            </button>
+          </div>
+          <div id="my-recipes-scroll" class="horizontal-scroll"></div>
+        </div>
+
+        <div class="menu-list">
+          <div class="menu-group">
+            <h4>Preferensi</h4>
+            <div class="menu-item" id="theme-btn" onclick="toggleTheme()">
+              <i data-feather="moon"></i> Mode Gelap
+            </div>
+            <div class="menu-item" id="install-btn" style="display: none">
+              <i data-feather="download"></i> Unduh Aplikasi
+            </div>
+          <div class="menu-group">
+            <h4>Info & Bantuan</h4>
+            <div class="menu-item" onclick="openPopup('bantuan')">
+              <i data-feather="help-circle"></i> Bantuan & FAQ
+            </div>
+            <div class="menu-item" onclick="openPopup('privasi')">
+              <i data-feather="shield"></i> Kebijakan Privasi
+            </div>
+            <div class="menu-item" onclick="openPopup('tentang')">
+              <i data-feather="info"></i> Tentang Aplikasi
+            </div>
+          </div>
+          <div class="menu-group">
+            <button
+              class="menu-item"
+              style="
+                width: 100%;
+                border: none;
+                background: #fff8e1;
+                color: #f59e0b;
+                justify-content: center;
+                font-weight: 600;
+              "
+              onclick="
+                window.open('https://trakteer.id/muhammad_azizy2/tip', '_blank')
+              "
+            >
+              <i data-feather="coffee"></i> Traktir Kopi Developer
+            </button>
+            <button class="reset-btn" onclick="resetData()">
+              <i data-feather="trash-2"></i> Hapus Data & Reset
+            </button>
+          </div>
+
+          <div
+            style="
+              text-align: center;
+              margin-top: 30px;
+              margin-bottom: 20px;
+              font-size: 12px;
+              color: var(--text-muted);
+            "
+          >
+            Made with
+            <i
+              data-feather="heart"
+              style="width: 12px; height: 12px; color: red; fill: red"
+            ></i>
+            by
+            <a
+              href="https://instagram.com/mhmmdazizy"
+              style="
+                color: var(--primary);
+                text-decoration: none;
+                font-weight: 600;
+              "
+              >Muhammad Azizy</a
+            >
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div id="notif-sheet" class="bottom-sheet">
+      <div class="sheet-handle"></div>
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 15px;
+        "
+      >
+        <h3 style="margin: 0">Notifikasi</h3>
+      </div>
+
+      <div class="notif-list" id="notif-list-container">
+        <p
+          style="
+            text-align: center;
+            color: #888;
+            font-size: 12px;
+            margin-top: 20px;
+          "
+        >
+          Memuat notifikasi...
+        </p>
+      </div>
+    </div>
+    <div
+      id="sheet-backdrop"
+      class="backdrop"
+      onclick="toggleNotifSheet()"
+    ></div>
+
+    <div id="info-popup" class="popup-overlay">
+      <div class="popup-card">
+        <div class="popup-header">
+          <h3 style="display: flex; align-items: center; gap: 10px">
+            <i id="popup-icon"></i>
+            <span id="popup-title">Info</span>
+          </h3>
+          <button class="close-popup" onclick="closePopup()">
+            <i data-feather="x"></i>
+          </button>
+        </div>
+        <div class="popup-content" id="popup-body"></div>
+      </div>
+    </div>
+
+    <nav class="bottom-nav">
+      <a href="#" class="nav-item active" onclick="switchPage('home')">
+        <i data-feather="home"></i>
+        <span>Home</span>
+      </a>
+      <a href="#" class="nav-item" onclick="switchPage('explore')">
+        <i data-feather="compass"></i>
+        <span>Jelajah</span>
+      </a>
+      <a href="#" class="nav-item" onclick="switchPage('menu-page')">
+        <i data-feather="book-open"></i>
+        <span>Menu</span>
+      </a>
+      <a href="#" class="nav-item" onclick="switchPage('favorit')">
+        <i data-feather="heart"></i>
+        <span>Favorit</span>
+      </a>
+      <a
+        href="#"
+        class="nav-item"
+        id="nav-profile"
+        onclick="switchPage('profile-page')"
+      >
+        <i data-feather="user"></i>
+        <span>Profil</span>
+      </a>
+    </nav>
+    <div id="article-view" class="detail-overlay">
+      <div class="detail-header">
+        <button onclick="closeArticle()">
+          <i data-feather="arrow-left"></i>
+        </button>
+        <span id="detail-category">KATEGORI</span>
+        <button onclick="shareArticle()"><i data-feather="share-2"></i></button>
+      </div>
+      <div class="detail-hero" id="detail-image"></div>
+      <div class="detail-body">
+        <h1 id="detail-title">Judul Artikel</h1>
+        <div
+          class="detail-meta"
+          style="
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            color: var(--text-muted);
+            font-size: 12px;
+            margin-bottom: 15px;
+          "
+        >
+          <span>
+            <i data-feather="user" style="width: 14px"></i>
+            <span id="detail-author">Admin</span>
+          </span>
+          <span>
+            <i data-feather="clock" style="width: 14px"></i>
+            <span id="detail-time">- Menit</span>
+          </span>
+          <span>
+            <i data-feather="users" style="width: 14px"></i>
+            <span id="detail-servings">- Porsi</span>
+          </span>
+        </div>
+
+        <div class="detail-content" id="detail-desc"></div>
+      </div>
+    </div>
+    <div
+      id="recipe-form"
+      class="popup-overlay"
+      style="display: none; align-items: center; justify-content: center"
+    >
+      <div class="popup-card">
+        <div class="popup-header">
+          <h3>Buat Resep Baru</h3>
+          <button class="close-popup" onclick="closeRecipeForm()">
+            <i data-feather="x"></i>
+          </button>
+        </div>
+
+        <input type="hidden" id="edit-index" />
+        <input type="hidden" id="edit-id" />
+        <label>Nama Masakan</label>
+        <input
+          type="text"
+          id="rec-title"
+          class="form-input"
+          placeholder="Nasi Goreng..."
+        />
+
+        <label>Kategori (Pedas/Manis/Kuah)</label>
+        <input
+          type="text"
+          id="rec-tag"
+          class="form-input"
+          placeholder="PEDAS"
+        />
+
+        <label>Upload Foto Masakan</label>
+        <input type="file" id="rec-file" class="form-input" accept="image/*" />
+
+        <input type="hidden" id="rec-img" />
+
+        <div style="display: flex; gap: 10px; margin-bottom: 15px">
+          <div style="flex: 1">
+            <label>Waktu Masak</label>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                border: 1px solid var(--border, #ddd);
+                border-radius: 8px;
+                overflow: hidden;
+                background: var(--surface, #fff);
+              "
+            >
+              <input
+                type="number"
+                id="input-time"
+                placeholder="30"
+                style="
+                  width: 100%;
+                  padding: 10px;
+                  border: none;
+                  outline: none;
+                  background: transparent;
+                  color: inherit;
+                "
+              />
+              <span
+                style="
+                  padding: 10px;
+                  background: rgba(128, 128, 128, 0.1);
+                  color: var(--text-muted);
+                  font-size: 13px;
+                  font-weight: bold;
+                "
+                >Menit</span
+              >
+            </div>
+          </div>
+          <div style="flex: 1">
+            <label>Jumlah Sajian</label>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                border: 1px solid var(--border, #ddd);
+                border-radius: 8px;
+                overflow: hidden;
+                background: var(--surface, #fff);
+              "
+            >
+              <input
+                type="number"
+                id="input-servings"
+                placeholder="4"
+                style="
+                  width: 100%;
+                  padding: 10px;
+                  border: none;
+                  outline: none;
+                  background: transparent;
+                  color: inherit;
+                "
+              />
+              <span
+                style="
+                  padding: 10px;
+                  background: rgba(128, 128, 128, 0.1);
+                  color: var(--text-muted);
+                  font-size: 13px;
+                  font-weight: bold;
+                "
+                >Porsi</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <label>Cara Masak</label>
+        <textarea
+          id="rec-desc"
+          class="form-input"
+          rows="5"
+          placeholder="Tulis resep di sini..."
+        ></textarea>
+
+        <button class="find-btn" onclick="saveMyRecipe()">Simpan</button>
+      </div>
+    </div>
+
+    <script src="database.js"></script>
+    <script src="app.js"></script>
+    <div id="toast-notif"></div>
+  </body>
+</html>
