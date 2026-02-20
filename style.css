@@ -466,6 +466,7 @@ header {
 
 .popup-overlay.active {
   display: flex-end;
+  align-items: flex-end;
 }
 
 .popup-card {
