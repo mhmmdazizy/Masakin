@@ -951,3 +951,93 @@ header {
 #detail-desc {
   padding-bottom: 50px; /* Memberikan ruang napas ekstra di bawah teks */
 }
+/* =========================================================
+   TAMPILAN KHUSUS KOMPUTER / LAPTOP (MAX WIDTH)
+========================================================= */
+@media screen and (min-width: 481px) {
+  /* 1. KUNCI LAYAR UTAMA */
+  body {
+    max-width: 480px !important;
+    margin: 0 auto !important;
+    min-height: 100vh;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.15);
+    border-left: 1px solid var(--border, #ddd);
+    border-right: 1px solid var(--border, #ddd);
+    position: relative;
+  }
+  /* --- SEMBUNYIKAN TOTAL SAAT TIDAK DIBUKA --- */
+  /* Jika artikel/popup TIDAK memiliki class .active, jadikan dia gaib! */
+  #article-view:not(.active),
+  #info-popup:not(.active),
+  .bottom-sheet:not(.active) {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    /* Opsional: Tambahkan transisi agar hilangnya mulus */
+    transition:
+      opacity 0.3s ease,
+      visibility 0.3s,
+      transform 0.3s ease !important;
+  }
+
+  /* Kembalikan wujudnya saat dibuka (.active) */
+  #article-view.active,
+  #info-popup.active,
+  .bottom-sheet.active {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+  /* 2. GEMBOK HEADER & MENU BAWAH */
+  /* Tarik kiri-kanan jadi 0, lalu biarkan margin auto yang menengahkan! */
+  header,
+  .bottom-nav,
+  #bottom-nav,
+  .nav-bottom {
+    width: 100% !important;
+    max-width: 480px !important;
+    left: 19.1% !important;
+    right: 0 !important;
+    margin: 0 auto !important;
+  }
+
+  /* 3. GEMBOK ARTIKEL & POPUP (HANYA SAAT DIBUKA) */
+  /* Saat ditutup, biarkan dia sembunyi normal. Saat active, gembok di tengah! */
+  #article-view.active,
+  #info-popup.active,
+  .bottom-sheet.active {
+    width: 100% !important;
+    max-width: 480px !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 auto !important;
+  }
+
+  /* Batasi juga lebarnya saat belum active (agar pas animasi nutup gak melar) */
+  #article-view,
+  #info-popup,
+  .bottom-sheet {
+    width: 100% !important;
+    max-width: 480px !important;
+  }
+
+  /* 4. TOAST NOTIFIKASI */
+  #toast-notif {
+    width: 90% !important;
+    max-width: 400px !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 auto !important;
+    transform: translateY(0) !important; /* Hapus efek X biar gak miring */
+  }
+  /* --- GEMBOK OVERLAY ARTIKEL --- */
+  /* Tarik overlay agar sejajar persis dengan wadah artikelnya */
+  .detail-overlay,
+  #detail-overlay {
+    width: 100% !important;
+    max-width: 480px !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 auto !important;
+  }
+}
