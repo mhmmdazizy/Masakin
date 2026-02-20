@@ -993,8 +993,7 @@ header {
   header {
     width: 100% !important;
     max-width: 480px !important;
-    left: 19.1% !important;
-    right: 0 !important;
+    left: 50% !important;
     margin: 0 auto !important;
   }
 
