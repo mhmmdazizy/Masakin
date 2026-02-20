@@ -1015,7 +1015,6 @@ if (installBtn) {
 window.addEventListener("appinstalled", () => {
   if (installBtn) installBtn.style.display = "none";
   deferredPrompt = null;
-  console.log("Aplikasi berhasil diinstall!");
 });
 // --- FITUR NOTIFIKASI MELAYANG (TOAST) ---
 window.showToast = (message) => {
