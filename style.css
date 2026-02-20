@@ -990,15 +990,25 @@ header {
   }
   /* 2. GEMBOK HEADER & MENU BAWAH */
   /* Tarik kiri-kanan jadi 0, lalu biarkan margin auto yang menengahkan! */
-  header,
-  .bottom-nav,
-  #bottom-nav,
-  .nav-bottom {
+  header {
     width: 100% !important;
     max-width: 480px !important;
     left: 19.1% !important;
     right: 0 !important;
     margin: 0 auto !important;
+  }
+
+  .bottom-nav,
+  #bottom-nav,
+  .nav-bottom {
+    width: 100% !important;
+    max-width: 480px !important;
+
+    /* Ini mantra absolutnya: */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+
+    /* HAPUS right: 0 dan margin: 0 auto biar gak berantem */
   }
 
   /* 3. GEMBOK ARTIKEL & POPUP (HANYA SAAT DIBUKA) */
