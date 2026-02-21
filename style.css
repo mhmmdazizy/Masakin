@@ -1082,3 +1082,67 @@ body[data-theme="dark"] .logo-dark {
   max-width: 90%;
   object-fit: contain;
 }
+/* --- DESAIN FORM LANGKAH (CAROUSEL) --- */
+.steps-carousel {
+  display: flex;
+  gap: 15px;
+  overflow-x: auto;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+  /* Efek snap biar berhentinya pas di tengah card */
+  scroll-snap-type: x mandatory;
+}
+
+/* Sembunyikan scrollbar jelek di Chrome/Safari */
+.steps-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.step-card {
+  min-width: 85%; /* Lebar card, sisakan sedikit biar card berikutnya ngintip */
+  flex-shrink: 0;
+  scroll-snap-align: center;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #ddd);
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+}
+
+.step-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.step-number {
+  font-weight: bold;
+  color: var(--primary, #ff6b6b);
+  font-size: 14px;
+}
+
+.btn-remove-step {
+  color: #dc3545;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.btn-add-step {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: 2px dashed var(--primary, #ff6b6b);
+  color: var(--primary, #ff6b6b);
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: 0.2s;
+}
+.btn-add-step:active {
+  background: rgba(255, 107, 107, 0.1);
+}
