@@ -600,7 +600,7 @@ window.openRecipeForm = (index = -1) => {
     document.getElementById("rec-tag").value = item.tag || "";
     document.getElementById("edit-id").value = item.id;
     if (fileStatus && item.img) {
-      fileStatus.innerHTML = `<p style="font-size:10px; color:#28a745; margin-top:5px; font-weight:bold;">✓ Foto tersimpan (Pilih file baru untuk mengganti)</p>`;
+      fileStatus.innerHTML = `<p style="font-size:11px; color:#28a745; margin-top:-12px; margin-bottom:15px; margin-left:4px; font-weight:bold;">✓ Foto tersimpan (Pilih file baru untuk mengganti)</p>`;
     }
 
     const ingInput = document.getElementById("rec-ingredients");
