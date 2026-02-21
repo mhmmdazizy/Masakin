@@ -565,6 +565,8 @@ window.openRecipeForm = (index = -1) => {
 
   const fileInput = document.getElementById("rec-file");
   if (fileInput) fileInput.value = "";
+  const fileStatus = document.getElementById("rec-file-status");
+  if (fileStatus) fileStatus.innerHTML = "";
 
   // Reset Input Bahan
   const ingInput = document.getElementById("rec-ingredients");
@@ -597,6 +599,9 @@ window.openRecipeForm = (index = -1) => {
     document.getElementById("rec-title").value = item.title || "";
     document.getElementById("rec-tag").value = item.tag || "";
     document.getElementById("edit-id").value = item.id;
+    if (fileStatus && item.img) {
+      fileStatus.innerHTML = `<p style="font-size:10px; color:#28a745; margin-top:5px; font-weight:bold;">✓ Foto tersimpan (Pilih file baru untuk mengganti)</p>`;
+    }
 
     const ingInput = document.getElementById("rec-ingredients");
     const stepsContainer = document.getElementById("steps-container");
