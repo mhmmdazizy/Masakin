@@ -510,7 +510,20 @@ header {
 .popup-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+
+  /* --- KUNCI HEADER DI ATAS --- */
+  position: sticky;
+  top: 0; /* Nempel tepat di atas wadah scroll */
+
+  /* Wajib ada background biar teks yang di-scroll ketutup dan gak numpuk */
+  background: var(--surface, #fff);
+  z-index: 10; /* Biar posisinya selalu di atas elemen lain */
+
+  /* Tambahan estetika: Kasih jarak & garis bawah biar rapi saat di-scroll */
+  padding-bottom: 15px;
   margin-bottom: 15px;
+  border-bottom: 1px solid var(--border, #ddd);
 }
 .close-popup {
   background: none;
