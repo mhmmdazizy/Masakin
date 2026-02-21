@@ -368,7 +368,8 @@ window.saveMyRecipe = async () => {
 
   // 3. Kalau judul aman, baru ambil sisa data lainnya
   const tag = document.getElementById("rec-tag").value;
-  const desc = document.getElementById("rec-desc").value;
+  const ingInput = document.getElementById("rec-ingredients");
+  const desc = ingInput ? ingInput.value : "";
   const fileInput = document.getElementById("rec-file");
   const editId = document.getElementById("edit-id").value; // Ambil ID jika ada
 
@@ -519,38 +520,6 @@ window.confirmReset = () => {
 
 // --- 7. MODALS & POPUPS ---
 // --- FUNGSI OPEN ARTICLE (YANG ERROR SUDAH DIPERBAIKI) ---
-window.openArticle = (
-  title,
-  tag,
-  img,
-  desc = null,
-  author = "Admin",
-  time = "- Menit",
-  servings = "- Porsi",
-) => {
-  document.getElementById("detail-title").innerText = title;
-  document.getElementById("detail-category").innerText = tag;
-  document.getElementById("detail-image").style.backgroundImage =
-    `url('${img}')`;
-
-  // Update Meta Info Baru
-  document.getElementById("detail-author").innerText = author;
-  document.getElementById("detail-time").innerText = time;
-  document.getElementById("detail-servings").innerText = servings;
-
-  // Render Deskripsi (Kembali pakai format lama dulu sampai sistem save di-upgrade)
-  document.getElementById("detail-desc").innerHTML =
-    desc || "Belum ada deskripsi.";
-
-  document.getElementById("article-view").classList.add("active");
-  history.pushState({ modal: "article" }, null, "");
-
-  // Render ulang icon feather di dalam modal
-  if (typeof feather !== "undefined") feather.replace();
-};
-
-window.closeArticle = () => history.back();
-
 window.openRecipeForm = (index = -1) => {
   if (!currentUser) {
     openPopup("login dulu");
@@ -558,13 +527,34 @@ window.openRecipeForm = (index = -1) => {
   }
   const form = document.getElementById("recipe-form");
 
-  // Reset Form Default
+  // === RESET FORM (VERSI BARU) ===
   document.getElementById("rec-title").value = "";
   document.getElementById("rec-tag").value = "";
-  document.getElementById("rec-desc").value = "";
-  document.getElementById("rec-file").value = ""; // Reset file input
   document.getElementById("edit-index").value = index;
-  document.getElementById("edit-id").value = ""; // Reset ID
+  document.getElementById("edit-id").value = "";
+
+  const fileInput = document.getElementById("rec-file");
+  if (fileInput) fileInput.value = "";
+
+  // Reset Input Bahan
+  const ingInput = document.getElementById("rec-ingredients");
+  if (ingInput) ingInput.value = "";
+
+  // Reset Langkah-langkah kembali ke 1 card default
+  const stepsContainer = document.getElementById("steps-container");
+  if (stepsContainer) {
+    stepCounter = 1; // Kembalikan counter ke 1
+    stepsContainer.innerHTML = `
+        <div class="step-card">
+            <div class="step-header">
+                <span class="step-number">Langkah 1</span>
+            </div>
+            <textarea class="step-text form-input" rows="3" placeholder="Tumis bawang putih hingga harum..."></textarea>
+            <input type="file" class="step-img form-input" accept="image/*" style="font-size: 12px; padding: 8px;">
+        </div>
+      `;
+  }
+  // ===============================
 
   // JUDUL MODAL
   const titleEl = form.querySelector("h3");
@@ -574,10 +564,11 @@ window.openRecipeForm = (index = -1) => {
   // JIKA MODE EDIT (Index >= 0)
   if (index >= 0 && myRecipes[index]) {
     const item = myRecipes[index];
-    document.getElementById("rec-title").value = item.title;
-    document.getElementById("rec-tag").value = item.tag;
-    document.getElementById("rec-desc").value = item.desc || "";
-    // Simpan ID Dokumen Firestore (Penting buat update)
+    document.getElementById("rec-title").value = item.title || "";
+    document.getElementById("rec-tag").value = item.tag || "";
+
+    // Sementara masukkan desc lama ke kolom bahan (karena sistem edit langkah belum dibuat)
+    if (ingInput) ingInput.value = item.desc || "";
     document.getElementById("edit-id").value = item.id;
   }
 
