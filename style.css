@@ -824,9 +824,13 @@ header {
   border: 1px solid #ddd;
   border-radius: 8px;
   background: var(--bg);
-  color: var(--text);
-  box-sizing: border-box;
+  color: var(--text);
   font-family: inherit;
+/* --- MATIKAN TARIKAN TEXTAREA --- */
+textarea {
+  resize: none;
+}
+
 }
 
 /* Pastikan tombol + di profil bisa diklik */
