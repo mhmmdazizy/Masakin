@@ -175,33 +175,7 @@ window.addStepCard = () => {
   // Otomatis geser layar ke card yang baru ditambah
   container.scrollLeft = container.scrollWidth;
 };
-// CONTOH CARA MERENDER DATANYA NANTI:
 
-// 1. Render Bahan (Otomatis jadi list berdasarkan enter)
-const bahanArray = resep.ingredients.split("\n");
-let bahanHTML = `<h4 style="margin-bottom: 10px;">Bahan-bahan:</h4><ul style="padding-left: 20px; color: var(--text-muted); margin-bottom: 25px;">`;
-bahanArray.forEach((bahan) => {
-  if (bahan.trim() !== "")
-    bahanHTML += `<li style="margin-bottom: 5px;">${bahan}</li>`;
-});
-bahanHTML += `</ul>`;
-
-// 2. Render Langkah dengan desain modern
-let langkahHTML = `<h4 style="margin-bottom: 15px;">Cara Membuat:</h4>`;
-resep.steps.forEach((step, index) => {
-  langkahHTML += `
-    <div style="display: flex; gap: 15px; margin-bottom: 20px;">
-        <div style="width: 28px; height: 28px; background: var(--primary, #ff6b6b); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; font-size: 14px;">
-            ${index + 1}
-        </div>
-        <div style="flex: 1;">
-            <p style="margin: 0; line-height: 1.6; color: var(--text);">${step.text}</p>
-            </div>
-    </div>`;
-});
-
-// Masukkan ke wadah deskripsi
-document.getElementById("detail-desc").innerHTML = bahanHTML + langkahHTML;
 // --- GANTI FUNGSI RENDER GRID ---
 function renderGrid(containerId, data) {
   const container = document.getElementById(containerId);
@@ -564,10 +538,30 @@ window.openArticle = (
   document.getElementById("detail-time").innerText = time;
   document.getElementById("detail-servings").innerText = servings;
 
-  let contentHTML = desc
-    ? `<p>${desc.replace(/\n/g, "<br>")}</p>`
-    : `<p>Tidak ada deskripsi.</p>`;
-  document.getElementById("detail-desc").innerHTML = contentHTML;
+  // 2. Render Langkah dengan desain modern
+  // 1. Render Bahan (Otomatis jadi list berdasarkan enter)
+  const bahanArray = resep.ingredients.split("\n");
+  let bahanHTML = `<h4 style="margin-bottom: 10px;">Bahan-bahan:</h4><ul style="padding-left: 20px; color: var(--text-muted); margin-bottom: 25px;">`;
+  bahanArray.forEach((bahan) => {
+    if (bahan.trim() !== "")
+      bahanHTML += `<li style="margin-bottom: 5px;">${bahan}</li>`;
+  });
+  bahanHTML += `</ul>`;
+
+  // 2. Render Langkah dengan desain modern
+  let langkahHTML = `<h4 style="margin-bottom: 15px;">Cara Membuat:</h4>`;
+  resep.steps.forEach((step, index) => {
+    langkahHTML += `
+    <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+        <div style="width: 28px; height: 28px; background: var(--primary, #ff6b6b); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; font-size: 14px;">
+            ${index + 1}
+        </div>
+        <div style="flex: 1;">
+            <p style="margin: 0; line-height: 1.6; color: var(--text);">${step.text}</p>
+            </div>
+    </div>`;
+  });
+  document.getElementById("detail-desc").innerHTML = bahanHTML + langkahHTML;
 
   document.getElementById("article-view").classList.add("active");
   history.pushState({ modal: "article" }, null, "");
