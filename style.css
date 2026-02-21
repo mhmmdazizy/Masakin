@@ -511,31 +511,26 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-
-  /* --- KUNCI HEADER DI ATAS --- */
   position: sticky;
   top: 0;
-
-  /* --- TRIK MENUTUP LUBANG PADDING (Atap Bolong) --- */
-  /* Tarik header ke luar menembus padding bawaan popup-card */
-  margin-top: -20px; /* Sesuaikan jika padding aslimu 15px */
-  margin-left: -20px;
-  margin-right: -20px;
-
-  /* Kembalikan jarak ke dalam biar teks/tombol gak nabrak pinggiran layar */
-  padding: 20px;
-
-  /* Estetika: Bikin sudut atasnya membulat ngikutin kartu (sesuaikan dengan border-radius popup-card kamu) */
-  border-top-left-radius: 15px;
-  border-top-right-radius: 15px;
-
-  /* Wajib ada background biar solid nutupin yang lewat */
-  background: var(--surface, #fff);
+  background: var(--surface, #fff); /* Pastikan background solid */
   z-index: 10;
 
-  /* Garis batas bawah */
+  /* --- INI DIA OBAT ANTI BOLONGNYA --- */
+  margin-top: -20px; /* Menarik header ke atas menutupi padding bolong */
+  margin-left: -20px; /* Menarik ke kiri mentok layar */
+  margin-right: -20px; /* Menarik ke kanan mentok layar */
+
+  /* Kembalikan jarak ke dalam biar tulisan "Edit Resep" & tombol "X" gak nabrak pinggir */
+  padding: 20px;
+
+  /* Bikin sudut atasnya melengkung rapi ngikutin kartunya */
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  /* ----------------------------------- */
+
   border-bottom: 1px solid var(--border, #ddd);
-  margin-bottom: 20px; /* Kasih nafas ke elemen di bawahnya */
+  margin-bottom: 20px;
 }
 .close-popup {
   background: none;
