@@ -511,27 +511,32 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  
+  /* --- KUNCI SAMPAI UJUNG ATAS --- */
   position: sticky;
-  top: 0;
-  background: var(--surface, #fff); /* Pastikan background solid */
-  z-index: 10;
+  top: -20px; /* RAHASIANYA DI SINI: Ubah dari 0 jadi minus! */
+  
+  /* Tarik ukurannya mentok ke ujung layar */
+  margin-top: -20px;
+  margin-left: -20px;
+  margin-right: -20px;
+  
+  /* Balikin jarak ke dalam */
+  padding: 20px; 
+  /* ------------------------------- */
 
-  /* --- INI DIA OBAT ANTI BOLONGNYA --- */
-  margin-top: -20px; /* Menarik header ke atas menutupi padding bolong */
-  margin-left: -20px; /* Menarik ke kiri mentok layar */
-  margin-right: -20px; /* Menarik ke kanan mentok layar */
-
-  /* Kembalikan jarak ke dalam biar tulisan "Edit Resep" & tombol "X" gak nabrak pinggir */
-  padding: 20px;
-
-  /* Bikin sudut atasnya melengkung rapi ngikutin kartunya */
-  border-top-left-radius: 15px;
+  /* Pastikan background solid biar gak tembus pandang */
+  background: var(--surface, #fff); 
+  z-index: 10; 
+  
+  /* Bikin sudut atasnya melengkung rapi */
+  border-top-left-radius: 15px; 
   border-top-right-radius: 15px;
-  /* ----------------------------------- */
 
   border-bottom: 1px solid var(--border, #ddd);
   margin-bottom: 20px;
 }
+
 .close-popup {
   background: none;
   border: none;
