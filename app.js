@@ -152,6 +152,22 @@ function renderIngredients() {
       )
       .join("");
 }
+// --- FUNGSI UPDATE NOMOR URUT LANGKAH OTOMATIS ---
+window.updateStepNumbers = () => {
+  // Cari semua kotak langkah yang masih ada di dalam form
+  const stepCards = document.querySelectorAll("#steps-container .step-card");
+
+  // Looping dan ganti nomornya satu per satu sesuai urutan barisnya
+  stepCards.forEach((card, index) => {
+    const numberSpan = card.querySelector(".step-number");
+    if (numberSpan) {
+      numberSpan.innerText = `Langkah ${index + 1}`;
+    }
+  });
+
+  // Update memori counter agar tombol "+ Tambah Langkah" selanjutnya gak salah angka
+  stepCounter = stepCards.length;
+};
 // --- FUNGSI DINAMIS LANGKAH RESEP ---
 let stepCounter = 1;
 
@@ -164,7 +180,7 @@ window.addStepCard = () => {
   newCard.innerHTML = `
         <div class="step-header">
             <span class="step-number">Langkah ${stepCounter}</span>
-            <button class="btn-remove-step" onclick="this.parentElement.parentElement.remove()">Hapus</button>
+            <button class="btn-remove-step" onclick="this.parentElement.parentElement.remove(); updateStepNumbers();">Hapus</button>
         </div>
         <textarea class="step-text form-input" rows="3" placeholder="Deskripsi langkah selanjutnya..."></textarea>
         <input type="file" class="step-img form-input" accept="image/*" style="font-size: 12px; padding: 8px;">
@@ -622,7 +638,7 @@ window.openRecipeForm = (index = -1) => {
           newCard.innerHTML = `
                     <div class="step-header">
                         <span class="step-number">Langkah ${stepCounter}</span>
-                        ${stepCounter > 1 ? `<button class="btn-remove-step" onclick="this.parentElement.parentElement.remove()">Hapus</button>` : ""}
+                        ${stepCounter > 1 ? `<button class="btn-remove-step" onclick="this.parentElement.parentElement.remove(); updateStepNumbers();">Hapus</button>` : ""}
                     </div>
                     <textarea class="step-text form-input" rows="3" placeholder="Deskripsi...">${step.text || ""}</textarea>
                     
