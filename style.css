@@ -514,7 +514,8 @@ header {
 
   /* --- KUNCI HEADER DI ATAS --- */
   position: sticky;
-  top: 0; /* Nempel tepat di atas wadah scroll */
+  padding-top: 24px;
+  top: -24px; /* Nempel tepat di atas wadah scroll */
 
   /* Wajib ada background biar teks yang di-scroll ketutup dan gak numpuk */
   background: var(--surface, #fff);
