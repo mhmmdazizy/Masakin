@@ -303,6 +303,7 @@ header {
 
 /* BUTTONS */
 .find-btn {
+  font-family: "Plus Jakarta Sans", sans-serif;
   background: var(--primary);
   color: white;
   width: 100%;
@@ -1132,6 +1133,7 @@ body[data-theme="dark"] .logo-dark {
 }
 
 .btn-add-step {
+  font-family: "Plus Jakarta Sans", sans-serif;
   width: 100%;
   padding: 12px;
   background: transparent;

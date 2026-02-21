@@ -630,7 +630,7 @@ window.openRecipeForm = (index = -1) => {
                     
                     <input type="hidden" class="old-step-img" value="${step.img || ""}">
                     
-                    ${step.img ? `<p style="font-size:10px; color:#28a745; margin-top:5px; font-weight:bold;">✓ Foto tersimpan (Pilih file baru untuk mengganti)</p>` : ""}
+                    ${step.img ? `<p style="font-size:10px; color:#28a745; margin-top:-12px; font-weight:bold;">✓ Foto tersimpan (Pilih file baru untuk mengganti)</p>` : ""}
                 `;
           stepsContainer.appendChild(newCard);
         });
