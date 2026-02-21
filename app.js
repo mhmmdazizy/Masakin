@@ -544,6 +544,63 @@ window.confirmReset = () => {
 };
 
 // --- 7. MODALS & POPUPS ---
+
+// --- FUNGSI OPEN ARTICLE (YANG ERROR SUDAH DIPERBAIKI) ---
+window.openRecipeForm = (index = -1) => {
+  if (!currentUser) {
+    openPopup("login dulu");
+    return;
+  }
+  const form = document.getElementById("recipe-form");
+
+  // === RESET FORM (VERSI BARU) ===
+  document.getElementById("rec-title").value = "";
+  document.getElementById("rec-tag").value = "";
+  document.getElementById("edit-index").value = index;
+  document.getElementById("edit-id").value = "";
+
+  const fileInput = document.getElementById("rec-file");
+  if (fileInput) fileInput.value = "";
+
+  // Reset Input Bahan
+  const ingInput = document.getElementById("rec-ingredients");
+  if (ingInput) ingInput.value = "";
+
+  // Reset Langkah-langkah kembali ke 1 card default
+  const stepsContainer = document.getElementById("steps-container");
+  if (stepsContainer) {
+    stepCounter = 1; // Kembalikan counter ke 1
+    stepsContainer.innerHTML = `
+        <div class="step-card">
+            <div class="step-header">
+                <span class="step-number">Langkah 1</span>
+            </div>
+            <textarea class="step-text form-input" rows="3" placeholder="Tumis bawang putih hingga harum..."></textarea>
+            <input type="file" class="step-img form-input" accept="image/*" style="font-size: 12px; padding: 8px;">
+        </div>
+      `;
+  }
+  // ===============================
+
+  // JUDUL MODAL
+  const titleEl = form.querySelector("h3");
+  if (titleEl)
+    titleEl.innerText = index >= 0 ? "Edit Resep" : "Buat Resep Baru";
+
+  // JIKA MODE EDIT (Index >= 0)
+  if (index >= 0 && myRecipes[index]) {
+    const item = myRecipes[index];
+    document.getElementById("rec-title").value = item.title || "";
+    document.getElementById("rec-tag").value = item.tag || "";
+
+    // Sementara masukkan desc lama ke kolom bahan (karena sistem edit langkah belum dibuat)
+    if (ingInput) ingInput.value = item.desc || "";
+    document.getElementById("edit-id").value = item.id;
+  }
+
+  form.style.display = "flex";
+  history.pushState({ modal: "form" }, null, "");
+};
 // --- FUNGSI MEMBUKA HALAMAN DETAIL RESEP ---
 window.openArticle = (
   title,
@@ -615,63 +672,7 @@ window.openArticle = (
 
   if (typeof feather !== "undefined") feather.replace();
 };
-// --- FUNGSI OPEN ARTICLE (YANG ERROR SUDAH DIPERBAIKI) ---
-window.openRecipeForm = (index = -1) => {
-  if (!currentUser) {
-    openPopup("login dulu");
-    return;
-  }
-  const form = document.getElementById("recipe-form");
-
-  // === RESET FORM (VERSI BARU) ===
-  document.getElementById("rec-title").value = "";
-  document.getElementById("rec-tag").value = "";
-  document.getElementById("edit-index").value = index;
-  document.getElementById("edit-id").value = "";
-
-  const fileInput = document.getElementById("rec-file");
-  if (fileInput) fileInput.value = "";
-
-  // Reset Input Bahan
-  const ingInput = document.getElementById("rec-ingredients");
-  if (ingInput) ingInput.value = "";
-
-  // Reset Langkah-langkah kembali ke 1 card default
-  const stepsContainer = document.getElementById("steps-container");
-  if (stepsContainer) {
-    stepCounter = 1; // Kembalikan counter ke 1
-    stepsContainer.innerHTML = `
-        <div class="step-card">
-            <div class="step-header">
-                <span class="step-number">Langkah 1</span>
-            </div>
-            <textarea class="step-text form-input" rows="3" placeholder="Tumis bawang putih hingga harum..."></textarea>
-            <input type="file" class="step-img form-input" accept="image/*" style="font-size: 12px; padding: 8px;">
-        </div>
-      `;
-  }
-  // ===============================
-
-  // JUDUL MODAL
-  const titleEl = form.querySelector("h3");
-  if (titleEl)
-    titleEl.innerText = index >= 0 ? "Edit Resep" : "Buat Resep Baru";
-
-  // JIKA MODE EDIT (Index >= 0)
-  if (index >= 0 && myRecipes[index]) {
-    const item = myRecipes[index];
-    document.getElementById("rec-title").value = item.title || "";
-    document.getElementById("rec-tag").value = item.tag || "";
-
-    // Sementara masukkan desc lama ke kolom bahan (karena sistem edit langkah belum dibuat)
-    if (ingInput) ingInput.value = item.desc || "";
-    document.getElementById("edit-id").value = item.id;
-  }
-
-  form.style.display = "flex";
-  history.pushState({ modal: "form" }, null, "");
-};
-
+window.closeArticle = () => history.back();
 window.closeRecipeForm = () => history.back();
 
 window.openPopup = (type) => {
