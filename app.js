@@ -350,79 +350,104 @@ const compressImage = (file) => {
   });
 };
 
+// --- 5. LOGIC SIMPAN RESEP (UPDATE UNTUK CAROUSEL LANGKAH) ---
 window.saveMyRecipe = async () => {
   if (!currentUser) return alert("Login dulu!");
 
-  // 1. Tangkap elemen dan nilai khusus Judul dulu
+  // 1. Validasi Judul
   const titleInput = document.getElementById("rec-title");
   const titleError = document.getElementById("error-title");
-  const title = titleInput.value.trim(); // Ambil nilainya dan bersihkan spasi
+  const title = titleInput.value.trim();
 
-  // === 2. VALIDASI TANPA ALERT (Langsung cek di awal) ===
   if (!title) {
-    titleInput.style.borderColor = "#dc3545"; // Ubah border jadi merah
-    titleError.style.display = "block"; // Munculkan teks error
-    titleInput.focus(); // Tarik kursor ke kolom ini
-    return; // Hentikan proses simpan
+    titleInput.style.borderColor = "#dc3545";
+    titleError.style.display = "block";
+    titleInput.focus();
+    return;
   }
 
-  // 3. Kalau judul aman, baru ambil sisa data lainnya
   const tag = document.getElementById("rec-tag").value;
-  const ingInput = document.getElementById("rec-ingredients");
-  const desc = ingInput ? ingInput.value : "";
-  const fileInput = document.getElementById("rec-file");
-  const editId = document.getElementById("edit-id").value; // Ambil ID jika ada
+  const mainFileInput = document.getElementById("rec-file");
+  const editId = document.getElementById("edit-id").value;
 
   const rawTime = document.getElementById("input-time").value;
   const rawServings = document.getElementById("input-servings").value;
   const time = rawTime ? `${rawTime} Menit` : "- Menit";
   const servings = rawServings ? `${rawServings} Porsi` : "- Porsi";
 
-  // Validasi Foto: Wajib jika Buat Baru, Opsional jika Edit
-  if (!editId && fileInput.files.length === 0)
-    return alert("Wajib pilih foto!");
+  // Tangkap Teks Bahan-bahan
+  const ingredientsText = document
+    .getElementById("rec-ingredients")
+    .value.trim();
 
+  if (!editId && mainFileInput.files.length === 0) {
+    return alert("Wajib pilih foto utama resep!");
+  }
+
+  // Ubah tombol jadi status loading
   const btn = document.querySelector("#recipe-form .find-btn");
   const originalText = btn.innerText;
-  btn.innerText = "Memproses...";
+  btn.innerText = "Mengompres & Menyimpan...";
   btn.disabled = true;
 
   try {
-    let imageBase64 = null;
-
-    // Cek jika user upload foto baru
-    if (fileInput.files.length > 0) {
-      btn.innerText = "Mengompres Gambar...";
-      imageBase64 = await compressImage(fileInput.files[0]);
+    let mainImageBase64 = null;
+    if (mainFileInput.files.length > 0) {
+      mainImageBase64 = await compressImage(mainFileInput.files[0]);
     }
+
+    // === MESIN PENYEDOT DATA LANGKAH (CAROUSEL) ===
+    const stepCards = document.querySelectorAll(".step-card");
+    let stepsArray = [];
+    let combinedDesc = ingredientsText + " "; // Digabung biar fitur Search tetap bisa nyari bahan!
+
+    // Looping semua card langkah satu per satu
+    for (let i = 0; i < stepCards.length; i++) {
+      const card = stepCards[i];
+      const textVal = card.querySelector(".step-text").value.trim();
+      const stepImgInput = card.querySelector(".step-img");
+
+      let stepImgBase64 = null;
+      // Kalau ada foto di langkah ini, kompres fotonya!
+      if (stepImgInput.files.length > 0) {
+        stepImgBase64 = await compressImage(stepImgInput.files[0]);
+      }
+
+      stepsArray.push({
+        text: textVal,
+        img: stepImgBase64, // Bisa berisi data foto atau null
+      });
+
+      combinedDesc += textVal + " "; // Gabungkan teks buat fitur search
+    }
+    // ===============================================
 
     const recipeData = {
       userId: currentUser.uid,
-      authorName: currentUser.displayName, // Update nama penulis sesuai akun Google
+      authorName: currentUser.displayName,
       authorPhoto: currentUser.photoURL,
       title: title,
       tag: tag,
-      desc: desc,
       time: time,
       servings: servings,
+      ingredients: ingredientsText, // Simpan format baru
+      steps: stepsArray, // Simpan format baru
+      desc: combinedDesc.trim(), // Simpan format lama (untuk Search Database)
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
     };
 
-    // Jika ada gambar baru, masukkan. Jika tidak, jangan timpa yg lama.
-    if (imageBase64) {
-      recipeData.img = imageBase64;
+    if (mainImageBase64) {
+      recipeData.img = mainImageBase64;
     }
 
     if (editId) {
-      // MODE EDIT (Update Data yang ada)
+      // UPDATE DATA LAMA
       await db.collection("recipes").doc(editId).update(recipeData);
       alert("Resep berhasil diperbarui!");
     } else {
-      // MODE BUAT BARU
+      // SIMPAN DATA BARU
       recipeData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-      // Pastikan img ada untuk data baru
-      if (!recipeData.img) throw new Error("Gambar wajib untuk resep baru");
-
+      if (!recipeData.img) throw new Error("Gambar utama wajib!");
       await db.collection("recipes").add(recipeData);
       alert("Resep berhasil dipublish!");
     }
@@ -519,6 +544,77 @@ window.confirmReset = () => {
 };
 
 // --- 7. MODALS & POPUPS ---
+// --- FUNGSI MEMBUKA HALAMAN DETAIL RESEP ---
+window.openArticle = (
+  title,
+  tag,
+  img,
+  desc = null,
+  author = "Admin",
+  time = "- Menit",
+  servings = "- Porsi",
+) => {
+  document.getElementById("detail-title").innerText = title;
+  document.getElementById("detail-category").innerText = tag;
+  document.getElementById("detail-image").style.backgroundImage =
+    `url('${img}')`;
+
+  document.getElementById("detail-author").innerText = author;
+  document.getElementById("detail-time").innerText = time;
+  document.getElementById("detail-servings").innerText = servings;
+
+  // === TRIK CERDAS: CARI DATA ASLI DARI MEMORI BERDASARKAN JUDUL ===
+  // Cek apakah 'menus' ada (dari database statis)
+  const staticMenus = typeof menus !== "undefined" ? menus : [];
+  // Cek apakah 'allCloudRecipes' ada (dari Firebase)
+  const cloudMenus =
+    typeof allCloudRecipes !== "undefined" ? allCloudRecipes : [];
+
+  // Gabungkan dan cari resep yang diklik
+  const allItems = [...staticMenus, ...cloudMenus];
+  const item = allItems.find((i) => i.title === title);
+
+  let htmlContent = "";
+
+  // JIKA RESEP INI PAKAI FORMAT BARU (Punya Bahan & Langkah)
+  if (item && item.ingredients && item.steps) {
+    // 1. Render Bahan-bahan
+    const bahanArray = item.ingredients.split("\n");
+    let bahanHTML = `<h4 style="margin-bottom: 10px;">Bahan-bahan:</h4><ul style="padding-left: 20px; color: var(--text-muted); margin-bottom: 25px;">`;
+    bahanArray.forEach((bahan) => {
+      if (bahan.trim() !== "")
+        bahanHTML += `<li style="margin-bottom: 5px;">${bahan}</li>`;
+    });
+    bahanHTML += `</ul>`;
+
+    // 2. Render Langkah-langkah dengan Desain Nomor Keren
+    let langkahHTML = `<h4 style="margin-bottom: 15px;">Cara Membuat:</h4>`;
+    item.steps.forEach((step, index) => {
+      langkahHTML += `
+          <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+              <div style="width: 28px; height: 28px; background: var(--primary, #ff6b6b); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; font-size: 14px;">
+                  ${index + 1}
+              </div>
+              <div style="flex: 1;">
+                  <p style="margin: 0 0 10px 0; line-height: 1.6; color: var(--text);">${step.text}</p>
+                  ${step.img ? `<img src="${step.img}" style="width: 100%; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--border, #ddd);">` : ""}
+              </div>
+          </div>`;
+    });
+
+    htmlContent = bahanHTML + langkahHTML;
+  } else {
+    // JIKA RESEP FORMAT LAMA (Cuma teks desc biasa)
+    htmlContent = desc || "Belum ada deskripsi.";
+  }
+
+  // Tampilkan ke layar
+  document.getElementById("detail-desc").innerHTML = htmlContent;
+  document.getElementById("article-view").classList.add("active");
+  history.pushState({ modal: "article" }, null, "");
+
+  if (typeof feather !== "undefined") feather.replace();
+};
 // --- FUNGSI OPEN ARTICLE (YANG ERROR SUDAH DIPERBAIKI) ---
 window.openRecipeForm = (index = -1) => {
   if (!currentUser) {
