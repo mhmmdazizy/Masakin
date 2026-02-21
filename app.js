@@ -1022,28 +1022,40 @@ window.shareArticle = () => {
 };
 // --- FITUR CARI RESEP BERDASARKAN BAHAN (HOME) ---
 
+// --- FITUR CARI RESEP BERDASARKAN BAHAN (HOME) ---
 window.findRecipes = () => {
   // 1. Cek apakah ada bahan yang dicentang
   if (selectedIngredients.size === 0) {
-    // GANTI alert DENGAN INI:
     openPopup("Belum ada yang dipilih");
     return;
   }
 
-  // 2. Gabungkan resep bawaan (database.js) dan resep cloud/Firebase
-  const allRecipes = [...menus, ...myRecipes];
+  // === PERBAIKAN 1: Gunakan allCloudRecipes agar SELURUH resep Firebase ikut dicari ===
+  const staticMenus = typeof menus !== "undefined" ? menus : [];
+  const cloudMenus =
+    typeof allCloudRecipes !== "undefined" ? allCloudRecipes : [];
+  const allRecipes = [...staticMenus, ...cloudMenus];
 
   // 3. Ubah daftar bahan yang dicentang menjadi Array
-  // Contoh isi selectedArr: ['telur', 'nasi']
   const selectedArr = Array.from(selectedIngredients);
 
   // 4. Deteksi & Filter Resep Otomatis
   const matchedRecipes = allRecipes.filter((recipe) => {
-    // Gabungkan judul dan deskripsi, lalu ubah jadi huruf kecil semua agar pencarian akurat
-    const textToSearch = (recipe.title + " " + recipe.desc).toLowerCase();
+    // === PERBAIKAN 2: Gabungkan Judul, Deskripsi, DAN Bahan-bahan ===
+    // Pakai fallback ("") biar gak error kalau ada data lama yang kosong
+    const safeTitle = recipe.title || "";
+    const safeDesc = recipe.desc || "";
+    const safeIngredients = recipe.ingredients || "";
 
-    // Cek apakah dari bahan yg dipilih, ada yang teksnya nyangkut di resep ini
-    // Menggunakan .some() berarti jika minimal 1 bahan cocok, resep akan ditampilkan
+    const textToSearch = (
+      safeTitle +
+      " " +
+      safeDesc +
+      " " +
+      safeIngredients
+    ).toLowerCase();
+
+    // Cek kecocokan
     return selectedArr.some((bahan) =>
       textToSearch.includes(bahan.toLowerCase()),
     );
@@ -1053,25 +1065,20 @@ window.findRecipes = () => {
   const resultSection = document.getElementById("recipe-results");
   const container = document.getElementById("results-container");
 
-  // Pastikan wadahnya punya format grid kotak-kotak
   container.classList.add("masonry-grid");
-
-  // Munculkan section hasil pencarian
   resultSection.style.display = "block";
 
   if (matchedRecipes.length > 0) {
-    // Gunakan fungsi renderGrid agar tampilan card-nya sama persis dengan menu!
     renderGrid("results-container", matchedRecipes);
   } else {
-    // Kalau kata "telur" atau bahan lainnya tidak ada di teks deskripsi manapun
     container.innerHTML = `
-            <p style="grid-column: 1 / -1; text-align:center; color:var(--text-muted); font-size:13px; margin-top:10px;">
-                Yah, belum ada resep yang cocok dengan bahan tersebut. Coba pilih bahan lain atau kurangi pilihannya!
-            </p>
-        `;
+      <p style="grid-column: 1 / -1; text-align:center; color:var(--text-muted); font-size:13px; margin-top:10px;">
+        Yah, belum ada resep yang cocok dengan bahan tersebut. Coba pilih bahan lain atau kurangi pilihannya!
+      </p>
+    `;
   }
 
-  // 6. Gulir (scroll) layar otomatis ke bawah melihat hasilnya
+  // 6. Gulir (scroll) layar otomatis ke bawah
   resultSection.scrollIntoView({ behavior: "smooth", block: "start" });
 };
 

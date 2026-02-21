@@ -455,81 +455,28 @@
 
         <input type="hidden" id="rec-img" />
 
-        <div style="display: flex; gap: 10px; margin-bottom: 15px">
-          <div style="flex: 1">
+        <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+          
+          <div style="flex: 1;">
             <label>Waktu Masak</label>
-            <div
-              style="
-                display: flex;
-                align-items: center;
-                border: 1px solid var(--border, #ddd);
-                border-radius: 8px;
-                overflow: hidden;
-                background: var(--surface, #fff);
-              "
-            >
-              <input
-                type="number"
-                id="input-time"
-                placeholder="30"
-                style="
-                  width: 100%;
-                  padding: 10px;
-                  border: none;
-                  outline: none;
-                  background: transparent;
-                  color: inherit;
-                "
-              />
-              <span
-                style="
-                  padding: 10px;
-                  background: rgba(128, 128, 128, 0.1);
-                  color: var(--text-muted);
-                  font-size: 13px;
-                  font-weight: bold;
-                "
-                >Menit</span
-              >
+            <div style="position: relative;">
+              <input type="number" id="input-time" class="form-input" placeholder="30" style="padding-right: 60px; width: 100%;">
+              <span style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 13px; font-weight: bold;">
+                Menit
+              </span>
             </div>
           </div>
-          <div style="flex: 1">
+
+          <div style="flex: 1;">
             <label>Jumlah Sajian</label>
-            <div
-              style="
-                display: flex;
-                align-items: center;
-                border: 1px solid var(--border, #ddd);
-                border-radius: 8px;
-                overflow: hidden;
-                background: var(--surface, #fff);
-              "
-            >
-              <input
-                type="number"
-                id="input-servings"
-                placeholder="4"
-                style="
-                  width: 100%;
-                  padding: 10px;
-                  border: none;
-                  outline: none;
-                  background: transparent;
-                  color: inherit;
-                "
-              />
-              <span
-                style="
-                  padding: 10px;
-                  background: rgba(128, 128, 128, 0.1);
-                  color: var(--text-muted);
-                  font-size: 13px;
-                  font-weight: bold;
-                "
-                >Porsi</span
-              >
+            <div style="position: relative;">
+              <input type="number" id="input-servings" class="form-input" placeholder="4" style="padding-right: 60px; width: 100%;">
+              <span style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 13px; font-weight: bold;">
+                Porsi
+              </span>
             </div>
           </div>
+
         </div>
 
         <label><span>Bahan-bahan</span><span style="font-size: 11px; opacity: 0.7;"> (Pisahkan dengan Enter)</span></label>
