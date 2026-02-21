@@ -330,17 +330,29 @@ const compressImage = (file) => {
 window.saveMyRecipe = async () => {
   if (!currentUser) return alert("Login dulu!");
 
-  const title = document.getElementById("rec-title").value;
+  // 1. Tangkap elemen dan nilai khusus Judul dulu
+  const titleInput = document.getElementById("rec-title");
+  const titleError = document.getElementById("error-title");
+  const title = titleInput.value.trim(); // Ambil nilainya dan bersihkan spasi
+
+  // === 2. VALIDASI TANPA ALERT (Langsung cek di awal) ===
+  if (!title) {
+    titleInput.style.borderColor = "#dc3545"; // Ubah border jadi merah
+    titleError.style.display = "block"; // Munculkan teks error
+    titleInput.focus(); // Tarik kursor ke kolom ini
+    return; // Hentikan proses simpan
+  }
+
+  // 3. Kalau judul aman, baru ambil sisa data lainnya
   const tag = document.getElementById("rec-tag").value;
   const desc = document.getElementById("rec-desc").value;
   const fileInput = document.getElementById("rec-file");
   const editId = document.getElementById("edit-id").value; // Ambil ID jika ada
+
   const rawTime = document.getElementById("input-time").value;
   const rawServings = document.getElementById("input-servings").value;
   const time = rawTime ? `${rawTime} Menit` : "- Menit";
   const servings = rawServings ? `${rawServings} Porsi` : "- Porsi";
-
-  if (!title) return alert("Judul wajib diisi!");
 
   // Validasi Foto: Wajib jika Buat Baru, Opsional jika Edit
   if (!editId && fileInput.files.length === 0)

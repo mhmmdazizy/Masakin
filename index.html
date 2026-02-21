@@ -434,7 +434,11 @@
           id="rec-title"
           class="form-input"
           placeholder="Nasi Goreng..."
+          oninput="this.style.borderColor=''; document.getElementById('error-title').style.display='none';"
         />
+        <div id="error-title" style="color: #dc3545; font-size: 12px; margin-top: 4px; display: none;">
+          Judul wajib diisi!
+        </div>
 
         <label>Kategori (Pedas/Manis/Kuah)</label>
         <input
