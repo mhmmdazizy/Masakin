@@ -168,6 +168,8 @@ window.addStepCard = () => {
         </div>
         <textarea class="step-text form-input" rows="3" placeholder="Deskripsi langkah selanjutnya..."></textarea>
         <input type="file" class="step-img form-input" accept="image/*" style="font-size: 12px; padding: 8px;">
+        
+        <input type="hidden" class="old-step-img" value="">
     `;
 
   container.appendChild(newCard);
@@ -399,26 +401,28 @@ window.saveMyRecipe = async () => {
     // === MESIN PENYEDOT DATA LANGKAH (CAROUSEL) ===
     const stepCards = document.querySelectorAll(".step-card");
     let stepsArray = [];
-    let combinedDesc = ingredientsText + " "; // Digabung biar fitur Search tetap bisa nyari bahan!
+    let combinedDesc = ingredientsText + " ";
 
-    // Looping semua card langkah satu per satu
     for (let i = 0; i < stepCards.length; i++) {
       const card = stepCards[i];
       const textVal = card.querySelector(".step-text").value.trim();
       const stepImgInput = card.querySelector(".step-img");
+      const oldStepImgInput = card.querySelector(".old-step-img"); // Tangkap foto lama
 
-      let stepImgBase64 = null;
-      // Kalau ada foto di langkah ini, kompres fotonya!
+      // Default pakai foto lama (kalau ada)
+      let stepImgBase64 = oldStepImgInput ? oldStepImgInput.value : null;
+
+      // Tapi, KALAU user upload foto BARU, kompres dan timpa foto lamanya!
       if (stepImgInput.files.length > 0) {
         stepImgBase64 = await compressImage(stepImgInput.files[0]);
       }
 
       stepsArray.push({
         text: textVal,
-        img: stepImgBase64, // Bisa berisi data foto atau null
+        img: stepImgBase64,
       });
 
-      combinedDesc += textVal + " "; // Gabungkan teks buat fitur search
+      combinedDesc += textVal + " ";
     }
     // ===============================================
 
@@ -592,10 +596,45 @@ window.openRecipeForm = (index = -1) => {
     const item = myRecipes[index];
     document.getElementById("rec-title").value = item.title || "";
     document.getElementById("rec-tag").value = item.tag || "";
-
-    // Sementara masukkan desc lama ke kolom bahan (karena sistem edit langkah belum dibuat)
-    if (ingInput) ingInput.value = item.desc || "";
     document.getElementById("edit-id").value = item.id;
+
+    const ingInput = document.getElementById("rec-ingredients");
+    const stepsContainer = document.getElementById("steps-container");
+
+    // JIKA RESEP PUNYA FORMAT BARU (Bahan & Langkah)
+    if (item.ingredients && item.steps) {
+      if (ingInput) ingInput.value = item.ingredients;
+
+      // Bongkar langkah-langkahnya
+      if (stepsContainer) {
+        stepsContainer.innerHTML = ""; // Kosongkan default-nya
+        stepCounter = 0; // Reset counter
+
+        item.steps.forEach((step, i) => {
+          stepCounter++;
+          const newCard = document.createElement("div");
+          newCard.className = "step-card";
+          newCard.innerHTML = `
+                    <div class="step-header">
+                        <span class="step-number">Langkah ${stepCounter}</span>
+                        ${stepCounter > 1 ? `<button class="btn-remove-step" onclick="this.parentElement.parentElement.remove()">Hapus</button>` : ""}
+                    </div>
+                    <textarea class="step-text form-input" rows="3" placeholder="Deskripsi...">${step.text || ""}</textarea>
+                    
+                    <input type="file" class="step-img form-input" accept="image/*" style="font-size: 12px; padding: 8px;">
+                    
+                    <input type="hidden" class="old-step-img" value="${step.img || ""}">
+                    
+                    ${step.img ? `<p style="font-size:10px; color:#28a745; margin-top:5px; font-weight:bold;">✓ Foto tersimpan (Pilih file baru untuk mengganti)</p>` : ""}
+                `;
+          stepsContainer.appendChild(newCard);
+        });
+      }
+    } else {
+      // JIKA FORMAT LAMA (Cuma Desc Biasa)
+      if (ingInput) ingInput.value = item.desc || "";
+      // Form langkah biarkan kosong 1 default
+    }
   }
 
   form.style.display = "flex";
