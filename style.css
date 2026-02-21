@@ -514,10 +514,10 @@ header {
   
   /* --- KUNCI SAMPAI UJUNG ATAS --- */
   position: sticky;
-  top: -20px; /* RAHASIANYA DI SINI: Ubah dari 0 jadi minus! */
+  top: -24px; /* RAHASIANYA DI SINI: Ubah dari 0 jadi minus! */
   
   /* Tarik ukurannya mentok ke ujung layar */
-  margin-top: -20px;
+  margin-top: -24px;
   margin-left: -20px;
   margin-right: -20px;
   
