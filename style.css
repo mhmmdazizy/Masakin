@@ -514,17 +514,28 @@ header {
 
   /* --- KUNCI HEADER DI ATAS --- */
   position: sticky;
-  padding-top: 24px;
-  top: -24px; /* Nempel tepat di atas wadah scroll */
+  top: 0;
 
-  /* Wajib ada background biar teks yang di-scroll ketutup dan gak numpuk */
+  /* --- TRIK MENUTUP LUBANG PADDING (Atap Bolong) --- */
+  /* Tarik header ke luar menembus padding bawaan popup-card */
+  margin-top: -20px; /* Sesuaikan jika padding aslimu 15px */
+  margin-left: -20px;
+  margin-right: -20px;
+
+  /* Kembalikan jarak ke dalam biar teks/tombol gak nabrak pinggiran layar */
+  padding: 20px;
+
+  /* Estetika: Bikin sudut atasnya membulat ngikutin kartu (sesuaikan dengan border-radius popup-card kamu) */
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+
+  /* Wajib ada background biar solid nutupin yang lewat */
   background: var(--surface, #fff);
-  z-index: 10; /* Biar posisinya selalu di atas elemen lain */
+  z-index: 10;
 
-  /* Tambahan estetika: Kasih jarak & garis bawah biar rapi saat di-scroll */
-  padding-bottom: 15px;
-  margin-bottom: 15px;
+  /* Garis batas bawah */
   border-bottom: 1px solid var(--border, #ddd);
+  margin-bottom: 20px; /* Kasih nafas ke elemen di bawahnya */
 }
 .close-popup {
   background: none;
