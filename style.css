@@ -1090,8 +1090,12 @@ body[data-theme="dark"] .logo-dark {
   overflow-x: auto;
   padding-bottom: 15px;
   margin-bottom: 15px;
-  /* Efek snap biar berhentinya pas di tengah card */
   scroll-snap-type: x mandatory;
+
+  /* --- TAMBAHAN SABUK PENGAMAN BIAR GAK OFFSIDE --- */
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 /* Sembunyikan scrollbar jelek di Chrome/Safari */
