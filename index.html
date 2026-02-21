@@ -18,9 +18,9 @@
     />
     <meta
       property="og:image"
-      content="https://cooking-ideas-app.vercel.app/icon.png"
+      content="https://masakin.my.id/icon.png"
     />
-    <meta property="og:url" content="https://cooking-ideas-app.vercel.app//" />
+    <meta property="og:url" content="https://masakin.my.id" />
     <meta property="og:type" content="website" />
     <link rel="stylesheet" href="style.css" />
     <link rel="manifest" href="manifest.json" />
@@ -37,19 +37,15 @@
   </head>
   <body>
     <header id="main-header" style="display: flex; justify-content: space-between; align-items: center;">
-      
       <div class="app-logo" style="display: flex; align-items: center;">
         <img src="icon/logo-header-terang.png" alt="Masakin" class="logo-light" style="height: 32px;">
         <img src="icon/logo-header-gelap.png" alt="Masakin" class="logo-dark" style="height: 32px;">
       </div>
-
       <div class="header-actions" style="display: flex; align-items: center; gap: 12px;">
-        
         <button class="notif-btn" onclick="toggleNotifSheet()">
           <i data-feather="bell"></i>
           <span class="notif-dot"></span>
         </button>
-
         <div class="profile-pill" onclick="switchPage('profile-page')">
           <div class="avatar" id="header-avatar">G</div>
           <div class="profile-info">
@@ -57,7 +53,6 @@
             <span class="user-name" id="header-username">Guest User</span>
           </div>
         </div>
-        
       </div>
     </header>
 
@@ -196,7 +191,7 @@
         <div class="profile-header-large">
           <div class="avatar-large" id="profile-avatar-large">G</div>
           <h2 id="profile-name-large">Guest User</h2>
-          <p id="profile-email-large">Belum Login</p>
+          <p id="profile-email-large">Silakan Login</p>
           <div id="auth-btn-container"></div>
         </div>
 
@@ -260,13 +255,13 @@
               style="
                 width: 100%;
                 border: none;
-                background: #fff8e1;
-                color: #f59e0b;
+                background: #0095f6;
+                color: #ffffff;
                 justify-content: center;
                 font-weight: 600;
               "
               onclick="
-                window.open('https://trakteer.id/mhmmdazizy/tip', '_blank')
+                window.open('https://trakteer.id/muhmmdazizy/tip', '_blank')
               "
             >
               <i data-feather="coffee"></i> Traktir Kopi Developer

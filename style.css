@@ -11,12 +11,12 @@
 }
 
 [data-theme="dark"] {
-  --bg: #111827;
-  --surface: #1f2937;
+  --bg: #000000;
+  --surface: #262626;
   --text: #f9fafb;
   --text-muted: #9ca3af;
   --border: #374151;
-  --nav-bg: rgba(31, 41, 55, 0.95);
+  --nav-bg: rgba(0, 0, 0, 0.95);
 }
 
 /* --- NATIVE APP FEEL (Request Anda) --- */
@@ -330,8 +330,8 @@ header {
   font-size: 14px;
 }
 .reset-btn {
-  background: #fee2e2;
-  color: #991b1b;
+  background: #d62222;
+  color: #ffffff;
   border: none;
   padding: 14px;
   width: 100%;
@@ -1014,6 +1014,7 @@ header {
   /* Saat ditutup, biarkan dia sembunyi normal. Saat active, gembok di tengah! */
   #article-view.active,
   #info-popup.active,
+  .popup-card,
   .bottom-sheet.active {
     width: 100% !important;
     max-width: 480px !important;

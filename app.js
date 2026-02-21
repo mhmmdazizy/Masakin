@@ -72,71 +72,70 @@ document.addEventListener("DOMContentLoaded", () => {
   // Render Icon (Penting biar gak hilang)
   if (typeof feather !== "undefined") feather.replace();
 
-  // Cek Login & Load Data Cloud
-  auth.onAuthStateChanged((user) => {
-    currentUser = user;
-    updateUI(user);
-
-    // 1. Ambil Resep dari Cloud
-    db.collection("recipes")
-      .orderBy("createdAt", "desc")
-      .onSnapshot((snapshot) => {
-        myRecipes = [];
-        allCloudRecipes = []; // Pakai variabel global yang baru
-
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          data.id = doc.id;
-          allCloudRecipes.push(data);
-
-          if (currentUser && data.userId === currentUser.uid) {
-            myRecipes.push(data);
-          }
-        });
-
-        renderMyRecipes();
-        // Render jika sedang di halaman menu
-        renderGrid("menu-container", [...menus, ...allCloudRecipes]);
-      });
-
-    // 2. SINKRONISASI ANGKA FAVORIT GLOBAL SE-DUNIA
-    db.collection("counters").onSnapshot((snapshot) => {
-      const globalCounts = {};
+  // 1. Ambil Resep dari Cloud
+  db.collection("recipes")
+    .orderBy("createdAt", "desc")
+    .onSnapshot((snapshot) => {
+      myRecipes = [];
+      allCloudRecipes = []; // Pakai variabel global yang baru
 
       snapshot.forEach((doc) => {
-        let count = doc.data().favCount || 0;
+        const data = doc.data();
+        data.id = doc.id;
+        allCloudRecipes.push(data);
 
-        // --- FITUR SELF HEALING ---
-        // Kalau database diam-diam minus, langsung paksa kembali ke 0 di server!
-        if (count < 0) {
-          db.collection("counters")
-            .doc(doc.id)
-            .set({ favCount: 0 }, { merge: true });
-          count = 0; // Tampilkan 0 di layar
+        if (currentUser && data.userId === currentUser.uid) {
+          myRecipes.push(data);
         }
-
-        globalCounts[doc.id] = count;
       });
 
-      const applyFavCount = (arr) => {
-        arr.forEach((item) => {
-          const safeTitle = item.title.replace(/[^a-zA-Z0-9]/g, "_");
-          item.favCount = globalCounts[safeTitle] || 0;
-        });
-      };
-
-      applyFavCount(menus);
-      applyFavCount(articles);
-      applyFavCount(allCloudRecipes);
-      applyFavCount(favorites);
-      localStorage.setItem("myFavorites", JSON.stringify(favorites));
-
-      // Render Ulang Layar secara Realtime
-      renderGrid("explore-container", articles);
+      renderMyRecipes();
+      // Render jika sedang di halaman menu
       renderGrid("menu-container", [...menus, ...allCloudRecipes]);
-      renderGrid("favorit-container", favorites);
     });
+
+  // 2. SINKRONISASI ANGKA FAVORIT GLOBAL SE-DUNIA
+  db.collection("counters").onSnapshot((snapshot) => {
+    const globalCounts = {};
+
+    snapshot.forEach((doc) => {
+      let count = doc.data().favCount || 0;
+
+      // --- FITUR SELF HEALING ---
+      // Kalau database diam-diam minus, langsung paksa kembali ke 0 di server!
+      if (count < 0) {
+        db.collection("counters")
+          .doc(doc.id)
+          .set({ favCount: 0 }, { merge: true });
+        count = 0; // Tampilkan 0 di layar
+      }
+
+      globalCounts[doc.id] = count;
+    });
+
+    const applyFavCount = (arr) => {
+      arr.forEach((item) => {
+        const safeTitle = item.title.replace(/[^a-zA-Z0-9]/g, "_");
+        item.favCount = globalCounts[safeTitle] || 0;
+      });
+    };
+
+    applyFavCount(menus);
+    applyFavCount(articles);
+    applyFavCount(allCloudRecipes);
+    applyFavCount(favorites);
+    localStorage.setItem("myFavorites", JSON.stringify(favorites));
+
+    // Render Ulang Layar secara Realtime
+    renderGrid("explore-container", articles);
+    renderGrid("menu-container", [...menus, ...allCloudRecipes]);
+    renderGrid("favorit-container", favorites);
   });
+});
+// Cek Login & Load Data Cloud
+auth.onAuthStateChanged((user) => {
+  currentUser = user;
+  updateUI(user);
 });
 
 // --- 4. RENDER FUNCTIONS ---
