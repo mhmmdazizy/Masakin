@@ -1092,9 +1092,10 @@ body[data-theme="dark"] .logo-dark {
   margin-bottom: 15px;
   scroll-snap-type: x mandatory;
 
-  /* --- TAMBAHAN SABUK PENGAMAN BIAR GAK OFFSIDE --- */
+  /* --- JURUS PAMUNGKAS ANTI TEMBUS --- */
   width: 100%;
   max-width: 100%;
+  min-width: 0; /* Ini mantra wajib kalau parent-nya Flexbox! */
   box-sizing: border-box;
 }
 
@@ -1104,7 +1105,8 @@ body[data-theme="dark"] .logo-dark {
 }
 
 .step-card {
-  min-width: 85%; /* Lebar card, sisakan sedikit biar card berikutnya ngintip */
+  min-width: 85%;
+  max-width: 85%; /* Kunci maksimal biar isinya nggak maksa melar */
   flex-shrink: 0;
   scroll-snap-align: center;
   background: var(--surface, #fff);
@@ -1112,6 +1114,9 @@ body[data-theme="dark"] .logo-dark {
   border-radius: 12px;
   padding: 15px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+
+  /* --- KUNCI PADDING KE DALAM --- */
+  box-sizing: border-box;
 }
 
 .step-header {
