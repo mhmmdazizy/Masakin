@@ -36,7 +36,7 @@ const articles = [
 const menus = [
   {
     title: "Nasi Goreng Spesial",
-    tag: "15 MIN",
+    tag: "Sat-Set",
     img: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=300&q=80",
 
     // 1. FORMAT BARU BAHAN (Gunakan backtick ` agar bisa di-enter ke bawah)
@@ -84,7 +84,7 @@ Minyak untuk menumis`,
   },
   {
     title: "Soto Ayam Kuning",
-    tag: "KUAH",
+    tag: "Anget-Anget",
     img: "https://images.unsplash.com/photo-1633436375795-12b3b339712f?w=300&q=80",
 
     // 1. FORMAT BAHAN (Tanpa strip, cukup enter saja)
