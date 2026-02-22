@@ -90,6 +90,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
 
+      if (typeof globalFavCounts !== "undefined") {
+        allCloudRecipes.forEach((item) => {
+          const safeTitle = item.title.replace(/[^a-zA-Z0-9]/g, "_");
+          item.favCount = globalFavCounts[safeTitle] || 0;
+        });
+      }
+
       renderMyRecipes();
       // Render jika sedang di halaman menu
       renderGrid("menu-container", [...menus, ...allCloudRecipes]);
@@ -97,6 +104,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
   // 2. SINKRONISASI ANGKA FAVORIT GLOBAL SE-DUNIA
+  window.globalFavCounts = {}; // Memori pengingat angka Suka
+
   db.collection("counters").onSnapshot((snapshot) => {
     const globalCounts = {};
 
@@ -104,21 +113,22 @@ document.addEventListener("DOMContentLoaded", () => {
       let count = doc.data().favCount || 0;
 
       // --- FITUR SELF HEALING ---
-      // Kalau database diam-diam minus, langsung paksa kembali ke 0 di server!
       if (count < 0) {
         db.collection("counters")
           .doc(doc.id)
           .set({ favCount: 0 }, { merge: true });
-        count = 0; // Tampilkan 0 di layar
+        count = 0;
       }
-
       globalCounts[doc.id] = count;
     });
+
+    // Simpan ke memori global biar nggak amnesia
+    globalFavCounts = globalCounts;
 
     const applyFavCount = (arr) => {
       arr.forEach((item) => {
         const safeTitle = item.title.replace(/[^a-zA-Z0-9]/g, "_");
-        item.favCount = globalCounts[safeTitle] || 0;
+        item.favCount = globalFavCounts[safeTitle] || 0;
       });
     };
 
@@ -132,6 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderGrid("explore-container", articles);
     renderGrid("menu-container", [...menus, ...allCloudRecipes]);
     renderGrid("favorit-container", favorites);
+
     if (typeof renderPublicRecipes === "function") renderPublicRecipes();
     if (typeof updateTotalLikesUI === "function") updateTotalLikesUI();
   });
@@ -1141,27 +1152,47 @@ function updateUI(user) {
 }
 
 // --- FITUR HAPUS RESEPKU ---
-window.deleteMyRecipe = async (docId) => {
-  if (!docId || docId === "undefined") return alert("Data error!");
+// --- 1. FUNGSI MUNCULIN POP-UP KONFIRMASI HAPUS ---
+window.deleteMyRecipe = (docId) => {
+  if (!docId || docId === "undefined") {
+    showToast("Data error!");
+    return;
+  }
 
-  const confirmDelete = confirm(
-    "Yakin ingin menghapus resep ini secara permanen?",
-  );
-  if (confirmDelete) {
-    try {
-      await db.collection("recipes").doc(docId).delete();
-      {
-        showToast("Resep berhasil dihapus!");
-        closeRecipeForm();
-      }
-      // Tidak perlu panggil render ulang manual, karena .onSnapshot di atas otomatis mendeteksi perubahan database.
-    } catch (error) {
-      console.error("Gagal hapus:", error);
-      {
-        showToast("Gagal menghapus: " + error.message);
-        closeRecipeForm();
-      }
-    }
+  // Gunakan wadah pop-up bawaan yang sudah kamu buat
+  document.getElementById("popup-title").innerText = "Hapus Resep";
+  document.getElementById("popup-icon").setAttribute("data-feather", "trash-2");
+
+  // Desain dua tombol: Batal dan Hapus (Warna Merah)
+  document.getElementById("popup-body").innerHTML = `
+    <p style="text-align:center; margin-bottom:20px;">Yakin ingin menghapus resep ini secara permanen?</p>
+    <div style="display: flex; gap: 10px;">
+        <button class="find-btn" onclick="closePopup()" style="flex: 1; background: var(--bg); color: var(--text); border: 1px solid var(--border);">
+            Batal
+        </button>
+        <button class="find-btn" onclick="executeDelete('${docId}')" style="flex: 1; background: #dc3545; color: white; border: none;">
+            Hapus
+        </button>
+    </div>
+  `;
+
+  // Munculkan Pop-up ke layar
+  document.getElementById("info-popup").classList.add("active");
+  if (typeof feather !== "undefined") feather.replace();
+  history.pushState({ modal: "popup" }, null, "");
+};
+
+// --- 2. FUNGSI EKSEKUSI HAPUS (DIPANGGIL DARI TOMBOL MERAH) ---
+window.executeDelete = async (docId) => {
+  // Tutup pop-up konfirmasinya dulu
+  closePopup();
+
+  try {
+    await db.collection("recipes").doc(docId).delete();
+    showToast("Resep berhasil dihapus! 🗑️");
+  } catch (error) {
+    console.error("Gagal hapus:", error);
+    showToast("Gagal menghapus: " + error.message);
   }
 };
 
