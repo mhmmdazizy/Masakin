@@ -221,15 +221,16 @@ function renderGrid(containerId, data) {
 
       let authorHtml = "";
 
-      // Cek apakah Admin (Bisa disesuaikan, misalnya cek string 'admin' atau UID khusus admin)
+      // Cek apakah Admin
       if (authorName.toLowerCase() === "admin") {
-        authorHtml = `<span style="color: var(--text-muted); cursor: default;">
+        authorHtml = `<span style="color: var(--text-muted); cursor: default; display:flex; gap:5px; align-items:center;">
                     <i data-feather="shield" style="width:12px;"></i> ${authorName}
                   </span>`;
       } else {
-        // Kalau user biasa, warnanya primary dan bisa diklik!
-        authorHtml = `<span style="color: var(--primary, #ff6b6b); font-weight: bold; cursor: pointer;" 
-                        onclick="openPublicProfile('${authorUid}', '${authorName}', '${item.authorPhoto || ""}')">
+        // === TAMBAHKAN event.stopPropagation() DI SINI ===
+        // Biar pas namanya diklik, kartunya gak ikut kebuka!
+        authorHtml = `<span style="color: var(--primary, #ff6b6b); font-weight: bold; cursor: pointer; display:flex; gap:5px; align-items:center;" 
+                        onclick="event.stopPropagation(); openPublicProfile('${authorUid}', '${authorName}', '${item.authorPhoto || ""}')">
                     <i data-feather="user" style="width:12px;"></i> ${authorName}
                   </span>`;
       }
@@ -248,8 +249,9 @@ function renderGrid(containerId, data) {
          <div class="card-info">
              <span class="card-tag">${item.tag}</span>
              <h4 class="menu-title">${item.title}</h4>
-             <div class="card-author" style="font-size:10px; color:#888; margin-top:5px; display:flex; gap:5px; align-items:center;">
-                <i data-feather="user" style="width:10px;"></i> ${authorName}
+             
+             <div class="card-author" style="font-size:10px; margin-top:5px;">
+                ${authorHtml}
              </div>
              <div class="card-image" style="background-image: url('...'); position: relative;"></div>
         </div>
@@ -713,7 +715,7 @@ window.openArticle = (
   if (authorContainer) {
     // PERBAIKAN 2: Beri pengaman (item &&) agar tidak crash kalau data tidak ketemu
     const authorName = item && item.authorName ? item.authorName : author;
-    const authorUid = item && item.authorUid ? item.authorUid : "";
+    const authorUid = item && item.userUid ? item.userUid : "";
     const authorPhoto = item && item.authorPhoto ? item.authorPhoto : "";
 
     if (authorName.toLowerCase() === "admin") {
@@ -724,8 +726,8 @@ window.openArticle = (
     } else if (authorUid) {
       // Kalau User Biasa: Warna primary, tebal, dan bisa diklik!
       authorContainer.innerHTML = `<span style="color: var(--primary, #ff6b6b); font-weight: bold; cursor: pointer; text-decoration: underline;" 
-                onclick="openPublicProfile('${authorUid}', '${authorName}', '${authorPhoto}')">
-                <i data-feather="user" style="width:12px;"></i> ${authorName}
+                onclick="openPublicProfile('${userUid}', '${userName}', '${userPhoto}')">
+                <i data-feather="user" style="width:12px;"></i> ${userName}
             </span>`;
     } else {
       // Fallback kalau data lama tidak punya UID
@@ -1616,6 +1618,13 @@ firebase.auth().onAuthStateChanged((user) => {
     // 2. Dengar perubahan followers/following dari Firebase
     db.collection("users")
       .doc(user.uid)
+      .set(
+        {
+          name: user.displayName,
+          photoURL: user.photoURL,
+        },
+        { merge: true },
+      )
       .onSnapshot((doc) => {
         if (doc.exists) {
           const data = doc.data();
@@ -1753,30 +1762,25 @@ let viewedPublicUid = null;
 
 // 1. Membuka Halaman Profil Orang Lain
 window.openPublicProfile = (uid, name, photoUrl) => {
-  // 1. Tutup modal resep detail yang sedang terbuka!
   const articleView = document.getElementById("article-view");
   if (articleView) articleView.classList.remove("active");
 
-  // 2. Cegah user membuka profilnya sendiri (Arahkan ke tab Profil Saya)
+  // Jika klik diri sendiri, lari ke menu profil pribadi
   if (currentUser && currentUser.uid === uid) {
-    switchPage("profile"); // Sesuaikan dengan id halaman profilmu
+    switchPage("profile-page");
     return;
   }
 
   viewedPublicUid = uid;
 
-  // 3. Sembunyikan semua halaman utama, lalu munculkan public-profile-page
-  document
-    .querySelectorAll(".page-section")
-    .forEach((el) => (el.style.display = "none"));
-  document.getElementById("public-profile-page").style.display = "block";
+  // Tampilkan Overlay Profil
+  document.getElementById("public-profile-page").classList.add("active");
 
-  // Set Info Dasar
   document.getElementById("public-profile-name").innerText = name || "Pengguna";
   document.getElementById("public-profile-avatar").src =
     photoUrl || `https://ui-avatars.com/api/?name=${name}&background=random`;
 
-  // Tarik data Followers/Following si pembuat resep dari Firebase
+  // Tarik Followers
   db.collection("users")
     .doc(uid)
     .onSnapshot((doc) => {
@@ -1787,26 +1791,28 @@ window.openPublicProfile = (uid, name, photoUrl) => {
       document.getElementById("public-followers").innerText = followers.length;
       document.getElementById("public-following").innerText = following.length;
 
-      // Atur tombol Follow
       const btnFollow = document.getElementById("btn-follow-public");
       if (currentUser) {
         btnFollow.style.display = "block";
         if (followers.includes(currentUser.uid)) {
           btnFollow.innerText = "Mengikuti";
-          btnFollow.classList.add("following");
+          btnFollow.style.background = "rgba(0,0,0,0.05)";
+          btnFollow.style.color = "var(--text-muted)";
         } else {
-          btnFollow.innerText = "+ Follow";
-          btnFollow.classList.remove("following");
+          btnFollow.innerText = "+ Ikuti";
+          btnFollow.style.background = "var(--primary, #ff6b6b)";
+          btnFollow.style.color = "white";
         }
       } else {
         btnFollow.style.display = "none";
       }
     });
 
-  // Tarik HANYA resep buatan user ini
-  // (Pastikan kamu punya field 'authorUid' di koleksi resep/menus kamu)
-  db.collection("menus")
-    .where("authorUid", "==", uid)
+  // TARIK RESEP: Ganti koleksi jadi 'recipes' dan cari berdasarkan 'userId'
+  document.getElementById("public-profile-recipes").innerHTML =
+    `<p style="text-align:center; width:100%; color:#888;">Memuat resep...</p>`;
+  db.collection("recipes")
+    .where("userId", "==", uid)
     .get()
     .then((snapshot) => {
       let userRecipes = [];
@@ -1814,61 +1820,67 @@ window.openPublicProfile = (uid, name, photoUrl) => {
         userRecipes.push({ id: doc.id, ...doc.data() });
       });
 
-      // Gunakan fungsi renderGrid bawaanmu untuk menggambar kartu resep
       if (userRecipes.length > 0) {
         renderGrid("public-profile-recipes", userRecipes);
       } else {
         document.getElementById("public-profile-recipes").innerHTML =
-          `<p style="text-align:center; width:100%; color:#888;">Belum ada resep.</p>`;
+          `<p style="text-align:center; width:100%; color:#888; font-size:12px;">Pengguna ini belum membagikan resep.</p>`;
       }
     });
+
+  if (typeof feather !== "undefined") feather.replace();
 };
 
-// 2. Tombol Kembali dari Profil Publik
+// 2. Tutup Profil
 window.closePublicProfile = () => {
   viewedPublicUid = null;
-  document.getElementById("public-profile-page").style.display = "none";
-
-  // Kembalikan ke halaman beranda (sesuaikan dengan fungsi navigasimu)
-  switchPage("home");
+  document.getElementById("public-profile-page").classList.remove("active");
 };
 
-// 3. Fungsi Follow/Unfollow dari dalam Profil Publik
-window.toggleFollowPublic = () => {
-  if (!currentUser) return;
+// 3. Menampilkan Modal Daftar Pengikut/Mengikuti
+window.showFollowList = async (type) => {
   if (!viewedPublicUid) return;
 
-  const myUid = currentUser.uid;
-  const targetUid = viewedPublicUid;
+  const titleText = type === "followers" ? "Pengikut" : "Mengikuti";
+  document.getElementById("follow-list-title").innerText = titleText;
 
-  const myRef = db.collection("users").doc(myUid);
-  const targetRef = db.collection("users").doc(targetUid);
+  const content = document.getElementById("follow-list-content");
+  content.innerHTML =
+    '<p style="text-align:center; font-size:12px; color:#888;">Memuat data...</p>';
+  document.getElementById("follow-list-modal").style.display = "flex";
 
-  myRef.get().then((doc) => {
+  try {
+    const doc = await db.collection("users").doc(viewedPublicUid).get();
     const data = doc.exists ? doc.data() : {};
-    const following = data.following || [];
-    const isFollowing = following.includes(targetUid);
+    const listIds = data[type] || [];
 
-    if (isFollowing) {
-      // Unfollow
-      myRef.set(
-        { following: firebase.firestore.FieldValue.arrayRemove(targetUid) },
-        { merge: true },
-      );
-      targetRef.set(
-        { followers: firebase.firestore.FieldValue.arrayRemove(myUid) },
-        { merge: true },
-      );
-    } else {
-      // Follow
-      myRef.set(
-        { following: firebase.firestore.FieldValue.arrayUnion(targetUid) },
-        { merge: true },
-      );
-      targetRef.set(
-        { followers: firebase.firestore.FieldValue.arrayUnion(myUid) },
-        { merge: true },
-      );
+    if (listIds.length === 0) {
+      content.innerHTML = `<p style="text-align:center; font-size:12px; color:#888;">Belum ada ${titleText.toLowerCase()}.</p>`;
+      return;
     }
-  });
+
+    content.innerHTML = "";
+
+    // Looping untuk mengambil nama & foto dari masing-masing UID
+    for (let id of listIds) {
+      const userDoc = await db.collection("users").doc(id).get();
+      if (userDoc.exists) {
+        const uData = userDoc.data();
+        const uName = uData.name || "Pengguna";
+        const uPhoto =
+          uData.photoURL || `https://ui-avatars.com/api/?name=${uName}`;
+
+        // Buat Barisan Pengguna (BISA DIKLIK!)
+        content.innerHTML += `
+        <div style="display:flex; align-items:center; gap:10px; cursor:pointer; padding: 5px;" 
+             onclick="document.getElementById('follow-list-modal').style.display='none'; openPublicProfile('${id}', '${uName}', '${uPhoto}')">
+            <img src="${uPhoto}" style="width:40px; height:40px; border-radius:50%; object-fit:cover; border: 1px solid #eee;">
+            <b style="font-size:14px; color:var(--text);">${uName}</b>
+        </div>`;
+      }
+    }
+  } catch (e) {
+    content.innerHTML =
+      '<p style="text-align:center; color:red;">Gagal memuat data.</p>';
+  }
 };
