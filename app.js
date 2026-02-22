@@ -217,6 +217,22 @@ function renderGrid(containerId, data) {
       const docId = item.id || "undefined";
       const time = item.time || "- Menit";
       const servings = item.servings || "- Porsi";
+      const authorUid = item.authorUid || ""; // Pastikan kamu menyimpan UID pembuat resep
+
+      let authorHtml = "";
+
+      // Cek apakah Admin (Bisa disesuaikan, misalnya cek string 'admin' atau UID khusus admin)
+      if (authorName.toLowerCase() === "admin") {
+        authorHtml = `<span style="color: var(--text-muted); cursor: default;">
+                    <i data-feather="shield" style="width:12px;"></i> ${authorName}
+                  </span>`;
+      } else {
+        // Kalau user biasa, warnanya primary dan bisa diklik!
+        authorHtml = `<span style="color: var(--primary, #ff6b6b); font-weight: bold; cursor: pointer;" 
+                        onclick="openPublicProfile('${authorUid}', '${authorName}', '${item.authorPhoto || ""}')">
+                    <i data-feather="user" style="width:12px;"></i> ${authorName}
+                  </span>`;
+      }
 
       return `
     <div class="card-item menu-card" onclick="openArticle('${item.title}', '${item.tag}', '${item.img}', '${safeDesc}', '${authorName}', '${time}', '${servings}')">
@@ -1552,4 +1568,273 @@ window.submitComment = (btnElement) => {
       btnElement.innerText = originalBtnText;
       btnElement.disabled = false;
     });
+};
+// ==========================================
+// --- FITUR FOLLOW / UNFOLLOW (FIREBASE) ---
+// ==========================================
+
+let currentRecipeAuthorUid = null; // Menyimpan UID author dari resep yang sedang dibuka
+
+// 1. Dengar Data Profil Secara Realtime (Untuk Header Profil)
+firebase.auth().onAuthStateChanged((user) => {
+  const myStatsContainer = document.getElementById("my-profile-stats");
+  if (user) {
+    // --- JIKA SUDAH LOGIN ---
+    // 1. Munculkan wadah statistiknya
+    if (myStatsContainer) myStatsContainer.style.display = "flex";
+
+    // 2. Dengar perubahan followers/following dari Firebase
+    db.collection("users")
+      .doc(user.uid)
+      .onSnapshot((doc) => {
+        if (doc.exists) {
+          const data = doc.data();
+          const followers = data.followers || [];
+          const following = data.following || [];
+
+          const elFollowers = document.getElementById("count-followers");
+          const elFollowing = document.getElementById("count-following");
+
+          if (elFollowers) elFollowers.innerText = followers.length;
+          if (elFollowing) elFollowing.innerText = following.length;
+        }
+      });
+  } else {
+    // --- JIKA BELUM LOGIN (GUEST) ---
+    // Sembunyikan wadah statistiknya secara total
+    if (myStatsContainer) myStatsContainer.style.display = "none";
+
+    // (Opsional) Reset angka balik ke 0 biar bersih
+    const elFollowers = document.getElementById("count-followers");
+    const elFollowing = document.getElementById("count-following");
+    if (elFollowers) elFollowers.innerText = "0";
+    if (elFollowing) elFollowing.innerText = "0";
+  }
+  // Dengar perubahan followers/following milik akun yang sedang login
+  db.collection("users")
+    .doc(user.uid)
+    .onSnapshot((doc) => {
+      if (doc.exists) {
+        const data = doc.data();
+        const followers = data.followers || [];
+        const following = data.following || [];
+
+        // Update angka di Profil Header
+        const elFollowers = document.getElementById("count-followers");
+        const elFollowing = document.getElementById("count-following");
+
+        if (elFollowers) elFollowers.innerText = followers.length;
+        if (elFollowing) elFollowing.innerText = following.length;
+      }
+    });
+});
+
+// 2. Cek Status Follow Saat Buka Detail Resep
+// PANGGIL FUNGSI INI di dalam window.openArticle() setelah kamu mendapatkan data resepnya
+window.checkFollowStatus = (authorUid) => {
+  const btnFollow = document.getElementById("btn-follow-author");
+  if (!btnFollow || !authorUid) return;
+
+  currentRecipeAuthorUid = authorUid;
+
+  // Sembunyikan tombol kalau resep ini buatan sendiri atau user belum login
+  if (!currentUser || currentUser.uid === authorUid) {
+    btnFollow.style.display = "none";
+    return;
+  }
+
+  btnFollow.style.display = "block"; // Munculkan tombol
+
+  // Cek apakah kita sudah nge-follow orang ini
+  db.collection("users")
+    .doc(currentUser.uid)
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        const data = doc.data();
+        const following = data.following || [];
+
+        if (following.includes(authorUid)) {
+          btnFollow.innerText = "Mengikuti";
+          btnFollow.classList.add("following");
+        } else {
+          btnFollow.innerText = "+ Follow";
+          btnFollow.classList.remove("following");
+        }
+      }
+    });
+};
+
+// 3. Eksekusi Follow / Unfollow Saat Tombol Diklik
+window.toggleFollow = () => {
+  if (!currentUser) {
+    openPopup("Login dengan Google dulu untuk nge-follow!");
+    return;
+  }
+
+  if (!currentRecipeAuthorUid) return;
+
+  const myUid = currentUser.uid;
+  const targetUid = currentRecipeAuthorUid;
+
+  const myRef = db.collection("users").doc(myUid);
+  const targetRef = db.collection("users").doc(targetUid);
+
+  // Ambil data kita sekarang buat ngecek udah follow atau belum
+  myRef.get().then((doc) => {
+    const data = doc.exists ? doc.data() : {};
+    const following = data.following || [];
+    const isFollowing = following.includes(targetUid);
+
+    if (isFollowing) {
+      // JIKA SUDAH FOLLOW -> UNFOLLOW
+      myRef.set(
+        { following: firebase.firestore.FieldValue.arrayRemove(targetUid) },
+        { merge: true },
+      );
+      targetRef.set(
+        { followers: firebase.firestore.FieldValue.arrayRemove(myUid) },
+        { merge: true },
+      );
+
+      // Update UI tombol
+      const btn = document.getElementById("btn-follow-author");
+      btn.innerText = "+ Follow";
+      btn.classList.remove("following");
+    } else {
+      // JIKA BELUM FOLLOW -> FOLLOW
+      myRef.set(
+        { following: firebase.firestore.FieldValue.arrayUnion(targetUid) },
+        { merge: true },
+      );
+      targetRef.set(
+        { followers: firebase.firestore.FieldValue.arrayUnion(myUid) },
+        { merge: true },
+      );
+
+      // Update UI tombol
+      const btn = document.getElementById("btn-follow-author");
+      btn.innerText = "Mengikuti";
+      btn.classList.add("following");
+    }
+  });
+};
+let viewedPublicUid = null;
+
+// 1. Membuka Halaman Profil Orang Lain
+window.openPublicProfile = (uid, name, photoUrl) => {
+  // Jangan buka profil sendiri, arahkan ke tab Profil Saya
+  if (currentUser && currentUser.uid === uid) {
+    switchPage("profile"); // Sesuaikan dengan fungsi pindah menu-mu
+    return;
+  }
+
+  viewedPublicUid = uid;
+
+  // Sembunyikan semua halaman utama, lalu munculkan public-profile-page
+  document
+    .querySelectorAll(".page-section")
+    .forEach((el) => (el.style.display = "none"));
+  document.getElementById("public-profile-page").style.display = "block";
+
+  // Set Info Dasar
+  document.getElementById("public-profile-name").innerText = name || "Pengguna";
+  document.getElementById("public-profile-avatar").src =
+    photoUrl || `https://ui-avatars.com/api/?name=${name}&background=random`;
+
+  // Tarik data Followers/Following si pembuat resep dari Firebase
+  db.collection("users")
+    .doc(uid)
+    .onSnapshot((doc) => {
+      const data = doc.exists ? doc.data() : {};
+      const followers = data.followers || [];
+      const following = data.following || [];
+
+      document.getElementById("public-followers").innerText = followers.length;
+      document.getElementById("public-following").innerText = following.length;
+
+      // Atur tombol Follow
+      const btnFollow = document.getElementById("btn-follow-public");
+      if (currentUser) {
+        btnFollow.style.display = "block";
+        if (followers.includes(currentUser.uid)) {
+          btnFollow.innerText = "Mengikuti";
+          btnFollow.classList.add("following");
+        } else {
+          btnFollow.innerText = "+ Follow";
+          btnFollow.classList.remove("following");
+        }
+      } else {
+        btnFollow.style.display = "none";
+      }
+    });
+
+  // Tarik HANYA resep buatan user ini
+  // (Pastikan kamu punya field 'authorUid' di koleksi resep/menus kamu)
+  db.collection("menus")
+    .where("authorUid", "==", uid)
+    .get()
+    .then((snapshot) => {
+      let userRecipes = [];
+      snapshot.forEach((doc) => {
+        userRecipes.push({ id: doc.id, ...doc.data() });
+      });
+
+      // Gunakan fungsi renderGrid bawaanmu untuk menggambar kartu resep
+      if (userRecipes.length > 0) {
+        renderGrid("public-profile-recipes", userRecipes);
+      } else {
+        document.getElementById("public-profile-recipes").innerHTML =
+          `<p style="text-align:center; width:100%; color:#888;">Belum ada resep.</p>`;
+      }
+    });
+};
+
+// 2. Tombol Kembali dari Profil Publik
+window.closePublicProfile = () => {
+  viewedPublicUid = null;
+  document.getElementById("public-profile-page").style.display = "none";
+
+  // Kembalikan ke halaman beranda (sesuaikan dengan fungsi navigasimu)
+  switchPage("home");
+};
+
+// 3. Fungsi Follow/Unfollow dari dalam Profil Publik
+window.toggleFollowPublic = () => {
+  if (!currentUser) return;
+  if (!viewedPublicUid) return;
+
+  const myUid = currentUser.uid;
+  const targetUid = viewedPublicUid;
+
+  const myRef = db.collection("users").doc(myUid);
+  const targetRef = db.collection("users").doc(targetUid);
+
+  myRef.get().then((doc) => {
+    const data = doc.exists ? doc.data() : {};
+    const following = data.following || [];
+    const isFollowing = following.includes(targetUid);
+
+    if (isFollowing) {
+      // Unfollow
+      myRef.set(
+        { following: firebase.firestore.FieldValue.arrayRemove(targetUid) },
+        { merge: true },
+      );
+      targetRef.set(
+        { followers: firebase.firestore.FieldValue.arrayRemove(myUid) },
+        { merge: true },
+      );
+    } else {
+      // Follow
+      myRef.set(
+        { following: firebase.firestore.FieldValue.arrayUnion(targetUid) },
+        { merge: true },
+      );
+      targetRef.set(
+        { followers: firebase.firestore.FieldValue.arrayUnion(myUid) },
+        { merge: true },
+      );
+    }
+  });
 };

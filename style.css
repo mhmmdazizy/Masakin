@@ -1343,3 +1343,25 @@ body[data-theme="dark"] .logo-dark {
   transform: scale(0.85);
   transform-origin: bottom right; /* Kunci biar tetap nempel rapat di pojok! */
 }
+/* --- DESAIN TOMBOL FOLLOW --- */
+.btn-follow {
+  background: var(--primary, #ff6b6b);
+  color: white;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-follow.following {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text-muted);
+  border: 1px solid var(--border, #ddd);
+}
+
+.btn-follow:hover {
+  transform: scale(1.05);
+}
