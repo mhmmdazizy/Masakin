@@ -1249,3 +1249,73 @@ body[data-theme="dark"] .logo-dark {
   color: var(--text-muted);
   font-weight: 500;
 }
+/* --- DESAIN KOLOM KOMENTAR --- */
+.comments-section {
+  margin-top: 25px;
+  padding-top: 25px;
+  border-top: 1px dashed var(--border, #ddd);
+}
+
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+
+  /* Batasi tinggi wadah komentar biar bisa di-scroll di dalam */
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 5px; /* Kasih jarak buat scrollbar */
+}
+
+/* Desain Kartu Tiap Komentar */
+.comment-card {
+  display: flex;
+  gap: 12px;
+  background: rgba(0, 0, 0, 0.03);
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.comment-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #ccc;
+  flex-shrink: 0;
+}
+
+.comment-content {
+  flex: 1;
+}
+
+.comment-name {
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--text);
+  margin-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.comment-date {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: normal;
+}
+
+.comment-text {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+/* Sembunyikan scrollbar bawaan Chrome/Safari biar cantik */
+.comments-list::-webkit-scrollbar {
+  width: 4px;
+}
+.comments-list::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}

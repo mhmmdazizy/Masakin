@@ -731,6 +731,7 @@ window.openArticle = (
   const safeTitleId = title.replace(/[^a-zA-Z0-9]/g, "_");
   if (typeof renderReactions === "function") renderReactions(safeTitleId);
   if (typeof renderRatings === "function") renderRatings(safeTitleId);
+  if (typeof loadComments === "function") loadComments(safeTitleId);
   document.getElementById("article-view").classList.add("active");
   history.pushState({ modal: "article" }, null, "");
 
@@ -1403,3 +1404,120 @@ window.addEventListener("offline", () => {
 window.addEventListener("online", () => {
   showToast("Kembali online! Internet terhubung.");
 });
+// ==========================================
+// --- FITUR KOMENTAR BERSUARA (FIREBASE) ---
+// ==========================================
+
+let unsubscribeComments = null; // Kunci untuk mematikan tarikan data kalau user pindah resep
+
+// 1. Fungsi Menarik & Menggambar Komentar
+window.loadComments = (safeTitleId) => {
+  const listContainer = document.getElementById("comments-list");
+  if (!listContainer) return;
+
+  // Bersihkan jalur data lama sebelum membuka yang baru
+  if (unsubscribeComments) unsubscribeComments();
+
+  listContainer.innerHTML = `<p style="text-align:center; font-size:12px; color:var(--text-muted);">Memuat komentar...</p>`;
+
+  // Tarik data dari sub-collection 'messages' diurutkan berdasarkan waktu (paling lama di atas)
+  unsubscribeComments = db
+    .collection("comments")
+    .doc(safeTitleId)
+    .collection("messages")
+    .orderBy("timestamp", "asc")
+    .onSnapshot((snapshot) => {
+      listContainer.innerHTML = ""; // Bersihkan teks 'Memuat'
+
+      if (snapshot.empty) {
+        listContainer.innerHTML = `<p style="font-size:13px; color:var(--text-muted); text-align:center;">Belum ada komentar. Jadilah yang pertama!</p>`;
+        return;
+      }
+
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+
+        // Ubah waktu mesin Firebase jadi format jam/tanggal yang enak dibaca
+        let dateText = "Baru saja";
+        if (data.timestamp) {
+          const date = data.timestamp.toDate();
+          dateText = date.toLocaleDateString("id-ID", {
+            day: "numeric",
+            month: "short",
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+        }
+
+        // Fallback foto profil (Kalau user gak punya foto profil Google, pakai gambar inisial huruf)
+        const photoUrl =
+          data.photoURL ||
+          `https://ui-avatars.com/api/?name=${data.name}&background=random`;
+
+        // Cetak kartunya
+        listContainer.innerHTML += `
+                    <div class="comment-card">
+                        <img src="${photoUrl}" class="comment-avatar" alt="Avatar">
+                        <div class="comment-content">
+                            <div class="comment-name">
+                                ${data.name} 
+                                <span class="comment-date">${dateText}</span>
+                            </div>
+                            <div class="comment-text">${data.text}</div>
+                        </div>
+                    </div>
+                `;
+      });
+
+      // Otomatis gulir layar ke komentar paling bawah (terbaru)
+      listContainer.scrollTop = listContainer.scrollHeight;
+    });
+};
+
+// 2. Fungsi Mengirim Komentar Baru
+window.submitComment = (btnElement) => {
+  if (!currentUser) {
+    openPopup("Login dengan Google dulu untuk ikut berkomentar!");
+    return;
+  }
+
+  const inputElement = document.getElementById("comment-input");
+  const text = inputElement.value.trim();
+
+  if (text === "") {
+    openPopup("Komentar tidak boleh kosong!");
+    return;
+  }
+
+  const title = document.getElementById("detail-title").innerText;
+  const safeTitleId = title.replace(/[^a-zA-Z0-9]/g, "_");
+
+  // Ubah teks tombol biar ada efek loading
+  const originalBtnText = btnElement.innerText;
+  btnElement.innerText = "Mengirim...";
+  btnElement.disabled = true;
+
+  // Tembakkan ke Firebase
+  db.collection("comments")
+    .doc(safeTitleId)
+    .collection("messages")
+    .add({
+      uid: currentUser.uid,
+      name: currentUser.displayName || "Pengguna",
+      photoURL: currentUser.photoURL,
+      text: text,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    })
+    .then(() => {
+      // Kalau sukses, bersihkan kotak ketik
+      inputElement.value = "";
+      btnElement.innerText = originalBtnText;
+      btnElement.disabled = false;
+    })
+    .catch((error) => {
+      console.error("Gagal mengirim:", error);
+      openPopup("Gagal mengirim komentar. Coba lagi.");
+      btnElement.innerText = originalBtnText;
+      btnElement.disabled = false;
+    });
+};
