@@ -1407,3 +1407,27 @@ body[data-theme="dark"] .logo-dark {
 .btn-follow:hover {
   transform: scale(1.05);
 }
+/* --- DESAIN MOOD PILL (MENU PAGE) --- */
+.mood-filter-container::-webkit-scrollbar {
+  display: none; /* Sembunyikan scrollbar di Chrome/Safari */
+}
+.mood-pill {
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #ddd);
+  color: var(--text-muted);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  white-space: nowrap; /* Teks gak boleh turun ke bawah */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0; /* Biar tombolnya gak gepeng */
+}
+.mood-pill.active {
+  background: var(--primary, #ff6b6b);
+  color: white;
+  border-color: var(--primary, #ff6b6b);
+  font-weight: bold;
+  transform: scale(1.05);
+}

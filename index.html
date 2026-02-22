@@ -145,6 +145,16 @@
             />
           </div>
         </div>
+        <div class="mood-filter-container" style="display: flex; gap: 10px; overflow-x: auto; padding: 0 20px 15px 20px; scrollbar-width: none; -ms-overflow-style: none;">
+            <button class="mood-pill" onclick="toggleMenuMood(this, 'Sat-Set')">⚡ Sat-Set</button>
+            <button class="mood-pill" onclick="toggleMenuMood(this, 'Comfort Food')">🥣 Comfort Food</button>
+            <button class="mood-pill" onclick="toggleMenuMood(this, 'Pecinta Pedas')">🔥 Pecinta Pedas</button>
+            <button class="mood-pill" onclick="toggleMenuMood(this, 'Anget-Anget')">🍲 Anget-Anget</button>
+            <button class="mood-pill" onclick="toggleMenuMood(this, 'Tanggal Tua')">💸 Tanggal Tua</button>
+            <button class="mood-pill" onclick="toggleMenuMood(this, 'Sweet Tooth')">🍰 Sweet Tooth</button>
+            <button class="mood-pill" onclick="toggleMenuMood(this, 'Menu Sehat')">🥗 Menu Sehat</button>
+            <button class="mood-pill" onclick="toggleMenuMood(this, 'Cemilan Santai')">🍿 Cemilan Santai</button>
+        </div>
         <div class="masonry-grid" id="menu-container"></div>
       </section>
 
@@ -526,7 +536,7 @@
         <select id="rec-tag" class="form-input" style="cursor: pointer;">
             <option value="" disabled selected>Pilih mood masakanmu...</option>
             
-            <option value="Sat-Set (Cepat)">⚡ Sat-Set (Cepat & Praktis)</option>
+            <option value="Sat-Set">⚡ Sat-Set (Cepat & Praktis)</option>
             <option value="Comfort Food">🥣 Comfort Food (Nyaman di Perut)</option>
             <option value="Pecinta Pedas">🔥 Pecinta Pedas (Bikin Melek)</option>
             <option value="Anget-Anget">🍲 Anget-Anget (Cocok pas Hujan)</option>

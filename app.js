@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Render Data Statis Dulu (Supaya gak kosong)
   renderIngredients();
   renderGrid("explore-container", articles);
-  renderGrid("menu-container", menus);
+  if (typeof renderMenuGrid === "function") renderMenuGrid();
   if (typeof updateTotalLikesUI === "function") updateTotalLikesUI();
 
   // Render Icon (Penting biar gak hilang)
@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       renderMyRecipes();
       // Render jika sedang di halaman menu
-      renderGrid("menu-container", [...menus, ...allCloudRecipes]);
+      if (typeof renderMenuGrid === "function") renderMenuGrid();
       if (typeof updateTotalLikesUI === "function") updateTotalLikesUI();
     });
 
@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Render Ulang Layar secara Realtime
     renderGrid("explore-container", articles);
-    renderGrid("menu-container", [...menus, ...allCloudRecipes]);
+    if (typeof renderMenuGrid === "function") renderMenuGrid();
     renderGrid("favorit-container", favorites);
 
     if (typeof renderPublicRecipes === "function") renderPublicRecipes();
@@ -453,7 +453,7 @@ window.saveMyRecipe = async () => {
   // Ubah tombol jadi status loading
   const btn = document.querySelector("#recipe-form .find-btn");
   const originalText = btn.innerText;
-  btn.innerText = "Mengompres & Menyimpan...";
+  btn.innerText = "Menyimpan...";
   btn.disabled = true;
 
   try {
@@ -2078,4 +2078,53 @@ window.updateTotalLikesUI = () => {
     const elPublicLikes = document.getElementById("public-likes");
     if (elPublicLikes) elPublicLikes.innerText = publicTotalLikes;
   }
+};
+// ==========================================
+// --- FITUR SORTING MOOD DI HALAMAN MENU ---
+// ==========================================
+let selectedMenuMood = null; // Memori pengingat mood apa yang lagi diklik
+
+window.toggleMenuMood = (btn, moodValue) => {
+  // 1. Atur Tampilan Tombol (Aktif/Nonaktif)
+  if (selectedMenuMood === moodValue) {
+    // Kalau diklik dua kali, matikan filternya
+    selectedMenuMood = null;
+    btn.classList.remove("active");
+  } else {
+    // Matikan semua tombol lain dulu
+    document
+      .querySelectorAll(".mood-pill")
+      .forEach((el) => el.classList.remove("active"));
+    // Hidupkan tombol yang ini
+    selectedMenuMood = moodValue;
+    btn.classList.add("active");
+  }
+
+  // 2. Susun ulang resep di layar
+  renderMenuGrid();
+};
+
+window.renderMenuGrid = () => {
+  const staticMenus = typeof menus !== "undefined" ? menus : [];
+  const cloudMenus =
+    typeof allCloudRecipes !== "undefined" ? allCloudRecipes : [];
+  let allMenus = [...staticMenus, ...cloudMenus];
+
+  // JIKA ADA MOOD YANG DIPILIH, PRIORITASKAN DI ATAS
+  if (selectedMenuMood) {
+    // Kelompokkan resep yang mood-nya cocok
+    const matchedRecipes = allMenus.filter(
+      (item) => item.tag === selectedMenuMood,
+    );
+    // Kelompokkan sisanya
+    const otherRecipes = allMenus.filter(
+      (item) => item.tag !== selectedMenuMood,
+    );
+
+    // Gabungkan: Yang cocok taruh di paling atas, sisanya ngekor di bawah
+    allMenus = [...matchedRecipes, ...otherRecipes];
+  }
+
+  // Render ulang ke layar
+  renderGrid("menu-container", allMenus);
 };
