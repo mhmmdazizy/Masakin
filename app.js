@@ -1078,14 +1078,22 @@ window.openPopup = (type) => {
 };
 window.closePopup = () => history.back();
 
-// Listener Back Button
+// Listener Back Button Bawaan HP / Browser
 window.addEventListener("popstate", () => {
-  const ids = ["recipe-form", "article-view", "info-popup"];
+  // === TAMBAHKAN ID PROFIL DAN MODAL FOLLOW KE DALAM DAFTAR INI ===
+  const ids = [
+    "recipe-form",
+    "article-view",
+    "info-popup",
+    "public-profile-page",
+    "follow-list-modal",
+  ];
+
   ids.forEach((id) => {
     const el = document.getElementById(id);
     if (el) {
       if (el.style.display === "flex") el.style.display = "none";
-      el.classList.remove("active");
+      el.classList.remove("active"); // Ini yang membuat animasinya turun/menghilang
     }
   });
 });
@@ -1766,6 +1774,7 @@ let viewedPublicUid = null;
 
 // 1. Membuka Halaman Profil Orang Lain
 window.openPublicProfile = (uid, name, photoUrl) => {
+  // Tutup pop-up resep jika sedang terbuka
   const articleView = document.getElementById("article-view");
   if (articleView) articleView.classList.remove("active");
 
@@ -1777,8 +1786,12 @@ window.openPublicProfile = (uid, name, photoUrl) => {
 
   viewedPublicUid = uid;
 
-  // Tampilkan Overlay Profil
-  document.getElementById("public-profile-page").classList.add("active");
+  // === MUNCULKAN OVERLAY SEPERTI ARTICLE-VIEW ===
+  const profilePage = document.getElementById("public-profile-page");
+  profilePage.style.display = ""; // Bersihkan sisa display none jika ada
+  profilePage.classList.add("active");
+  history.pushState({ modal: "public-profile" }, null, "");
+  // ==============================================
 
   document.getElementById("public-profile-name").innerText = name || "Pengguna";
   document.getElementById("public-profile-avatar").src =
@@ -1812,7 +1825,7 @@ window.openPublicProfile = (uid, name, photoUrl) => {
       }
     });
 
-  // TARIK RESEP: Ganti koleksi jadi 'recipes' dan cari berdasarkan 'userId'
+  // TARIK RESEP DARI ORANG TERSEBUT
   document.getElementById("public-profile-recipes").innerHTML =
     `<p style="text-align:center; width:100%; color:#888;">Memuat resep...</p>`;
   db.collection("recipes")
@@ -1835,10 +1848,10 @@ window.openPublicProfile = (uid, name, photoUrl) => {
   if (typeof feather !== "undefined") feather.replace();
 };
 
-// 2. Tutup Profil
+// 2. Tutup Profil (Sama seperti menutup resep, cukup panggil history.back)
 window.closePublicProfile = () => {
   viewedPublicUid = null;
-  document.getElementById("public-profile-page").classList.remove("active");
+  history.back();
 };
 
 // 3. Menampilkan Modal Daftar Pengikut/Mengikuti

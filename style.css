@@ -557,6 +557,26 @@ header {
 .detail-overlay.active {
   transform: translateX(0);
 }
+/* --- MENGHILANGKAN OVERLAY DI LAYAR LAPTOP SAAT TIDAK AKTIF --- */
+.detail-overlay:not(.active) {
+  visibility: hidden;
+  opacity: 0;
+  /* Tunggu animasi geser 0.3 detik selesai, baru hilangkan wujudnya */
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease,
+    visibility 0s 0.3s;
+}
+
+.detail-overlay.active {
+  visibility: visible;
+  opacity: 1;
+  /* Langsung munculkan wujudnya, lalu mulai animasi geser */
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease,
+    visibility 0s 0s;
+}
 
 .detail-header {
   padding: 15px 20px;
