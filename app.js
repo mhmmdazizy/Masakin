@@ -1901,3 +1901,70 @@ window.showFollowList = async (type) => {
       '<p style="text-align:center; color:red;">Gagal memuat data.</p>';
   }
 };
+// ==========================================
+// --- FUNGSI KLIK TOMBOL IKUTI DI PROFIL ---
+// ==========================================
+window.toggleFollowPublic = () => {
+  // 1. Cek apakah user sudah login
+  if (!currentUser) {
+    openPopup("login dulu");
+    return;
+  }
+
+  if (!viewedPublicUid) return;
+
+  const myUid = currentUser.uid;
+  const targetUid = viewedPublicUid;
+
+  const myRef = db.collection("users").doc(myUid);
+  const targetRef = db.collection("users").doc(targetUid);
+
+  // 2. Efek Loading di Tombol
+  const btnFollow = document.getElementById("btn-follow-public");
+  const originalText = btnFollow.innerText;
+  btnFollow.innerText = "Tunggu...";
+  btnFollow.style.opacity = "0.7";
+  btnFollow.disabled = true; // Kunci tombol biar gak diklik dobel (spam)
+
+  // 3. Eksekusi ke Firebase
+  myRef
+    .get()
+    .then((doc) => {
+      const data = doc.exists ? doc.data() : {};
+      const following = data.following || [];
+      const isFollowing = following.includes(targetUid);
+
+      if (isFollowing) {
+        // PROSES UNFOLLOW
+        myRef.set(
+          { following: firebase.firestore.FieldValue.arrayRemove(targetUid) },
+          { merge: true },
+        );
+        targetRef.set(
+          { followers: firebase.firestore.FieldValue.arrayRemove(myUid) },
+          { merge: true },
+        );
+      } else {
+        // PROSES FOLLOW
+        myRef.set(
+          { following: firebase.firestore.FieldValue.arrayUnion(targetUid) },
+          { merge: true },
+        );
+        targetRef.set(
+          { followers: firebase.firestore.FieldValue.arrayUnion(myUid) },
+          { merge: true },
+        );
+      }
+
+      // Kembalikan status tombol
+      btnFollow.disabled = false;
+      btnFollow.style.opacity = "1";
+    })
+    .catch((error) => {
+      console.error("Gagal follow:", error);
+      btnFollow.innerText = originalText;
+      btnFollow.disabled = false;
+      btnFollow.style.opacity = "1";
+      alert("Gagal memproses, periksa koneksi internetmu.");
+    });
+};
