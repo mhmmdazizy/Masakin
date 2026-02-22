@@ -1189,7 +1189,7 @@ window.executeDelete = async (docId) => {
 
   try {
     await db.collection("recipes").doc(docId).delete();
-    showToast("Resep berhasil dihapus! 🗑️");
+    showToast("Resep berhasil dihapus!");
   } catch (error) {
     console.error("Gagal hapus:", error);
     showToast("Gagal menghapus: " + error.message);
@@ -2066,3 +2066,4 @@ window.updateTotalLikesUI = () => {
     if (elPublicLikes) elPublicLikes.innerText = publicTotalLikes;
   }
 };
+
