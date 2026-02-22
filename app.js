@@ -1854,9 +1854,17 @@ window.closePublicProfile = () => {
   history.back();
 };
 
-// 3. Menampilkan Modal Daftar Pengikut/Mengikuti
-window.showFollowList = async (type) => {
-  if (!viewedPublicUid) return;
+// 3. Menampilkan Modal Daftar Pengikut/Mengikuti (Bisa untuk Diri Sendiri & Orang Lain)
+window.showFollowList = async (type, isMyProfile = false) => {
+  // LOGIKA PINTAR: Tentukan UID siapa yang mau ditarik datanya
+  // Kalau isMyProfile true, pakai ID kita (currentUser.uid). Kalau false, pakai ID profil yang lagi dilihat.
+  const targetUid = isMyProfile
+    ? currentUser
+      ? currentUser.uid
+      : null
+    : viewedPublicUid;
+
+  if (!targetUid) return;
 
   const titleText = type === "followers" ? "Pengikut" : "Mengikuti";
   document.getElementById("follow-list-title").innerText = titleText;
@@ -1867,7 +1875,7 @@ window.showFollowList = async (type) => {
   document.getElementById("follow-list-modal").style.display = "flex";
 
   try {
-    const doc = await db.collection("users").doc(viewedPublicUid).get();
+    const doc = await db.collection("users").doc(targetUid).get();
     const data = doc.exists ? doc.data() : {};
     const listIds = data[type] || [];
 
@@ -1885,7 +1893,8 @@ window.showFollowList = async (type) => {
         const uData = userDoc.data();
         const uName = uData.name || "Pengguna";
         const uPhoto =
-          uData.photoURL || `https://ui-avatars.com/api/?name=${uName}`;
+          uData.photoURL ||
+          `https://ui-avatars.com/api/?name=${uName}&background=random`;
 
         // Buat Barisan Pengguna (BISA DIKLIK!)
         content.innerHTML += `
