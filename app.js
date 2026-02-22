@@ -793,6 +793,49 @@ window.updateHomeRatings = () => {
   });
 };
 
+// 2. Fungsi menggambar Bintang & Menghitung Rata-rata
+window.renderRatings = (safeTitleId) => {
+  const container = document.getElementById("detail-ratings");
+  if (!container) return;
+
+  const data = globalRatings[safeTitleId] || {};
+  const userIds = Object.keys(data); // Daftar akun yang udah ngasih rating
+  const totalUsers = userIds.length;
+
+  let totalStars = 0;
+  let currentUserRating = 0;
+  const uid = currentUser ? currentUser.uid : null;
+
+  // Hitung total nilai semua orang
+  userIds.forEach((id) => {
+    totalStars += data[id];
+    // Cek rating khusus milik user yang lagi login
+    if (id === uid) currentUserRating = data[id];
+  });
+
+  // Rumus Rata-rata (Dibulatkan 1 angka di belakang koma)
+  const avgRating = totalUsers > 0 ? (totalStars / totalUsers).toFixed(1) : 0;
+
+  // Gambar 5 Bintang yang bisa diklik
+  let starsHtml = `<div class="stars-interactive">`;
+  for (let i = 1; i <= 5; i++) {
+    const isActive = i <= currentUserRating ? "active" : "";
+    starsHtml += `<button class="star-btn ${isActive}" onclick="rateRecipe('${safeTitleId}', ${i})">★</button>`;
+  }
+  starsHtml += `</div>`;
+
+  // Teks Rata-rata
+  let textHtml = `<span class="rating-text">`;
+  if (totalUsers > 0) {
+    textHtml += `<strong style="color:var(--text); font-size:15px;">${avgRating}</strong> dari ${totalUsers} ulasan`;
+  } else {
+    textHtml += `Belum ada ulasan.`;
+  }
+  textHtml += `</span>`;
+
+  container.innerHTML = starsHtml + textHtml;
+};
+
 // 3. Fungsi saat user ngeklik Bintang
 window.rateRecipe = (safeTitleId, stars) => {
   if (!currentUser) {
