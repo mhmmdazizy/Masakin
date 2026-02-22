@@ -712,25 +712,26 @@ window.openArticle = (
 
   const authorContainer = document.getElementById("detail-author-container");
   if (authorContainer) {
-    // PERBAIKAN 2: Beri pengaman (item &&) agar tidak crash kalau data tidak ketemu
-    const authorName = item && item.authorName ? item.authorName : author;
-    const authorUid = item && item.userUid ? item.userUid : "";
+    // Trik tahan banting: Cari 'userId', kalau nggak ada cari 'authorUid' (buat jaga-jaga data lama)
+    const authorUid = item ? item.userId || item.authorUid : "";
     const authorPhoto = item && item.authorPhoto ? item.authorPhoto : "";
 
     if (authorName.toLowerCase() === "admin") {
-      // Kalau Admin: Teks biasa, warna abu-abu, gabisa diklik
+      // 1. Kalau Admin: Abu-abu & Gabisa diklik
       authorContainer.innerHTML = `<span style="color: var(--text-muted); cursor: default; font-weight: bold;">
                 <i data-feather="shield" style="width:12px;"></i> ${authorName}
             </span>`;
-    } else if (authorUid) {
-      // Kalau User Biasa: Warna primary, tebal, dan bisa diklik!
+    } else if (authorUid !== "") {
+      // 2. Kalau Punya Akun Firebase: MERAH & BISA DIKLIK!
       authorContainer.innerHTML = `<span style="color: var(--primary, #ff6b6b); font-weight: bold; cursor: pointer; text-decoration: underline;" 
                 onclick="openPublicProfile('${authorUid}', '${authorName}', '${authorPhoto}')">
                 <i data-feather="user" style="width:12px;"></i> ${authorName}
             </span>`;
     } else {
-      // Fallback kalau data lama tidak punya UID
-      authorContainer.innerHTML = `<span style="color: var(--text-muted);"><i data-feather="user" style="width:12px;"></i> ${authorName}</span>`;
+      // 3. Fallback (Resep statis dari database.js yang nggak punya akun): Abu-abu
+      authorContainer.innerHTML = `<span style="color: var(--text-muted); cursor: default;">
+                <i data-feather="user" style="width:12px;"></i> ${authorName}
+            </span>`;
     }
 
     // Render ulang icon feather
