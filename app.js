@@ -235,10 +235,9 @@ function renderGrid(containerId, data) {
              <div class="card-author" style="font-size:10px; color:#888; margin-top:5px; display:flex; gap:5px; align-items:center;">
                 <i data-feather="user" style="width:10px;"></i> ${authorName}
              </div>
-             <div class="card-image" style="background-image: url('...'); position: relative;">
+             <div class="card-image" style="background-image: url('...'); position: relative;"></div>
         </div>
-         </div>
-         <div class="card-rating-badge" data-title="${item.title}" style="display: none;"></div>
+        <div class="card-rating-badge" data-title="${item.title}" style="display: none;"></div>
     </div>`;
     })
     .join("");

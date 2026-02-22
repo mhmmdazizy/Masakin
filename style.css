@@ -1319,11 +1319,11 @@ body[data-theme="dark"] .logo-dark {
   background: #ccc;
   border-radius: 4px;
 }
-/* --- DESAIN BADGE RATING DI CARD BERANDA (POJOK KANAN BAWAH) --- */
+/* --- DESAIN BADGE RATING DI POJOK KANAN BAWAH KARTU --- */
 .card-rating-badge {
   position: absolute;
-  bottom: 0; /* Tempel di paling bawah */
-  right: 0; /* Tempel di paling kanan */
+  top: 8px;
+  left: 8px;
 
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
@@ -1333,11 +1333,13 @@ body[data-theme="dark"] .logo-dark {
   padding: 6px 12px;
 
   /* Trik biar sudutnya pas di pojok: cuma lengkungkan sudut kiri-atas */
-  border-top-left-radius: 15px;
-  border-bottom-right-radius: 0; /* (Opsional) sesuaikan dengan radius kartumu */
+  border-radius: 10px;
 
   display: flex;
   align-items: center;
   gap: 4px;
   z-index: 2;
+  /* --- TAMBAHAN UNTUK MENGECILKAN JADI 70% --- */
+  transform: scale(0.85);
+  transform-origin: bottom right; /* Kunci biar tetap nempel rapat di pojok! */
 }
