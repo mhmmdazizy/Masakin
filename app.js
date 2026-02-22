@@ -727,6 +727,9 @@ window.openArticle = (
 
   // Tampilkan ke layar
   document.getElementById("detail-desc").innerHTML = htmlContent;
+  // Trigger render reaction emot
+  const safeTitleId = title.replace(/[^a-zA-Z0-9]/g, "_");
+  if (typeof renderReactions === "function") renderReactions(safeTitleId);
   document.getElementById("article-view").classList.add("active");
   history.pushState({ modal: "article" }, null, "");
 
@@ -1080,6 +1083,89 @@ window.findRecipes = () => {
 
   // 6. Gulir (scroll) layar otomatis ke bawah
   resultSection.scrollIntoView({ behavior: "smooth", block: "start" });
+};
+// ==========================================
+// --- FITUR REACTION EMOTICON (FIREBASE) ---
+// ==========================================
+
+let globalReactions = {};
+
+// 1. Dengar data dari Firebase secara realtime
+db.collection("reactions").onSnapshot((snapshot) => {
+  globalReactions = {};
+  snapshot.forEach((doc) => {
+    globalReactions[doc.id] = doc.data();
+  });
+
+  // Kalau halaman detail resep lagi dibuka, langsung update UI-nya!
+  const articleView = document.getElementById("article-view");
+  if (articleView && articleView.classList.contains("active")) {
+    const title = document.getElementById("detail-title").innerText;
+    const safeTitleId = title.replace(/[^a-zA-Z0-9]/g, "_");
+    renderReactions(safeTitleId);
+  }
+});
+
+// 2. Fungsi untuk menggambar tombol emot ke layar
+window.renderReactions = (safeTitleId) => {
+  const container = document.getElementById("detail-reactions");
+  if (!container) return;
+
+  // Ambil data emot untuk resep ini (kalau belum ada, anggap kosong)
+  const data = globalReactions[safeTitleId] || {};
+
+  // Siapkan array user yang ngeklik tiap emot
+  const likes = data.like || [];
+  const drools = data.drool || [];
+  const loves = data.love || [];
+
+  // Cek apakah user yang lagi login udah ngeklik?
+  const uid = currentUser ? currentUser.uid : null;
+  const isLikeActive = uid && likes.includes(uid) ? "active" : "";
+  const isDroolActive = uid && drools.includes(uid) ? "active" : "";
+  const isLoveActive = uid && loves.includes(uid) ? "active" : "";
+
+  container.innerHTML = `
+        <button class="reaction-btn ${isLikeActive}" onclick="toggleReaction('${safeTitleId}', 'like')">
+            👍 <span class="count">${likes.length > 0 ? likes.length : ""}</span>
+        </button>
+        <button class="reaction-btn ${isDroolActive}" onclick="toggleReaction('${safeTitleId}', 'drool')">
+            🤤 <span class="count">${drools.length > 0 ? drools.length : ""}</span>
+        </button>
+        <button class="reaction-btn ${isLoveActive}" onclick="toggleReaction('${safeTitleId}', 'love')">
+            😍 <span class="count">${loves.length > 0 ? loves.length : ""}</span>
+        </button>
+    `;
+};
+
+// 3. Fungsi saat user ngeklik tombol emot
+window.toggleReaction = (safeTitleId, type) => {
+  if (!currentUser) {
+    openPopup("login dulu");
+    return;
+  }
+
+  const docRef = db.collection("reactions").doc(safeTitleId);
+  const uid = currentUser.uid;
+  const data = globalReactions[safeTitleId] || {};
+  const reactedUsers = data[type] || [];
+
+  // Kalau user sudah pernah ngeklik, HAPUS (Unlike). Kalau belum, TAMBAHKAN (Like).
+  if (reactedUsers.includes(uid)) {
+    docRef.set(
+      {
+        [type]: firebase.firestore.FieldValue.arrayRemove(uid),
+      },
+      { merge: true },
+    );
+  } else {
+    docRef.set(
+      {
+        [type]: firebase.firestore.FieldValue.arrayUnion(uid),
+      },
+      { merge: true },
+    );
+  }
 };
 
 // --- FITUR NOTIFIKASI GLOBAL (FIREBASE) ---

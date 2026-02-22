@@ -511,32 +511,27 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  
-  /* --- KUNCI SAMPAI UJUNG ATAS --- */
   position: sticky;
-  top: -24px; /* RAHASIANYA DI SINI: Ubah dari 0 jadi minus! */
-  
-  /* Tarik ukurannya mentok ke ujung layar */
-  margin-top: -24px;
-  margin-left: -20px;
-  margin-right: -20px;
-  
-  /* Balikin jarak ke dalam */
-  padding: 20px; 
-  /* ------------------------------- */
+  top: 0;
+  background: var(--surface, #fff); /* Pastikan background solid */
+  z-index: 10;
 
-  /* Pastikan background solid biar gak tembus pandang */
-  background: var(--surface, #fff); 
-  z-index: 10; 
-  
-  /* Bikin sudut atasnya melengkung rapi */
-  border-top-left-radius: 15px; 
+  /* --- INI DIA OBAT ANTI BOLONGNYA --- */
+  margin-top: -20px; /* Menarik header ke atas menutupi padding bolong */
+  margin-left: -20px; /* Menarik ke kiri mentok layar */
+  margin-right: -20px; /* Menarik ke kanan mentok layar */
+
+  /* Kembalikan jarak ke dalam biar tulisan "Edit Resep" & tombol "X" gak nabrak pinggir */
+  padding: 20px;
+
+  /* Bikin sudut atasnya melengkung rapi ngikutin kartunya */
+  border-top-left-radius: 15px;
   border-top-right-radius: 15px;
+  /* ----------------------------------- */
 
   border-bottom: 1px solid var(--border, #ddd);
   margin-bottom: 20px;
 }
-
 .close-popup {
   background: none;
   border: none;
@@ -824,13 +819,9 @@ header {
   border: 1px solid #ddd;
   border-radius: 8px;
   background: var(--bg);
-  color: var(--text);
+  color: var(--text);
+  box-sizing: border-box;
   font-family: inherit;
-/* --- MATIKAN TARIKAN TEXTAREA --- */
-textarea {
-  resize: none;
-}
-
 }
 
 /* Pastikan tombol + di profil bisa diklik */
@@ -1185,4 +1176,39 @@ body[data-theme="dark"] .logo-dark {
 }
 .btn-add-step:active {
   background: rgba(255, 107, 107, 0.1);
+}
+/* --- DESAIN REACTION EMOTICON --- */
+.reaction-container {
+  display: flex;
+  gap: 12px;
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px dashed var(--border, #ddd);
+}
+
+.reaction-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 50px;
+  border: 1px solid var(--border, #ddd);
+  background: var(--surface, #fff);
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+}
+
+.reaction-btn:hover {
+  background: rgba(0, 0, 0, 0.02);
+  transform: translateY(-2px);
+}
+
+/* Warna saat user sudah ngeklik emot ini */
+.reaction-btn.active {
+  background: rgba(255, 107, 107, 0.1);
+  border-color: var(--primary, #ff6b6b);
+  color: var(--primary, #ff6b6b);
+  font-weight: bold;
 }
