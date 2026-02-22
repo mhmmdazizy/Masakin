@@ -235,6 +235,10 @@ function renderGrid(containerId, data) {
              <div class="card-author" style="font-size:10px; color:#888; margin-top:5px; display:flex; gap:5px; align-items:center;">
                 <i data-feather="user" style="width:10px;"></i> ${authorName}
              </div>
+             <div class="card-image" style="background-image: url('...'); position: relative;">
+        
+        <div class="card-rating-badge" data-title="${item.title}" style="display: none;"></div>
+        </div>
          </div>
     </div>`;
     })
@@ -750,56 +754,43 @@ db.collection("ratings").onSnapshot((snapshot) => {
     globalRatings[doc.id] = doc.data();
   });
 
-  // Auto-update UI kalau modal artikel lagi kebuka
+  // A. Auto-update UI kalau modal artikel lagi kebuka
   const articleView = document.getElementById("article-view");
   if (articleView && articleView.classList.contains("active")) {
     const title = document.getElementById("detail-title").innerText;
     const safeTitleId = title.replace(/[^a-zA-Z0-9]/g, "_");
     if (typeof renderRatings === "function") renderRatings(safeTitleId);
   }
+
+  // B. Auto-update SEMUA badge bintang di halaman depan
+  if (typeof updateHomeRatings === "function") updateHomeRatings();
 });
 
-// 2. Fungsi menggambar Bintang & Menghitung Rata-rata
-window.renderRatings = (safeTitleId) => {
-  const container = document.getElementById("detail-ratings");
-  if (!container) return;
+// FUNGSI BARU: Menyuntikkan bintang ke kartu beranda
+window.updateHomeRatings = () => {
+  // Cari semua elemen badge yang tadi kita pasang di HTML renderGrid
+  const ratingBadges = document.querySelectorAll(".card-rating-badge");
 
-  const data = globalRatings[safeTitleId] || {};
-  const userIds = Object.keys(data); // Daftar akun yang udah ngasih rating
-  const totalUsers = userIds.length;
+  ratingBadges.forEach((badge) => {
+    const title = badge.getAttribute("data-title");
+    if (!title) return;
 
-  let totalStars = 0;
-  let currentUserRating = 0;
-  const uid = currentUser ? currentUser.uid : null;
+    const safeTitleId = title.replace(/[^a-zA-Z0-9]/g, "_");
+    const data = globalRatings[safeTitleId] || {};
+    const userIds = Object.keys(data);
 
-  // Hitung total nilai semua orang
-  userIds.forEach((id) => {
-    totalStars += data[id];
-    // Cek rating khusus milik user yang lagi login
-    if (id === uid) currentUserRating = data[id];
+    // Kalau ada yang ngasih rating, hitung rata-ratanya lalu munculkan!
+    if (userIds.length > 0) {
+      let total = 0;
+      userIds.forEach((id) => (total += data[id]));
+      const avg = (total / userIds.length).toFixed(1);
+
+      badge.innerHTML = `⭐ ${avg}`;
+      badge.style.display = "flex"; // Munculkan badge-nya
+    } else {
+      badge.style.display = "none"; // Sembunyikan kalau resep belum ada rating
+    }
   });
-
-  // Rumus Rata-rata (Dibulatkan 1 angka di belakang koma)
-  const avgRating = totalUsers > 0 ? (totalStars / totalUsers).toFixed(1) : 0;
-
-  // Gambar 5 Bintang yang bisa diklik
-  let starsHtml = `<div class="stars-interactive">`;
-  for (let i = 1; i <= 5; i++) {
-    const isActive = i <= currentUserRating ? "active" : "";
-    starsHtml += `<button class="star-btn ${isActive}" onclick="rateRecipe('${safeTitleId}', ${i})">★</button>`;
-  }
-  starsHtml += `</div>`;
-
-  // Teks Rata-rata
-  let textHtml = `<span class="rating-text">`;
-  if (totalUsers > 0) {
-    textHtml += `<strong style="color:var(--text); font-size:15px;">${avgRating}</strong> dari ${totalUsers} ulasan`;
-  } else {
-    textHtml += `Belum ada ulasan.`;
-  }
-  textHtml += `</span>`;
-
-  container.innerHTML = starsHtml + textHtml;
 };
 
 // 3. Fungsi saat user ngeklik Bintang

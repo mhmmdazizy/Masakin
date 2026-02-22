@@ -1319,3 +1319,21 @@ body[data-theme="dark"] .logo-dark {
   background: #ccc;
   border-radius: 4px;
 }
+/* --- DESAIN BADGE RATING DI CARD BERANDA --- */
+.card-rating-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  color: #ffd700; /* Warna Emas */
+  font-size: 12px;
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 2;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
