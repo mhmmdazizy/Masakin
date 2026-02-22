@@ -1213,3 +1213,39 @@ body[data-theme="dark"] .logo-dark {
   color: var(--primary, #ff6b6b);
   font-weight: bold;
 }
+/* --- DESAIN RATING BINTANG --- */
+.rating-container {
+  margin-top: 25px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stars-interactive {
+  display: flex;
+  gap: 4px;
+}
+
+.star-btn {
+  background: none;
+  border: none;
+  font-size: 28px; /* Ukuran bintang */
+  color: #e0e0e0; /* Warna abu-abu pucat untuk bintang kosong */
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: all 0.2s ease;
+}
+
+/* Warna saat bintang menyala (aktif) atau saat di-hover */
+.star-btn.active,
+.star-btn:hover {
+  color: #ffd700; /* Warna Emas Premium */
+  transform: scale(1.1);
+}
+
+.rating-text {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+}

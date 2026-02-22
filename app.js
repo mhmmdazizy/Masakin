@@ -730,10 +730,93 @@ window.openArticle = (
   // Trigger render reaction emot
   const safeTitleId = title.replace(/[^a-zA-Z0-9]/g, "_");
   if (typeof renderReactions === "function") renderReactions(safeTitleId);
+  if (typeof renderRatings === "function") renderRatings(safeTitleId);
   document.getElementById("article-view").classList.add("active");
   history.pushState({ modal: "article" }, null, "");
 
   if (typeof feather !== "undefined") feather.replace();
+};
+// ==========================================
+// --- FITUR RATING BINTANG (FIREBASE) ---
+// ==========================================
+
+let globalRatings = {};
+
+// 1. Dengar data Rating dari Firebase secara realtime
+db.collection("ratings").onSnapshot((snapshot) => {
+  globalRatings = {};
+  snapshot.forEach((doc) => {
+    globalRatings[doc.id] = doc.data();
+  });
+
+  // Auto-update UI kalau modal artikel lagi kebuka
+  const articleView = document.getElementById("article-view");
+  if (articleView && articleView.classList.contains("active")) {
+    const title = document.getElementById("detail-title").innerText;
+    const safeTitleId = title.replace(/[^a-zA-Z0-9]/g, "_");
+    if (typeof renderRatings === "function") renderRatings(safeTitleId);
+  }
+});
+
+// 2. Fungsi menggambar Bintang & Menghitung Rata-rata
+window.renderRatings = (safeTitleId) => {
+  const container = document.getElementById("detail-ratings");
+  if (!container) return;
+
+  const data = globalRatings[safeTitleId] || {};
+  const userIds = Object.keys(data); // Daftar akun yang udah ngasih rating
+  const totalUsers = userIds.length;
+
+  let totalStars = 0;
+  let currentUserRating = 0;
+  const uid = currentUser ? currentUser.uid : null;
+
+  // Hitung total nilai semua orang
+  userIds.forEach((id) => {
+    totalStars += data[id];
+    // Cek rating khusus milik user yang lagi login
+    if (id === uid) currentUserRating = data[id];
+  });
+
+  // Rumus Rata-rata (Dibulatkan 1 angka di belakang koma)
+  const avgRating = totalUsers > 0 ? (totalStars / totalUsers).toFixed(1) : 0;
+
+  // Gambar 5 Bintang yang bisa diklik
+  let starsHtml = `<div class="stars-interactive">`;
+  for (let i = 1; i <= 5; i++) {
+    const isActive = i <= currentUserRating ? "active" : "";
+    starsHtml += `<button class="star-btn ${isActive}" onclick="rateRecipe('${safeTitleId}', ${i})">★</button>`;
+  }
+  starsHtml += `</div>`;
+
+  // Teks Rata-rata
+  let textHtml = `<span class="rating-text">`;
+  if (totalUsers > 0) {
+    textHtml += `<strong style="color:var(--text); font-size:15px;">${avgRating}</strong> dari ${totalUsers} ulasan`;
+  } else {
+    textHtml += `Belum ada ulasan.`;
+  }
+  textHtml += `</span>`;
+
+  container.innerHTML = starsHtml + textHtml;
+};
+
+// 3. Fungsi saat user ngeklik Bintang
+window.rateRecipe = (safeTitleId, stars) => {
+  if (!currentUser) {
+    openPopup("Login dengan Google dulu untuk memberi nilai!");
+    return;
+  }
+
+  const docRef = db.collection("ratings").doc(safeTitleId);
+
+  // Simpan/Timpa nilai pakai ID user sebagai kuncinya
+  docRef.set(
+    {
+      [currentUser.uid]: stars,
+    },
+    { merge: true },
+  );
 };
 window.closeArticle = () => history.back();
 window.closeRecipeForm = () => history.back();
