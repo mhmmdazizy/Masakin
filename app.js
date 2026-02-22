@@ -132,6 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderGrid("explore-container", articles);
     renderGrid("menu-container", [...menus, ...allCloudRecipes]);
     renderGrid("favorit-container", favorites);
+    if (typeof renderPublicRecipes === "function") renderPublicRecipes();
     if (typeof updateTotalLikesUI === "function") updateTotalLikesUI();
   });
 });
@@ -421,7 +422,8 @@ window.saveMyRecipe = async () => {
     .value.trim();
 
   if (!editId && mainFileInput.files.length === 0) {
-    return alert("Wajib pilih foto utama resep!");
+    showToast("Wajib pilih foto utama resep ya!");
+    return;
   }
 
   // Ubah tombol jadi status loading
@@ -485,19 +487,28 @@ window.saveMyRecipe = async () => {
     if (editId) {
       // UPDATE DATA LAMA
       await db.collection("recipes").doc(editId).update(recipeData);
-      alert("Resep berhasil diperbarui!");
+      {
+        showToast("Resep berhasil diperbarui!");
+        return;
+      }
     } else {
       // SIMPAN DATA BARU
       recipeData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
       if (!recipeData.img) throw new Error("Gambar utama wajib!");
       await db.collection("recipes").add(recipeData);
-      alert("Resep berhasil dipublish!");
+      {
+        showToast("Resep berhasil dipublish!");
+        return;
+      }
     }
 
     closeRecipeForm();
   } catch (error) {
     console.error(error);
-    alert("Gagal: " + error.message);
+    {
+      showToast("Gagal: " + error.message);
+      return;
+    }
   } finally {
     btn.innerText = originalText;
     btn.disabled = false;
@@ -1018,7 +1029,7 @@ window.openPopup = (type) => {
         Email: muhammadazizy48@gmail.com
         
     </div>
-    <p style="text-align:right; font-size:10px; color:var(--text-muted);">Diperbaharui: 19 Februari 2026</p>
+    <p style="text-align:right; font-size:10px; color:var(--text-muted);">Diperbarui: 19 Februari 2026</p>
     <button class="find-btn" onclick="closePopup()">Saya Mengerti</button>
     `;
   } else if (type === "tentang") {
@@ -1139,11 +1150,17 @@ window.deleteMyRecipe = async (docId) => {
   if (confirmDelete) {
     try {
       await db.collection("recipes").doc(docId).delete();
-      alert("Resep berhasil dihapus!");
+      {
+        showToast("Resep berhasil dihapus!");
+        return;
+      }
       // Tidak perlu panggil render ulang manual, karena .onSnapshot di atas otomatis mendeteksi perubahan database.
     } catch (error) {
       console.error("Gagal hapus:", error);
-      alert("Gagal menghapus: " + error.message);
+      {
+        showToast("Gagal menghapus: " + error.message);
+        return;
+      }
     }
   }
 };
@@ -1829,27 +1846,35 @@ window.openPublicProfile = (uid, name, photoUrl) => {
       }
     });
 
-  // TARIK RESEP DARI ORANG TERSEBUT
+  // --- GANTI BAGIAN TARIK RESEP MENJADI SEPERTI INI ---
   document.getElementById("public-profile-recipes").innerHTML =
     `<p style="text-align:center; width:100%; color:#888;">Memuat resep...</p>`;
-  db.collection("recipes")
-    .where("userId", "==", uid)
-    .get()
-    .then((snapshot) => {
-      let userRecipes = [];
-      snapshot.forEach((doc) => {
-        userRecipes.push({ id: doc.id, ...doc.data() });
-      });
 
-      if (userRecipes.length > 0) {
-        renderGrid("public-profile-recipes", userRecipes);
-      } else {
-        document.getElementById("public-profile-recipes").innerHTML =
-          `<p style="text-align:center; width:100%; color:#888; font-size:12px;">Pengguna ini belum membagikan resep.</p>`;
-      }
-    });
+  // Panggil fungsi render realtime
+  renderPublicRecipes();
 
   if (typeof feather !== "undefined") feather.replace();
+};
+
+// ==========================================
+// --- FUNGSI RENDER RESEP PROFIL PUBLIK ---
+// ==========================================
+window.renderPublicRecipes = () => {
+  if (!viewedPublicUid) return;
+
+  // Ambil resep langsung dari memori global yang sudah ter-update realtime!
+  const userRecipes = allCloudRecipes.filter(
+    (r) => r.userId === viewedPublicUid,
+  );
+
+  const container = document.getElementById("public-profile-recipes");
+  if (!container) return;
+
+  if (userRecipes.length > 0) {
+    renderGrid("public-profile-recipes", userRecipes);
+  } else {
+    container.innerHTML = `<p style="text-align:center; width:100%; color:#888; font-size:12px;">Pengguna ini belum membagikan resep.</p>`;
+  }
 };
 
 // 2. Tutup Profil (Sama seperti menutup resep, cukup panggil history.back)
@@ -1978,7 +2003,10 @@ window.toggleFollowPublic = () => {
       btnFollow.innerText = originalText;
       btnFollow.disabled = false;
       btnFollow.style.opacity = "1";
-      alert("Gagal memproses, periksa koneksi internetmu.");
+      {
+        showToast("Gagal memproses, periksa koneksi internetmu.");
+        return;
+      }
     });
 };
 // ==========================================

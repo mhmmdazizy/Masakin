@@ -476,12 +476,12 @@ header {
   border-radius: 24px 24px 0 0; /* Lengkung atas saja */
   padding-left: 24px;
   padding-right: 24px;
+  padding-bottom: 24px;
   position: relative;
   max-height: 85vh; /* Jangan menuhin layar */
   overflow-y: auto;
   animation: slideUp 0.3s cubic-bezier(0.19, 1, 0.22, 1);
   align-items: flex-end;
-  margin-bottom: 30px;
 }
 
 @keyframes slideUp {
