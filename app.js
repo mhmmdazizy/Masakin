@@ -417,8 +417,21 @@ window.saveMyRecipe = async () => {
     titleInput.focus();
     return;
   }
+  const tagInput = document.getElementById("rec-tag");
+  const tagError = document.getElementById("error-tag");
+  const tag = tagInput.value;
 
-  const tag = document.getElementById("rec-tag").value;
+  // === SATPAM MOOD MASAKAN ===
+  if (!tag) {
+    tagInput.style.borderColor = "#dc3545";
+    tagError.style.display = "block";
+    tagInput.focus();
+    showToast("Pilih Mood Masakannya dulu ya!");
+    return;
+  } else {
+    tagInput.style.borderColor = "";
+    tagError.style.display = "none";
+  }
   const mainFileInput = document.getElementById("rec-file");
   const editId = document.getElementById("edit-id").value;
 

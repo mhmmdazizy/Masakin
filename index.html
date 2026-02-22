@@ -522,13 +522,22 @@
           Judul wajib diisi!
         </div>
 
-        <label>Kategori (Pedas/Manis/Kuah)</label>
-        <input
-          type="text"
-          id="rec-tag"
-          class="form-input"
-          placeholder="PEDAS"
-        />
+        <label>Mood Masakan</label>
+        <select id="rec-tag" class="form-input" style="cursor: pointer;">
+            <option value="" disabled selected>Pilih mood masakanmu...</option>
+            
+            <option value="Sat-Set (Cepat)">⚡ Sat-Set (Cepat & Praktis)</option>
+            <option value="Comfort Food">🥣 Comfort Food (Nyaman di Perut)</option>
+            <option value="Pecinta Pedas">🔥 Pecinta Pedas (Bikin Melek)</option>
+            <option value="Anget-Anget">🍲 Anget-Anget (Cocok pas Hujan)</option>
+            <option value="Tanggal Tua">💸 Tanggal Tua (Hemat di Kantong)</option>
+            <option value="Sweet Tooth">🍰 Sweet Tooth (Lagi Pengen Manis)</option>
+            <option value="Menu Sehat">🥗 Menu Sehat (Lagi Diet / Clean Eating)</option>
+            <option value="Cemilan Santai">🍿 Cemilan Santai (Buat Nonton)</option>
+        </select>
+        <div id="error-tag" style="color: #dc3545; font-size: 11px; margin-top: -12px; margin-bottom: 12px; margin-left: 4px; display: none;">
+          Mood wajib dipilih!
+        </div>
 
         <label>Foto Sampul</label>
         <input type="file" id="rec-file" class="form-input" accept="image/*" />
