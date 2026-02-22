@@ -970,7 +970,7 @@ header {
 }
 /* --- PERBAIKAN JARAK BAWAH DESKRIPSI RESEP --- */
 #detail-desc {
-  padding-bottom: 50px; /* Memberikan ruang napas ekstra di bawah teks */
+  padding-bottom: 15px; /* Memberikan ruang napas ekstra di bawah teks */
 }
 /* =========================================================
    TAMPILAN KHUSUS KOMPUTER / LAPTOP (MAX WIDTH)
