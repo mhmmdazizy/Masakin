@@ -68,6 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderIngredients();
   renderGrid("explore-container", articles);
   renderGrid("menu-container", menus);
+  if (typeof updateTotalLikesUI === "function") updateTotalLikesUI();
 
   // Render Icon (Penting biar gak hilang)
   if (typeof feather !== "undefined") feather.replace();
@@ -92,6 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
       renderMyRecipes();
       // Render jika sedang di halaman menu
       renderGrid("menu-container", [...menus, ...allCloudRecipes]);
+      if (typeof updateTotalLikesUI === "function") updateTotalLikesUI();
     });
 
   // 2. SINKRONISASI ANGKA FAVORIT GLOBAL SE-DUNIA
@@ -130,6 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderGrid("explore-container", articles);
     renderGrid("menu-container", [...menus, ...allCloudRecipes]);
     renderGrid("favorit-container", favorites);
+    if (typeof updateTotalLikesUI === "function") updateTotalLikesUI();
   });
 });
 // Cek Login & Load Data Cloud
@@ -1785,6 +1788,7 @@ window.openPublicProfile = (uid, name, photoUrl) => {
   }
 
   viewedPublicUid = uid;
+  if (typeof updateTotalLikesUI === "function") updateTotalLikesUI();
 
   // === MUNCULKAN OVERLAY SEPERTI ARTICLE-VIEW ===
   const profilePage = document.getElementById("public-profile-page");
@@ -1976,4 +1980,30 @@ window.toggleFollowPublic = () => {
       btnFollow.style.opacity = "1";
       alert("Gagal memproses, periksa koneksi internetmu.");
     });
+};
+// ==========================================
+// --- FITUR MENGHITUNG TOTAL LIKES ---
+// ==========================================
+window.updateTotalLikesUI = () => {
+  // 1. Update Likes di "Akun Saya"
+  if (currentUser) {
+    // Cari resep buatan kita, lalu jumlahkan favCount-nya
+    const myTotalLikes = allCloudRecipes
+      .filter((r) => r.userId === currentUser.uid)
+      .reduce((sum, r) => sum + (r.favCount || 0), 0);
+
+    const elMyLikes = document.getElementById("count-likes");
+    if (elMyLikes) elMyLikes.innerText = myTotalLikes;
+  }
+
+  // 2. Update Likes di Profil Orang Lain
+  if (typeof viewedPublicUid !== "undefined" && viewedPublicUid) {
+    // Cari resep buatan target, lalu jumlahkan favCount-nya
+    const publicTotalLikes = allCloudRecipes
+      .filter((r) => r.userId === viewedPublicUid)
+      .reduce((sum, r) => sum + (r.favCount || 0), 0);
+
+    const elPublicLikes = document.getElementById("public-likes");
+    if (elPublicLikes) elPublicLikes.innerText = publicTotalLikes;
+  }
 };
