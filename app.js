@@ -712,7 +712,11 @@ window.openArticle = (
 
   const authorContainer = document.getElementById("detail-author-container");
   if (authorContainer) {
-    // Trik tahan banting: Cari 'userId', kalau nggak ada cari 'authorUid' (buat jaga-jaga data lama)
+    // === INI BARIS YANG KETINGGALAN TADI ===
+    const authorName = item && item.authorName ? item.authorName : author;
+    // =======================================
+
+    // Trik tahan banting: Cari 'userId', kalau nggak ada cari 'authorUid'
     const authorUid = item ? item.userId || item.authorUid : "";
     const authorPhoto = item && item.authorPhoto ? item.authorPhoto : "";
 
