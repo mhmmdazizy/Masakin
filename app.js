@@ -422,7 +422,7 @@ window.saveMyRecipe = async () => {
     .value.trim();
 
   if (!editId && mainFileInput.files.length === 0) {
-    showToast("Wajib pilih foto utama resep ya!");
+    showToast("Wajib pilih foto sampul resep ya!");
     return;
   }
 
@@ -489,7 +489,7 @@ window.saveMyRecipe = async () => {
       await db.collection("recipes").doc(editId).update(recipeData);
       {
         showToast("Resep berhasil diperbarui!");
-        return;
+        closeRecipeForm();
       }
     } else {
       // SIMPAN DATA BARU
@@ -498,7 +498,7 @@ window.saveMyRecipe = async () => {
       await db.collection("recipes").add(recipeData);
       {
         showToast("Resep berhasil dipublish!");
-        return;
+        closeRecipeForm();
       }
     }
 
@@ -507,7 +507,7 @@ window.saveMyRecipe = async () => {
     console.error(error);
     {
       showToast("Gagal: " + error.message);
-      return;
+      closeRecipeForm();
     }
   } finally {
     btn.innerText = originalText;
@@ -1152,14 +1152,14 @@ window.deleteMyRecipe = async (docId) => {
       await db.collection("recipes").doc(docId).delete();
       {
         showToast("Resep berhasil dihapus!");
-        return;
+        closeRecipeForm();
       }
       // Tidak perlu panggil render ulang manual, karena .onSnapshot di atas otomatis mendeteksi perubahan database.
     } catch (error) {
       console.error("Gagal hapus:", error);
       {
         showToast("Gagal menghapus: " + error.message);
-        return;
+        closeRecipeForm();
       }
     }
   }

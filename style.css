@@ -302,7 +302,7 @@ header {
 }
 
 /* BUTTONS */
-.find-btn {
+.find-btn-cari {
   font-family: "Plus Jakarta Sans", sans-serif;
   background: var(--primary);
   color: white;
@@ -313,6 +313,21 @@ header {
   font-weight: 600;
   font-size: 16px;
   margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+.find-btn {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  background: var(--primary);
+  color: white;
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 14px;
+  font-weight: 600;
+  font-size: 16px;
   display: flex;
   justify-content: center;
   align-items: center;
