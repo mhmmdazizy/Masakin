@@ -1087,11 +1087,11 @@ window.openPopup = (type) => {
             <button class="find-btn" onclick="closePopup()" style="width:100%;">Oke</button>
         `;
   } else if (type === "reset") {
-    title = "Hapus data & reset";
+    title = "Reset Aplikasi";
     icon = "alert-triangle"; // Icon peringatan
     content = `
-            <p style="text-align:center; margin-bottom:15px;">Yakin mau reset?</p>
-            <button class="find-btn" onclick="confirmReset()" style="width:100%;">Yakin</button>
+            <p style="text-align:center; margin-bottom:15px;">Memulai ulang aplikasi,<br>tidak akan menghapus akun ataupun resepmu.</p>
+            <button class="find-btn" onclick="confirmReset()" style="width:100%;">Reset</button>
         `;
   }
   document.getElementById("popup-title").innerText = title;
@@ -2066,4 +2066,3 @@ window.updateTotalLikesUI = () => {
     if (elPublicLikes) elPublicLikes.innerText = publicTotalLikes;
   }
 };
-
