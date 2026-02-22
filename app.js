@@ -679,7 +679,7 @@ window.openRecipeForm = (index = -1) => {
   form.style.display = "flex";
   history.pushState({ modal: "form" }, null, "");
 };
-// --- FUNGSI MEMBUKA HALAMAN DETAIL RESEP ---
+// --- FUNGSI MEMBUKA HALAMAN DETAIL RESEP (SUDAH DIPERBAIKI) ---
 window.openArticle = (
   title,
   tag,
@@ -693,21 +693,48 @@ window.openArticle = (
   document.getElementById("detail-category").innerText = tag;
   document.getElementById("detail-image").style.backgroundImage =
     `url('${img}')`;
-
-  document.getElementById("detail-author").innerText = author;
   document.getElementById("detail-time").innerText = time;
   document.getElementById("detail-servings").innerText = servings;
 
   // === TRIK CERDAS: CARI DATA ASLI DARI MEMORI BERDASARKAN JUDUL ===
-  // Cek apakah 'menus' ada (dari database statis)
   const staticMenus = typeof menus !== "undefined" ? menus : [];
-  // Cek apakah 'allCloudRecipes' ada (dari Firebase)
+
+  // PERBAIKAN 1: Tambahkan data articles (Explore) agar tidak terlewat
+  const staticArticles = typeof articles !== "undefined" ? articles : [];
+
   const cloudMenus =
     typeof allCloudRecipes !== "undefined" ? allCloudRecipes : [];
 
-  // Gabungkan dan cari resep yang diklik
-  const allItems = [...staticMenus, ...cloudMenus];
+  // Gabungkan semua data dari berbagai sumber
+  const allItems = [...staticMenus, ...staticArticles, ...cloudMenus];
   const item = allItems.find((i) => i.title === title);
+
+  const authorContainer = document.getElementById("detail-author-container");
+  if (authorContainer) {
+    // PERBAIKAN 2: Beri pengaman (item &&) agar tidak crash kalau data tidak ketemu
+    const authorName = item && item.authorName ? item.authorName : author;
+    const authorUid = item && item.authorUid ? item.authorUid : "";
+    const authorPhoto = item && item.authorPhoto ? item.authorPhoto : "";
+
+    if (authorName.toLowerCase() === "admin") {
+      // Kalau Admin: Teks biasa, warna abu-abu, gabisa diklik
+      authorContainer.innerHTML = `<span style="color: var(--text-muted); cursor: default; font-weight: bold;">
+                <i data-feather="shield" style="width:12px;"></i> ${authorName}
+            </span>`;
+    } else if (authorUid) {
+      // Kalau User Biasa: Warna primary, tebal, dan bisa diklik!
+      authorContainer.innerHTML = `<span style="color: var(--primary, #ff6b6b); font-weight: bold; cursor: pointer; text-decoration: underline;" 
+                onclick="openPublicProfile('${authorUid}', '${authorName}', '${authorPhoto}')">
+                <i data-feather="user" style="width:12px;"></i> ${authorName}
+            </span>`;
+    } else {
+      // Fallback kalau data lama tidak punya UID
+      authorContainer.innerHTML = `<span style="color: var(--text-muted);"><i data-feather="user" style="width:12px;"></i> ${authorName}</span>`;
+    }
+
+    // Render ulang icon feather
+    if (typeof feather !== "undefined") feather.replace();
+  }
 
   let htmlContent = "";
 
@@ -745,11 +772,14 @@ window.openArticle = (
 
   // Tampilkan ke layar
   document.getElementById("detail-desc").innerHTML = htmlContent;
-  // Trigger render reaction emot
+
+  // Trigger fitur sosial
   const safeTitleId = title.replace(/[^a-zA-Z0-9]/g, "_");
   if (typeof renderReactions === "function") renderReactions(safeTitleId);
   if (typeof renderRatings === "function") renderRatings(safeTitleId);
   if (typeof loadComments === "function") loadComments(safeTitleId);
+
+  // Tampilkan Pop-up
   document.getElementById("article-view").classList.add("active");
   history.pushState({ modal: "article" }, null, "");
 
@@ -1723,15 +1753,19 @@ let viewedPublicUid = null;
 
 // 1. Membuka Halaman Profil Orang Lain
 window.openPublicProfile = (uid, name, photoUrl) => {
-  // Jangan buka profil sendiri, arahkan ke tab Profil Saya
+  // 1. Tutup modal resep detail yang sedang terbuka!
+  const articleView = document.getElementById("article-view");
+  if (articleView) articleView.classList.remove("active");
+
+  // 2. Cegah user membuka profilnya sendiri (Arahkan ke tab Profil Saya)
   if (currentUser && currentUser.uid === uid) {
-    switchPage("profile"); // Sesuaikan dengan fungsi pindah menu-mu
+    switchPage("profile"); // Sesuaikan dengan id halaman profilmu
     return;
   }
 
   viewedPublicUid = uid;
 
-  // Sembunyikan semua halaman utama, lalu munculkan public-profile-page
+  // 3. Sembunyikan semua halaman utama, lalu munculkan public-profile-page
   document
     .querySelectorAll(".page-section")
     .forEach((el) => (el.style.display = "none"));
