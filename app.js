@@ -219,19 +219,18 @@ function renderGrid(containerId, data) {
       const servings = item.servings || "- Porsi";
       const authorUid = item.userUid || ""; // Pastikan kamu menyimpan UID pembuat resep
 
+      // === LOGIKA NAMA AUTHOR DI CARD (TIDAK BISA DIKLIK) ===
       let authorHtml = "";
 
-      // Cek apakah Admin
       if (authorName.toLowerCase() === "admin") {
-        authorHtml = `<span style="color: var(--text-muted); cursor: default; display:flex; gap:5px; align-items:center;">
-                    <i data-feather="shield" style="width:12px;"></i> ${authorName}
+        authorHtml = `<span style="color: var(--text-muted); display:flex; gap:5px; align-items:center;">
+                    <i data-feather="shield" style="width:10px; flex-shrink: 0; margin-top: 1px;"></i> 
+                    <span style="line-height: 1.4; word-wrap: break-word;">${authorName}</span>
                   </span>`;
       } else {
-        // === TAMBAHKAN event.stopPropagation() DI SINI ===
-        // Biar pas namanya diklik, kartunya gak ikut kebuka!
-        authorHtml = `<span style="color: var(--primary, #ff6b6b); font-weight: bold; cursor: pointer; display:flex; gap:5px; align-items:center;" 
-                        onclick="event.stopPropagation(); openPublicProfile('${authorUid}', '${authorName}', '${item.authorPhoto || ""}')">
-                    <i data-feather="user" style="width:12px;"></i> ${authorName}
+        authorHtml = `<span style="color: var(--text-muted); display:flex; gap:5px; align-items:center;">
+                    <i data-feather="user" style="width:10px; flex-shrink: 0; margin-top: 1px;"></i> 
+                    <span style="line-height: 1.4; word-wrap: break-word;">${authorName}</span>
                   </span>`;
       }
 
