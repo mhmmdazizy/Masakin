@@ -1619,43 +1619,43 @@ window.submitComment = (btnElement) => {
 
 let currentRecipeAuthorUid = null; // Menyimpan UID author dari resep yang sedang dibuka
 
-// 1. Dengar Data Profil Secara Realtime (Untuk Header Profil)
+// 1. Dengar Data Profil Secara Realtime (SINKRONISASI GLOBAL UNTUK AKUN SAYA)
+let unsubscribeMyProfile = null; // Kunci pengaman biar data gak bentrok
+
 firebase.auth().onAuthStateChanged((user) => {
   const myStatsContainer = document.getElementById("my-profile-stats");
+
+  // Matikan mesin pendengar lama jika ada (biar gak narik data dobel)
+  if (unsubscribeMyProfile) {
+    unsubscribeMyProfile();
+    unsubscribeMyProfile = null;
+  }
+
   if (user) {
     // --- JIKA SUDAH LOGIN ---
-    // 1. Munculkan wadah statistiknya
     if (myStatsContainer) myStatsContainer.style.display = "flex";
 
-    // 2. Dengar perubahan followers/following dari Firebase
-    db.collection("users")
+    // Pasang radar REALTIME khusus untuk akun sendiri
+    unsubscribeMyProfile = db
+      .collection("users")
       .doc(user.uid)
-      .set(
-        {
-          name: user.displayName,
-          photoURL: user.photoURL,
-        },
-        { merge: true },
-      )
       .onSnapshot((doc) => {
-        if (doc.exists) {
-          const data = doc.data();
-          const followers = data.followers || [];
-          const following = data.following || [];
+        const data = doc.exists ? doc.data() : {};
+        const followers = data.followers || [];
+        const following = data.following || [];
 
-          const elFollowers = document.getElementById("count-followers");
-          const elFollowing = document.getElementById("count-following");
+        // Tembak langsung perubahannya ke angka di tab Profil (Akun Saya)
+        const elFollowers = document.getElementById("count-followers");
+        const elFollowing = document.getElementById("count-following");
 
-          if (elFollowers) elFollowers.innerText = followers.length;
-          if (elFollowing) elFollowing.innerText = following.length;
-        }
+        if (elFollowers) elFollowers.innerText = followers.length;
+        if (elFollowing) elFollowing.innerText = following.length;
       });
   } else {
     // --- JIKA BELUM LOGIN (GUEST) ---
-    // Sembunyikan wadah statistiknya secara total
     if (myStatsContainer) myStatsContainer.style.display = "none";
 
-    // (Opsional) Reset angka balik ke 0 biar bersih
+    // Kembalikan ke 0
     const elFollowers = document.getElementById("count-followers");
     const elFollowing = document.getElementById("count-following");
     if (elFollowers) elFollowers.innerText = "0";
