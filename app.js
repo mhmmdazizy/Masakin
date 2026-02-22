@@ -726,8 +726,8 @@ window.openArticle = (
     } else if (authorUid) {
       // Kalau User Biasa: Warna primary, tebal, dan bisa diklik!
       authorContainer.innerHTML = `<span style="color: var(--primary, #ff6b6b); font-weight: bold; cursor: pointer; text-decoration: underline;" 
-                onclick="openPublicProfile('${userUid}', '${userName}', '${userPhoto}')">
-                <i data-feather="user" style="width:12px;"></i> ${userName}
+                onclick="openPublicProfile('${authorUid}', '${authorName}', '${authorPhoto}')">
+                <i data-feather="user" style="width:12px;"></i> ${authorName}
             </span>`;
     } else {
       // Fallback kalau data lama tidak punya UID
