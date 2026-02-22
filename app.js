@@ -217,7 +217,7 @@ function renderGrid(containerId, data) {
       const docId = item.id || "undefined";
       const time = item.time || "- Menit";
       const servings = item.servings || "- Porsi";
-      const authorUid = item.authorUid || ""; // Pastikan kamu menyimpan UID pembuat resep
+      const authorUid = item.userUid || ""; // Pastikan kamu menyimpan UID pembuat resep
 
       let authorHtml = "";
 
