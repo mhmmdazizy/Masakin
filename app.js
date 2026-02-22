@@ -236,14 +236,13 @@ function renderGrid(containerId, data) {
                 <i data-feather="user" style="width:10px;"></i> ${authorName}
              </div>
              <div class="card-image" style="background-image: url('...'); position: relative;">
-        
-        <div class="card-rating-badge" data-title="${item.title}" style="display: none;"></div>
         </div>
          </div>
+         <div class="card-rating-badge" data-title="${item.title}" style="display: none;"></div>
     </div>`;
     })
     .join("");
-
+  if (typeof updateHomeRatings === "function") updateHomeRatings();
   if (typeof feather !== "undefined") feather.replace();
 }
 
