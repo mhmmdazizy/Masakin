@@ -148,9 +148,50 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 // Cek Login & Load Data Cloud
-auth.onAuthStateChanged((user) => {
-  currentUser = user;
-  updateUI(user);
+auth.onAuthStateChanged(async (user) => {
+  if (user) {
+    currentUser = user;
+
+    // === PROSES SINKRONISASI DATA KE FIRESTORE (BIAR GAK JADI "PENGGUNA") ===
+    const userRef = db.collection("users").doc(user.uid);
+    const doc = await userRef.get();
+
+    // Ambil data dari Google/Auth sebagai cadangan
+    const userData = {
+      uid: user.uid,
+      name: user.displayName || "Koki Misterius",
+      photoURL:
+        user.photoURL ||
+        `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || "U")}&background=random`,
+      lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+    };
+
+    if (!doc.exists) {
+      // Jika user baru pertama kali masuk, simpan datanya
+      await userRef.set(userData);
+      console.log("Data user baru berhasil didaftarkan!");
+    } else {
+      // Jika sudah ada, update tipis-tipis (biar namanya tetap terbaru)
+      await userRef.update({
+        name: user.displayName || doc.data().name,
+        photoURL: user.photoURL || doc.data().photoURL,
+        lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+    }
+    // =====================================================================
+
+    document.getElementById("auth-btn").style.display = "none";
+    document.getElementById("user-profile").style.display = "flex";
+    document.getElementById("user-name").innerText = user.displayName;
+    document.getElementById("user-photo").src = user.photoURL;
+
+    // Refresh UI Profile
+    if (typeof updateProfileUI === "function") updateProfileUI();
+  } else {
+    currentUser = null;
+    document.getElementById("auth-btn").style.display = "block";
+    document.getElementById("user-profile").style.display = "none";
+  }
 });
 
 // --- 4. RENDER FUNCTIONS ---
