@@ -148,9 +148,73 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 // Cek Login & Load Data Cloud
-auth.onAuthStateChanged((user) => {
+let unsubscribeMyProfile = null; // Pastikan cuma ada satu baris ini di atas
+
+auth.onAuthStateChanged(async (user) => {
+  // === 1. KEMBALIKAN KODE UI ASLIMU YANG TERBUKTI AMAN ===
   currentUser = user;
-  updateUI(user);
+  if (typeof updateUI === "function") {
+    updateUI(user);
+  }
+  // ========================================================
+
+  const myStatsContainer = document.getElementById("my-profile-stats");
+
+  // Matikan radar lama biar memori HP nggak bocor
+  if (unsubscribeMyProfile) {
+    unsubscribeMyProfile();
+    unsubscribeMyProfile = null;
+  }
+
+  if (user) {
+    // --- 2. JIKA SUDAH LOGIN ---
+    if (myStatsContainer) myStatsContainer.style.display = "flex";
+
+    // A. Sinkronisasi Profil ke Database (Kerja diam-diam di belakang layar)
+    try {
+      const userRef = db.collection("users").doc(user.uid);
+      const doc = await userRef.get();
+      if (!doc.exists) {
+        await userRef.set({
+          uid: user.uid,
+          name: user.displayName || "Pengguna",
+          photoURL:
+            user.photoURL ||
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || "U")}&background=random`,
+          followers: [],
+          following: [],
+        });
+      } else {
+        await userRef.update({
+          name: user.displayName || doc.data().name,
+          photoURL: user.photoURL || doc.data().photoURL,
+        });
+      }
+    } catch (e) {
+      console.error("Gagal sinkron data user:", e);
+    }
+
+    // B. Pasang Radar Realtime untuk Angka Follower & Following
+    unsubscribeMyProfile = db
+      .collection("users")
+      .doc(user.uid)
+      .onSnapshot((doc) => {
+        const data = doc.exists ? doc.data() : {};
+        const followers = data.followers || [];
+        const following = data.following || [];
+        const elFollowers = document.getElementById("count-followers");
+        const elFollowing = document.getElementById("count-following");
+        if (elFollowers) elFollowers.innerText = followers.length;
+        if (elFollowing) elFollowing.innerText = following.length;
+      });
+  } else {
+    // --- 3. JIKA BELUM LOGIN (GUEST) ---
+    if (myStatsContainer) myStatsContainer.style.display = "none";
+    const elFollowers = document.getElementById("count-followers");
+    const elFollowing = document.getElementById("count-following");
+    if (elFollowers) elFollowers.innerText = "0";
+    if (elFollowing) elFollowing.innerText = "0";
+  }
 });
 
 // --- 4. RENDER FUNCTIONS ---
@@ -1684,7 +1748,6 @@ window.submitComment = (btnElement) => {
 let currentRecipeAuthorUid = null; // Menyimpan UID author dari resep yang sedang dibuka
 
 // 1. Dengar Data Profil Secara Realtime (SINKRONISASI GLOBAL UNTUK AKUN SAYA)
-let unsubscribeMyProfile = null; // Kunci pengaman biar data gak bentrok
 
 firebase.auth().onAuthStateChanged((user) => {
   const myStatsContainer = document.getElementById("my-profile-stats");
