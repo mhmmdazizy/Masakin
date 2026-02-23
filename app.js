@@ -47,12 +47,29 @@ let allCloudRecipes = [];
 
 // --- 3. START APP ---
 document.addEventListener("DOMContentLoaded", () => {
-  // === TEMBAKKAN SKELETON LANGSUNG ===
+  // 1. TEMBAKKAN SKELETON LANGSUNG KE LAYAR
   showSkeletonLoading("explore-container", 6);
   showSkeletonLoading("menu-container", 6);
   showSkeletonLoading("favorit-container", 4);
   showSkeletonLoading("my-recipe-list", 2);
-  // ===================================
+
+  // 2. TAHAN DATA LOKAL SELAMA 1.5 DETIK (Biar Shimmer Kelihatan!)
+  setTimeout(() => {
+    // Render data artikel statis (Explore)
+    if (typeof renderGrid === "function" && typeof articles !== "undefined") {
+        renderGrid("explore-container", articles);
+    }
+    
+    // Render data menu statis (Menu)
+    if (typeof renderMenuGrid === "function") {
+        renderMenuGrid();
+    }
+
+    // Render data favorit dari localStorage
+    if (typeof renderGrid === "function" && typeof favorites !== "undefined") {
+        renderGrid("favorit-container", favorites);
+    }
+  }, 1500); // 1500 milidetik = 1.5 detik
 
   // Update teks tombol tema kalau sebelumnya mode gelap
   const themeBtn = document.getElementById("theme-btn");
@@ -2242,6 +2259,7 @@ function showSkeletonLoading(containerId, count = 4) {
     
     container.innerHTML = skeletonHTML;
 }
+
 
 
 
