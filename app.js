@@ -170,25 +170,35 @@ auth.onAuthStateChanged(async (user) => {
     // --- 2. JIKA SUDAH LOGIN ---
     if (myStatsContainer) myStatsContainer.style.display = "flex";
 
-    // A. Sinkronisasi Profil ke Database (Kerja diam-diam di belakang layar)
+    // A. Sinkronisasi Profil ke Database (Versi Agresif & Self-Healing)
     try {
       const userRef = db.collection("users").doc(user.uid);
       const doc = await userRef.get();
+      
+      // Tangkap nama asli dari akun Google-nya
+      const realName = user.displayName || "Pengguna";
+      const realPhoto = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(realName)}&background=random`;
+
       if (!doc.exists) {
+        // 1. Jika belum ada sama sekali, buat baru
         await userRef.set({
           uid: user.uid,
-          name: user.displayName || "Pengguna",
-          photoURL:
-            user.photoURL ||
-            `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || "U")}&background=random`,
-          followers: [],
-          following: [],
+          name: realName,
+          photoURL: realPhoto,
+          followers: [], following: []
         });
       } else {
-        await userRef.update({
-          name: user.displayName || doc.data().name,
-          photoURL: user.photoURL || doc.data().photoURL,
-        });
+        // 2. Jika dokumen sudah ada (misal karena pencet Follow duluan)
+        const dataInDb = doc.data();
+        
+        // Cek apakah di database namanya masih kosong, atau "Pengguna", atau tidak sinkron
+        if (!dataInDb.name || dataInDb.name === "Pengguna" || dataInDb.name !== realName) {
+          // Paksa timpa dengan nama asli Google-nya!
+          await userRef.update({
+            name: realName,
+            photoURL: realPhoto
+          });
+        }
       }
     } catch (e) {
       console.error("Gagal sinkron data user:", e);
@@ -2191,3 +2201,4 @@ window.renderMenuGrid = () => {
   // Render ulang ke layar
   renderGrid("menu-container", allMenus);
 };
+
