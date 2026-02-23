@@ -47,14 +47,12 @@ let allCloudRecipes = [];
 
 // --- 3. START APP ---
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("App Started...");
-  // === MUNCULKAN SKELETON SEBELUM DATA FIREBASE TURUN ===
-  if (typeof showSkeletonLoading === "function") {
-      showSkeletonLoading("explore-container", 6);
-      showSkeletonLoading("menu-container", 6);
-      showSkeletonLoading("favorit-container", 4);
-      showSkeletonLoading("my-recipe-list", 2);
-  }
+  // === TEMBAKKAN SKELETON LANGSUNG ===
+  showSkeletonLoading("explore-container", 6);
+  showSkeletonLoading("menu-container", 6);
+  showSkeletonLoading("favorit-container", 4);
+  showSkeletonLoading("my-recipe-list", 2);
+  // ===================================
 
   // Update teks tombol tema kalau sebelumnya mode gelap
   const themeBtn = document.getElementById("theme-btn");
@@ -2227,23 +2225,23 @@ window.renderMenuGrid = () => {
 // ==========================================
 // --- FITUR SKELETON LOADING (SHIMMER) ---
 // ==========================================
-window.showSkeletonLoading = (containerId, count = 4) => {
+function showSkeletonLoading(containerId, count = 4) {
     const container = document.getElementById(containerId);
     if (!container) return;
     
     let skeletonHTML = '';
     for (let i = 0; i < count; i++) {
-        // Kita pakai class 'card-item' agar ukuran grid-nya mengikuti bawaan aplikasimu
         skeletonHTML += `
         <div class="card-item skeleton-card">
             <div class="skeleton-img shimmer"></div>
-            <div class="skeleton-text badge shimmer"></div>
+            <div class="skeleton-text badge shimmer" style="margin-top: 15px;"></div>
             <div class="skeleton-text shimmer" style="margin-top: 5px;"></div>
-            <div class="skeleton-text short shimmer"></div>
+            <div class="skeleton-text short shimmer" style="margin-top: 5px;"></div>
         </div>`;
     }
     
     container.innerHTML = skeletonHTML;
-};
+}
+
 
 
