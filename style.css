@@ -1618,3 +1618,23 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
+/* ==========================================
+   --- READING PROGRESS BAR ---
+   ========================================== */
+.progress-container {
+  position: sticky; /* Nempel di atas */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: transparent;
+  z-index: 1000; /* Pastikan di atas segalanya */
+}
+
+.progress-bar {
+  height: 100%;
+  background: #ff6b6b; /* Warna garisnya, silakan sesuaikan dengan tema */
+  width: 0%; /* Dimulai dari 0 */
+  border-radius: 0 2px 2px 0;
+  transition: width 0.1s ease-out; /* Biar pergerakannya mulus seperti air */
+}

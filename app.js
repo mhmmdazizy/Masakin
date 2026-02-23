@@ -2431,3 +2431,30 @@ document.addEventListener("DOMContentLoaded", () => {
     toggleCookingMode(toggleBtn);
   }
 });
+// ==========================================
+// --- FITUR READING PROGRESS BAR ---
+// ==========================================
+
+// Cari wadah pop-up yang bisa di-scroll
+const detailOverlay = document.getElementById("article-view");
+
+if (detailOverlay) {
+  // Pasang radar pendengar setiap kali user melakukan 'scroll'
+  detailOverlay.addEventListener("scroll", () => {
+    // 1. Hitung berapa pixel layar sudah digeser ke bawah
+    const scrollTop = detailOverlay.scrollTop;
+
+    // 2. Hitung total panjang konten dikurangi tinggi layar HP
+    const scrollHeight =
+      detailOverlay.scrollHeight - detailOverlay.clientHeight;
+
+    // 3. Cari persentasenya (Layar yang digeser dibagi Total panjang)
+    const scrollPercentage = (scrollTop / scrollHeight) * 100;
+
+    // 4. Update lebar garis merahnya sesuai persentase
+    const progressBar = document.getElementById("reading-progress");
+    if (progressBar) {
+      progressBar.style.width = scrollPercentage + "%";
+    }
+  });
+}
