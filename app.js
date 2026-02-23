@@ -2000,60 +2000,76 @@ window.closePublicProfile = () => {
   history.back();
 };
 
-// 3. Menampilkan Modal Daftar Pengikut/Mengikuti (Bisa untuk Diri Sendiri & Orang Lain)
+// === JURUS 2: BUAT WADAH CACHE DI MEMORI ===
+window.userProfileCache = {}; // Ingatan sementara biar gak download ulang
+
+// 3. Menampilkan Modal Daftar Pengikut/Mengikuti (VERSI NGEBUT & CACHE)
 window.showFollowList = async (type, isMyProfile = false) => {
-  // LOGIKA PINTAR: Tentukan UID siapa yang mau ditarik datanya
-  // Kalau isMyProfile true, pakai ID kita (currentUser.uid). Kalau false, pakai ID profil yang lagi dilihat.
-  const targetUid = isMyProfile
-    ? currentUser
-      ? currentUser.uid
-      : null
-    : viewedPublicUid;
-
+  const targetUid = isMyProfile ? (currentUser ? currentUser.uid : null) : viewedPublicUid;
   if (!targetUid) return;
-
-  const titleText = type === "followers" ? "Pengikut" : "Mengikuti";
-  document.getElementById("follow-list-title").innerText = titleText;
-
-  const content = document.getElementById("follow-list-content");
-  content.innerHTML =
-    '<p style="text-align:center; font-size:12px; color:#888;">Memuat data...</p>';
-  document.getElementById("follow-list-modal").style.display = "flex";
+  
+  const titleText = type === 'followers' ? 'Pengikut' : 'Mengikuti';
+  document.getElementById('follow-list-title').innerText = titleText;
+  
+  const content = document.getElementById('follow-list-content');
+  content.innerHTML = '<p style="text-align:center; font-size:12px; color:#888;">Memuat data...</p>';
+  document.getElementById('follow-list-modal').style.display = 'flex';
 
   try {
-    const doc = await db.collection("users").doc(targetUid).get();
+    const doc = await db.collection('users').doc(targetUid).get();
     const data = doc.exists ? doc.data() : {};
     const listIds = data[type] || [];
 
-    if (listIds.length === 0) {
+    if(listIds.length === 0) {
       content.innerHTML = `<p style="text-align:center; font-size:12px; color:#888;">Belum ada ${titleText.toLowerCase()}.</p>`;
       return;
     }
 
-    content.innerHTML = "";
-
-    // Looping untuk mengambil nama & foto dari masing-masing UID
-    for (let id of listIds) {
-      const userDoc = await db.collection("users").doc(id).get();
+    // === JURUS 1: AMBIL DATA SERENTAK BARENGAN ===
+    // Kita sebar "pasukan" untuk ngambil data setiap ID secara bersamaan
+    const userPromises = listIds.map(async (id) => {
+      // Cek Cache: Kalau datanya udah pernah didownload, langsung pakai!
+      if (window.userProfileCache[id]) {
+        return { id, ...window.userProfileCache[id] };
+      }
+      
+      // Kalau belum ada di cache, download dari Firebase
+      const userDoc = await db.collection('users').doc(id).get();
       if (userDoc.exists) {
         const uData = userDoc.data();
-        const uName = uData.name || "Pengguna";
-        const uPhoto =
-          uData.photoURL ||
-          `https://ui-avatars.com/api/?name=${uName}&background=random`;
+        window.userProfileCache[id] = uData; // Simpan ke cache buat nanti!
+        return { id, ...uData };
+      }
+      return null;
+    });
 
-        // Buat Barisan Pengguna (BISA DIKLIK!)
-        content.innerHTML += `
+    // Tunggu semua loket selesai melayani secara serentak (super cepat)
+    const usersData = await Promise.all(userPromises);
+
+    let htmlString = ""; 
+    
+    // === RAKIT HTML-NYA ===
+    usersData.forEach((uData) => {
+      if (uData) {
+        const uName = uData.name || "Pengguna";
+        const safeName = uName.replace(/'/g, "\\'"); 
+        const uPhoto = uData.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(uName)}&background=random`;
+        
+        htmlString += `
         <div style="display:flex; align-items:center; gap:10px; cursor:pointer; padding: 5px;" 
-             onclick="document.getElementById('follow-list-modal').style.display='none'; openPublicProfile('${id}', '${uName}', '${uPhoto}')">
+             onclick="document.getElementById('follow-list-modal').style.display='none'; openPublicProfile('${uData.id}', '${safeName}', '${uPhoto}')">
             <img src="${uPhoto}" style="width:40px; height:40px; border-radius:50%; object-fit:cover; border: 1px solid #eee;">
             <b style="font-size:14px; color:var(--text);">${uName}</b>
         </div>`;
       }
-    }
+    });
+    
+    // Tembakkan ke layar
+    content.innerHTML = htmlString;
+
   } catch (e) {
-    content.innerHTML =
-      '<p style="text-align:center; color:red;">Gagal memuat data.</p>';
+    console.error(e);
+    content.innerHTML = '<p style="text-align:center; color:red;">Gagal memuat data.</p>';
   }
 };
 // ==========================================
@@ -2201,4 +2217,5 @@ window.renderMenuGrid = () => {
   // Render ulang ke layar
   renderGrid("menu-container", allMenus);
 };
+
 
