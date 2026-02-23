@@ -1434,8 +1434,8 @@ body[data-theme="dark"] .logo-dark {
 /* --- TOMBOL FAV MELAYANG DI DETAIL RESEP --- */
 .detail-fav-floating {
   position: absolute;
-  top: 15px; /* Jarak dari atas */
-  right: 15px; /* Jarak dari kanan */
+  top: 70px; /* Jarak dari atas */
+  right: 20px; /* Jarak dari kanan */
   background: rgba(255, 255, 255, 0.9); /* Putih sedikit transparan */
   border: none;
   border-radius: 50%; /* Bikin bulat */
@@ -1455,10 +1455,9 @@ body[data-theme="dark"] .logo-dark {
   transform: scale(0.9);
 }
 
-/* Warna saat statusnya udah di-Fav */
-.detail-fav-floating.active {
-  color: #ff6b6b; /* Warna merah */
-}
-.detail-fav-floating.active i {
-  fill: #ff6b6b; /* Isi icon jadi merah */
+.detail-fav-floating.active i,
+.detail-fav-floating.active svg {
+  fill: #ff4757; /* Isi warna merah */
+  color: #ff4757; /* Garis warna merah */
+  stroke: #ff4757; /* Garis warna merah */
 }
