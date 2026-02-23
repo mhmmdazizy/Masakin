@@ -948,19 +948,72 @@ window.openArticle = (
 
   if (typeof feather !== "undefined") feather.replace();
 };
-// Fungsi saat tombol Fav di halaman detail diklik
-window.toggleDetailFav = () => {
+// === FUNGSI EKSEKUSI TOMBOL FAV DI DALAM DETAIL RESEP ===
+window.toggleDetailFav = async () => {
   if (!window.currentDetailRecipe) return;
 
-  // Panggil fungsi toggle favorit bawaanmu (pastikan nama fungsinya sesuai)
-  // Biasanya bernama toggleFavorite atau semacamnya
-  toggleFavorite(window.currentDetailRecipe);
-
-  // Ubah warna tombolnya seketika
+  const item = window.currentDetailRecipe;
   const favBtn = document.getElementById("detail-fav-btn");
-  favBtn.classList.toggle("active");
 
-  if (typeof feather !== "undefined") feather.replace();
+  // 1. Cek apakah resep ini sudah ada di daftar Favorit
+  // Kita pakai judul (title) sebagai patokan universal
+  const existingIndex =
+    typeof favorites !== "undefined"
+      ? favorites.findIndex((f) => f.title === item.title)
+      : -1;
+
+  try {
+    if (existingIndex >= 0) {
+      // --- JIKA SUDAH DI-FAV: HAPUS ---
+      favorites.splice(existingIndex, 1);
+      favBtn.classList.remove("active");
+
+      // Kurangi angka di Firebase (Hanya jika resep ini dari Cloud / punya ID)
+      if (item.id) {
+        db.collection("counters")
+          .doc(item.id)
+          .set(
+            {
+              favCount: firebase.firestore.FieldValue.increment(-1),
+            },
+            { merge: true },
+          );
+      }
+    } else {
+      // --- JIKA BELUM DI-FAV: TAMBAHKAN ---
+      favorites.push(item);
+      favBtn.classList.add("active");
+
+      // Tambah angka di Firebase (Hanya jika resep ini dari Cloud / punya ID)
+      if (item.id) {
+        db.collection("counters")
+          .doc(item.id)
+          .set(
+            {
+              favCount: firebase.firestore.FieldValue.increment(1),
+            },
+            { merge: true },
+          );
+      }
+    }
+
+    // 2. Simpan perubahan ke LocalStorage (Memori HP)
+    localStorage.setItem("myFavorites", JSON.stringify(favorites));
+
+    // 3. SINKRONISASI TAMPILAN LUAR SEKETIKA
+    // Ini yang bikin kartu di Menu dan Beranda otomatis berubah warnanya & angkanya!
+    if (typeof renderMenuGrid === "function") renderMenuGrid();
+    if (typeof renderGrid === "function") {
+      renderGrid("favorit-container", favorites);
+      if (typeof articles !== "undefined")
+        renderGrid("explore-container", articles);
+    }
+
+    // Render ulang icon
+    if (typeof feather !== "undefined") feather.replace();
+  } catch (error) {
+    console.error("Gagal mengubah status favorit:", error);
+  }
 };
 // ==========================================
 // --- FITUR RATING BINTANG (FIREBASE) ---
