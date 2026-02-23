@@ -1431,3 +1431,34 @@ body[data-theme="dark"] .logo-dark {
   font-weight: bold;
   transform: scale(1.05);
 }
+/* --- TOMBOL FAV MELAYANG DI DETAIL RESEP --- */
+.detail-fav-floating {
+  position: absolute;
+  top: 15px; /* Jarak dari atas */
+  right: 15px; /* Jarak dari kanan */
+  background: rgba(255, 255, 255, 0.9); /* Putih sedikit transparan */
+  border: none;
+  border-radius: 50%; /* Bikin bulat */
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Efek bayangan */
+  cursor: pointer;
+  z-index: 100; /* Pastikan selalu di atas gambar/teks */
+  transition: all 0.2s ease;
+}
+
+/* Efek pas dipencet */
+.detail-fav-floating:active {
+  transform: scale(0.9);
+}
+
+/* Warna saat statusnya udah di-Fav */
+.detail-fav-floating.active {
+  color: #ff6b6b; /* Warna merah */
+}
+.detail-fav-floating.active i {
+  fill: #ff6b6b; /* Isi icon jadi merah */
+}
