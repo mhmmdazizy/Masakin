@@ -2432,29 +2432,32 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 // ==========================================
-// --- FITUR READING PROGRESS BAR ---
+// --- FITUR PROGRESS BAR & PARALLAX ---
 // ==========================================
-
-// Cari wadah pop-up yang bisa di-scroll
 const detailOverlay = document.getElementById("article-view");
 
 if (detailOverlay) {
-  // Pasang radar pendengar setiap kali user melakukan 'scroll'
   detailOverlay.addEventListener("scroll", () => {
-    // 1. Hitung berapa pixel layar sudah digeser ke bawah
     const scrollTop = detailOverlay.scrollTop;
 
-    // 2. Hitung total panjang konten dikurangi tinggi layar HP
+    // 1. MESIN READING PROGRESS BAR (Kode yang tadi)
     const scrollHeight =
       detailOverlay.scrollHeight - detailOverlay.clientHeight;
-
-    // 3. Cari persentasenya (Layar yang digeser dibagi Total panjang)
     const scrollPercentage = (scrollTop / scrollHeight) * 100;
-
-    // 4. Update lebar garis merahnya sesuai persentase
     const progressBar = document.getElementById("reading-progress");
-    if (progressBar) {
-      progressBar.style.width = scrollPercentage + "%";
+    if (progressBar) progressBar.style.width = scrollPercentage + "%";
+
+    // 2. MESIN CINEMATIC PARALLAX (Efek Hollywood)
+    const heroImg = document.getElementById("detail-image");
+    if (heroImg) {
+      // Hanya jalankan efek jika scroll belum terlalu jauh ke bawah (hemat memori HP)
+      if (scrollTop < 350) {
+        // Geser foto ke bawah setengah lebih lambat (0.4) dari kecepatan jempol
+        heroImg.style.transform = `translateY(${scrollTop * 0.4}px)`;
+
+        // Bikin fotonya makin gelap & blur perlahan
+        heroImg.style.filter = `brightness(${100 - scrollTop * 0.1}%) blur(${scrollTop * 0.01}px)`;
+      }
     }
   });
 }

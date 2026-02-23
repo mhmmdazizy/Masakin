@@ -427,14 +427,15 @@
           <i data-feather="arrow-left"></i>
         </button>
         <span id="detail-category">KATEGORI</span>
+        <button id="detail-fav-btn" class="detail-fav-floating" onclick="event.stopPropagation(); toggleDetailFav();">
+            <i data-feather="heart" id="detail-fav-icon"></i>
+        </button>
         <button onclick="shareArticle()"><i data-feather="share-2"></i></button>
       </div>
       
       <div class="detail-hero" id="detail-image" style="position: relative; overflow: hidden;" onclick="handleImageTap(event)">
         
-        <button id="detail-fav-btn" class="detail-fav-floating" onclick="event.stopPropagation(); toggleDetailFav();">
-            <i data-feather="heart" id="detail-fav-icon"></i>
-        </button>
+        
 
         <i data-feather="heart" id="double-tap-heart" class="heart-animation"></i>
 
