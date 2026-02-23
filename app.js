@@ -47,29 +47,7 @@ let allCloudRecipes = [];
 
 // --- 3. START APP ---
 document.addEventListener("DOMContentLoaded", () => {
-  // 1. TEMBAKKAN SKELETON LANGSUNG KE LAYAR
-  showSkeletonLoading("explore-container", 6);
-  showSkeletonLoading("menu-container", 6);
-  showSkeletonLoading("favorit-container", 4);
-  showSkeletonLoading("my-recipe-list", 2);
-
-  // 2. TAHAN DATA LOKAL SELAMA 1.5 DETIK (Biar Shimmer Kelihatan!)
-  setTimeout(() => {
-    // Render data artikel statis (Explore)
-    if (typeof renderGrid === "function" && typeof articles !== "undefined") {
-        renderGrid("explore-container", articles);
-    }
-    
-    // Render data menu statis (Menu)
-    if (typeof renderMenuGrid === "function") {
-        renderMenuGrid();
-    }
-
-    // Render data favorit dari localStorage
-    if (typeof renderGrid === "function" && typeof favorites !== "undefined") {
-        renderGrid("favorit-container", favorites);
-    }
-  }, 1500); // 1500 milidetik = 1.5 detik
+  console.log("App Started...");
 
   // Update teks tombol tema kalau sebelumnya mode gelap
   const themeBtn = document.getElementById("theme-btn");
@@ -2239,27 +2217,5 @@ window.renderMenuGrid = () => {
   // Render ulang ke layar
   renderGrid("menu-container", allMenus);
 };
-// ==========================================
-// --- FITUR SKELETON LOADING (SHIMMER) ---
-// ==========================================
-function showSkeletonLoading(containerId, count = 4) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    
-    let skeletonHTML = '';
-    for (let i = 0; i < count; i++) {
-        skeletonHTML += `
-        <div class="card-item skeleton-card">
-            <div class="skeleton-img shimmer"></div>
-            <div class="skeleton-text badge shimmer" style="margin-top: 15px;"></div>
-            <div class="skeleton-text shimmer" style="margin-top: 5px;"></div>
-            <div class="skeleton-text short shimmer" style="margin-top: 5px;"></div>
-        </div>`;
-    }
-    
-    container.innerHTML = skeletonHTML;
-}
-
-
 
 
