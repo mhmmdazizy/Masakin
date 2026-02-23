@@ -174,10 +174,12 @@ auth.onAuthStateChanged(async (user) => {
     try {
       const userRef = db.collection("users").doc(user.uid);
       const doc = await userRef.get();
-      
+
       // Tangkap nama asli dari akun Google-nya
       const realName = user.displayName || "Pengguna";
-      const realPhoto = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(realName)}&background=random`;
+      const realPhoto =
+        user.photoURL ||
+        `https://ui-avatars.com/api/?name=${encodeURIComponent(realName)}&background=random`;
 
       if (!doc.exists) {
         // 1. Jika belum ada sama sekali, buat baru
@@ -185,18 +187,23 @@ auth.onAuthStateChanged(async (user) => {
           uid: user.uid,
           name: realName,
           photoURL: realPhoto,
-          followers: [], following: []
+          followers: [],
+          following: [],
         });
       } else {
         // 2. Jika dokumen sudah ada (misal karena pencet Follow duluan)
         const dataInDb = doc.data();
-        
+
         // Cek apakah di database namanya masih kosong, atau "Pengguna", atau tidak sinkron
-        if (!dataInDb.name || dataInDb.name === "Pengguna" || dataInDb.name !== realName) {
+        if (
+          !dataInDb.name ||
+          dataInDb.name === "Pengguna" ||
+          dataInDb.name !== realName
+        ) {
           // Paksa timpa dengan nama asli Google-nya!
           await userRef.update({
             name: realName,
-            photoURL: realPhoto
+            photoURL: realPhoto,
           });
         }
       }
@@ -855,7 +862,45 @@ window.openArticle = (
   }
 
   let htmlContent = "";
+  // === KODE TOMBOL FAV SUPER UNIVERSAL (ANTI HILANG) ===
+  try {
+    const favBtn = document.getElementById("detail-fav-btn");
 
+    // Mesin penangkap berbagai jenis nama variabel
+    let currentItem = null;
+    if (typeof recipeData !== "undefined" && recipeData)
+      currentItem = recipeData;
+    else if (typeof item !== "undefined" && item) currentItem = item;
+    else if (typeof data !== "undefined" && data) currentItem = data;
+    else if (typeof recipe !== "undefined" && recipe) currentItem = recipe;
+
+    // Pastikan datanya punya judul dan bahan/langkah (ciri khas resep, bukan artikel)
+    if (
+      favBtn &&
+      currentItem &&
+      currentItem.title &&
+      (currentItem.ingredients || currentItem.steps || currentItem.desc)
+    ) {
+      window.currentDetailRecipe = currentItem;
+      favBtn.style.display = "flex"; // Munculkan tombol Fav
+
+      // Cek apakah sudah di-Love sebelumnya
+      const isFav =
+        typeof favorites !== "undefined" &&
+        favorites.some((f) => f.title === currentItem.title);
+      if (isFav) {
+        favBtn.classList.add("active");
+      } else {
+        favBtn.classList.remove("active");
+      }
+    } else if (favBtn) {
+      // Sembunyikan HANYA jika memang murni artikel
+      favBtn.style.display = "none";
+    }
+  } catch (e) {
+    console.log("Aman, tombol Fav dilewati.", e);
+  }
+  // ==========================================================
   // JIKA RESEP INI PAKAI FORMAT BARU (Punya Bahan & Langkah)
   if (item && item.ingredients && item.steps) {
     // 1. Render Bahan-bahan
@@ -900,6 +945,20 @@ window.openArticle = (
   // Tampilkan Pop-up
   document.getElementById("article-view").classList.add("active");
   history.pushState({ modal: "article" }, null, "");
+
+  if (typeof feather !== "undefined") feather.replace();
+};
+// Fungsi saat tombol Fav di halaman detail diklik
+window.toggleDetailFav = () => {
+  if (!window.currentDetailRecipe) return;
+
+  // Panggil fungsi toggle favorit bawaanmu (pastikan nama fungsinya sesuai)
+  // Biasanya bernama toggleFavorite atau semacamnya
+  toggleFavorite(window.currentDetailRecipe);
+
+  // Ubah warna tombolnya seketika
+  const favBtn = document.getElementById("detail-fav-btn");
+  favBtn.classList.toggle("active");
 
   if (typeof feather !== "undefined") feather.replace();
 };
@@ -2005,22 +2064,27 @@ window.userProfileCache = {}; // Ingatan sementara biar gak download ulang
 
 // 3. Menampilkan Modal Daftar Pengikut/Mengikuti (VERSI NGEBUT & CACHE)
 window.showFollowList = async (type, isMyProfile = false) => {
-  const targetUid = isMyProfile ? (currentUser ? currentUser.uid : null) : viewedPublicUid;
+  const targetUid = isMyProfile
+    ? currentUser
+      ? currentUser.uid
+      : null
+    : viewedPublicUid;
   if (!targetUid) return;
-  
-  const titleText = type === 'followers' ? 'Pengikut' : 'Mengikuti';
-  document.getElementById('follow-list-title').innerText = titleText;
-  
-  const content = document.getElementById('follow-list-content');
-  content.innerHTML = '<p style="text-align:center; font-size:12px; color:#888;">Memuat data...</p>';
-  document.getElementById('follow-list-modal').style.display = 'flex';
+
+  const titleText = type === "followers" ? "Pengikut" : "Mengikuti";
+  document.getElementById("follow-list-title").innerText = titleText;
+
+  const content = document.getElementById("follow-list-content");
+  content.innerHTML =
+    '<p style="text-align:center; font-size:12px; color:#888;">Memuat data...</p>';
+  document.getElementById("follow-list-modal").style.display = "flex";
 
   try {
-    const doc = await db.collection('users').doc(targetUid).get();
+    const doc = await db.collection("users").doc(targetUid).get();
     const data = doc.exists ? doc.data() : {};
     const listIds = data[type] || [];
 
-    if(listIds.length === 0) {
+    if (listIds.length === 0) {
       content.innerHTML = `<p style="text-align:center; font-size:12px; color:#888;">Belum ada ${titleText.toLowerCase()}.</p>`;
       return;
     }
@@ -2032,9 +2096,9 @@ window.showFollowList = async (type, isMyProfile = false) => {
       if (window.userProfileCache[id]) {
         return { id, ...window.userProfileCache[id] };
       }
-      
+
       // Kalau belum ada di cache, download dari Firebase
-      const userDoc = await db.collection('users').doc(id).get();
+      const userDoc = await db.collection("users").doc(id).get();
       if (userDoc.exists) {
         const uData = userDoc.data();
         window.userProfileCache[id] = uData; // Simpan ke cache buat nanti!
@@ -2046,15 +2110,17 @@ window.showFollowList = async (type, isMyProfile = false) => {
     // Tunggu semua loket selesai melayani secara serentak (super cepat)
     const usersData = await Promise.all(userPromises);
 
-    let htmlString = ""; 
-    
+    let htmlString = "";
+
     // === RAKIT HTML-NYA ===
     usersData.forEach((uData) => {
       if (uData) {
         const uName = uData.name || "Pengguna";
-        const safeName = uName.replace(/'/g, "\\'"); 
-        const uPhoto = uData.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(uName)}&background=random`;
-        
+        const safeName = uName.replace(/'/g, "\\'");
+        const uPhoto =
+          uData.photoURL ||
+          `https://ui-avatars.com/api/?name=${encodeURIComponent(uName)}&background=random`;
+
         htmlString += `
         <div style="display:flex; align-items:center; gap:10px; cursor:pointer; padding: 5px;" 
              onclick="document.getElementById('follow-list-modal').style.display='none'; openPublicProfile('${uData.id}', '${safeName}', '${uPhoto}')">
@@ -2063,13 +2129,13 @@ window.showFollowList = async (type, isMyProfile = false) => {
         </div>`;
       }
     });
-    
+
     // Tembakkan ke layar
     content.innerHTML = htmlString;
-
   } catch (e) {
     console.error(e);
-    content.innerHTML = '<p style="text-align:center; color:red;">Gagal memuat data.</p>';
+    content.innerHTML =
+      '<p style="text-align:center; color:red;">Gagal memuat data.</p>';
   }
 };
 // ==========================================
@@ -2217,5 +2283,3 @@ window.renderMenuGrid = () => {
   // Render ulang ke layar
   renderGrid("menu-container", allMenus);
 };
-
-
