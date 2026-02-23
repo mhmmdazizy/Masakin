@@ -948,15 +948,17 @@ window.openArticle = (
 
   if (typeof feather !== "undefined") feather.replace();
 };
-// === FUNGSI EKSEKUSI TOMBOL FAV DI DALAM DETAIL RESEP ===
+// === FUNGSI EKSEKUSI TOMBOL FAV (SINKRON GLOBAL) ===
 window.toggleDetailFav = async () => {
   if (!window.currentDetailRecipe) return;
 
   const item = window.currentDetailRecipe;
   const favBtn = document.getElementById("detail-fav-btn");
 
-  // 1. Cek apakah resep ini sudah ada di daftar Favorit
-  // Kita pakai judul (title) sebagai patokan universal
+  // KUNCI GLOBAL: Buat ID unik berdasarkan judul (Sama persis dengan mesin Fav-mu)
+  const safeTitle = item.title.replace(/[^a-zA-Z0-9]/g, "_");
+
+  // Cek apakah resep ini sudah ada di daftar Favorit lokal
   const existingIndex =
     typeof favorites !== "undefined"
       ? favorites.findIndex((f) => f.title === item.title)
@@ -964,44 +966,39 @@ window.toggleDetailFav = async () => {
 
   try {
     if (existingIndex >= 0) {
-      // --- JIKA SUDAH DI-FAV: HAPUS ---
+      // --- 1. BATALKAN FAV (KURANGI ANGKA GLOBAL) ---
       favorites.splice(existingIndex, 1);
       favBtn.classList.remove("active");
 
-      // Kurangi angka di Firebase (Hanya jika resep ini dari Cloud / punya ID)
-      if (item.id) {
-        db.collection("counters")
-          .doc(item.id)
-          .set(
-            {
-              favCount: firebase.firestore.FieldValue.increment(-1),
-            },
-            { merge: true },
-          );
-      }
+      // Tembak langsung ke mesin Global Firebase
+      db.collection("counters")
+        .doc(safeTitle)
+        .set(
+          {
+            favCount: firebase.firestore.FieldValue.increment(-1),
+          },
+          { merge: true },
+        );
     } else {
-      // --- JIKA BELUM DI-FAV: TAMBAHKAN ---
+      // --- 2. JADIKAN FAV (TAMBAH ANGKA GLOBAL) ---
       favorites.push(item);
       favBtn.classList.add("active");
 
-      // Tambah angka di Firebase (Hanya jika resep ini dari Cloud / punya ID)
-      if (item.id) {
-        db.collection("counters")
-          .doc(item.id)
-          .set(
-            {
-              favCount: firebase.firestore.FieldValue.increment(1),
-            },
-            { merge: true },
-          );
-      }
+      // Tembak langsung ke mesin Global Firebase
+      db.collection("counters")
+        .doc(safeTitle)
+        .set(
+          {
+            favCount: firebase.firestore.FieldValue.increment(1),
+          },
+          { merge: true },
+        );
     }
 
-    // 2. Simpan perubahan ke LocalStorage (Memori HP)
+    // Simpan ke memori HP (Local Storage)
     localStorage.setItem("myFavorites", JSON.stringify(favorites));
 
-    // 3. SINKRONISASI TAMPILAN LUAR SEKETIKA
-    // Ini yang bikin kartu di Menu dan Beranda otomatis berubah warnanya & angkanya!
+    // Sinkronisasi paksa kartu-kartu di latar belakang
     if (typeof renderMenuGrid === "function") renderMenuGrid();
     if (typeof renderGrid === "function") {
       renderGrid("favorit-container", favorites);
@@ -1009,7 +1006,6 @@ window.toggleDetailFav = async () => {
         renderGrid("explore-container", articles);
     }
 
-    // Render ulang icon
     if (typeof feather !== "undefined") feather.replace();
   } catch (error) {
     console.error("Gagal mengubah status favorit:", error);
