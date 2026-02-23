@@ -148,49 +148,78 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 // Cek Login & Load Data Cloud
-auth.onAuthStateChanged(async (user) => {
+// 1. Dengar Data Profil Secara Realtime & Sinkronisasi User
+let unsubscribeMyProfile = null;
+
+firebase.auth().onAuthStateChanged(async (user) => {
+  const myStatsContainer = document.getElementById("my-profile-stats");
+
+  // Matikan mesin pendengar lama jika ada
+  if (unsubscribeMyProfile) {
+    unsubscribeMyProfile();
+    unsubscribeMyProfile = null;
+  }
+
   if (user) {
+    // --- 1. JIKA SUDAH LOGIN ---
     currentUser = user;
 
-    // === PROSES SINKRONISASI DATA KE FIRESTORE (BIAR GAK JADI "PENGGUNA") ===
-    const userRef = db.collection("users").doc(user.uid);
-    const doc = await userRef.get();
-
-    // Ambil data dari Google/Auth sebagai cadangan
-    const userData = {
-      uid: user.uid,
-      name: user.displayName || "Koki Misterius",
-      photoURL:
-        user.photoURL ||
-        `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || "U")}&background=random`,
-      lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
-    };
-
-    if (!doc.exists) {
-      // Jika user baru pertama kali masuk, simpan datanya
-      await userRef.set(userData);
-      console.log("Data user baru berhasil didaftarkan!");
-    } else {
-      // Jika sudah ada, update tipis-tipis (biar namanya tetap terbaru)
-      await userRef.update({
-        name: user.displayName || doc.data().name,
-        photoURL: user.photoURL || doc.data().photoURL,
-        lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
-      });
+    // A. Proses Sinkronisasi Database (Biar temanmu nggak jadi "Pengguna")
+    try {
+      const userRef = db.collection("users").doc(user.uid);
+      const doc = await userRef.get();
+      if (!doc.exists) {
+        await userRef.set({
+          uid: user.uid,
+          name: user.displayName || "Pengguna",
+          photoURL:
+            user.photoURL ||
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || "U")}&background=random`,
+          followers: [],
+          following: [],
+        });
+      } else {
+        await userRef.update({
+          name: user.displayName || doc.data().name,
+          photoURL: user.photoURL || doc.data().photoURL,
+        });
+      }
+    } catch (e) {
+      console.error("Gagal sinkron data user:", e);
     }
-    // =====================================================================
 
-    document.getElementById("auth-btn").style.display = "none";
-    document.getElementById("user-profile").style.display = "flex";
-    document.getElementById("user-name").innerText = user.displayName;
-    document.getElementById("user-photo").src = user.photoURL;
+    // B. Tampilkan Angka Realtime di Akun Saya
+    if (myStatsContainer) myStatsContainer.style.display = "flex";
 
-    // Refresh UI Profile
+    unsubscribeMyProfile = db
+      .collection("users")
+      .doc(user.uid)
+      .onSnapshot((doc) => {
+        const data = doc.exists ? doc.data() : {};
+        const followers = data.followers || [];
+        const following = data.following || [];
+        const elFollowers = document.getElementById("count-followers");
+        const elFollowing = document.getElementById("count-following");
+        if (elFollowers) elFollowers.innerText = followers.length;
+        if (elFollowing) elFollowing.innerText = following.length;
+      });
+
+    // C. Panggil fungsi render UI aslimu (Tanpa paksaan ID)
     if (typeof updateProfileUI === "function") updateProfileUI();
+    if (typeof renderProfile === "function") renderProfile();
   } else {
+    // --- 2. JIKA BELUM LOGIN (GUEST) ---
     currentUser = null;
-    document.getElementById("auth-btn").style.display = "block";
-    document.getElementById("user-profile").style.display = "none";
+    if (myStatsContainer) myStatsContainer.style.display = "none";
+
+    const elFollowers = document.getElementById("count-followers");
+    const elFollowing = document.getElementById("count-following");
+    if (elFollowers) elFollowers.innerText = "0";
+    if (elFollowing) elFollowing.innerText = "0";
+
+    // Panggil ulang UI biar tombol Masuk dengan Google muncul
+    if (typeof updateProfileUI === "function") updateProfileUI();
+    if (typeof renderProfile === "function") renderProfile();
   }
 });
 
@@ -1725,7 +1754,6 @@ window.submitComment = (btnElement) => {
 let currentRecipeAuthorUid = null; // Menyimpan UID author dari resep yang sedang dibuka
 
 // 1. Dengar Data Profil Secara Realtime (SINKRONISASI GLOBAL UNTUK AKUN SAYA)
-let unsubscribeMyProfile = null; // Kunci pengaman biar data gak bentrok
 
 firebase.auth().onAuthStateChanged((user) => {
   const myStatsContainer = document.getElementById("my-profile-stats");
