@@ -259,6 +259,24 @@
             <div class="menu-item" id="theme-btn" onclick="toggleTheme()">
               <i data-feather="moon"></i> Mode Gelap
             </div>
+            <div class="menu-item" style="display: flex; justify-content: space-between; align-items: center; cursor: default;">
+                
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <i data-feather="monitor"></i> <span> Mode Masak </span>
+                    
+                    <div class="info-tooltip-container">
+                        <i data-feather="info" style="width: 16px; height: 16px; color: #888; cursor: help;"></i>
+                        <div class="info-bubble">
+                            Fitur ini akan mencegah layar HP mati otomatis saat membaca resep. Sangat cocok saat tangan sedang kotor!
+                        </div>
+                    </div>
+                </div>
+                
+                <label class="switch" style="margin-bottom: 0;">
+                    <input type="checkbox" id="toggle-cooking-mode" onchange="toggleCookingMode(this)">
+                    <span class="slider round"></span>
+                </label>
+            </div>
             <div class="menu-item" id="install-btn" style="display: none">
               <i data-feather="download"></i> Unduh Aplikasi
             </div>
@@ -407,9 +425,16 @@
         <span id="detail-category">KATEGORI</span>
         <button onclick="shareArticle()"><i data-feather="share-2"></i></button>
       </div>
-      <div class="detail-hero" id="detail-image"><button id="detail-fav-btn" class="detail-fav-floating" onclick="toggleDetailFav()">
+      
+      <div class="detail-hero" id="detail-image" style="position: relative; overflow: hidden;" onclick="handleImageTap(event)">
+        
+        <button id="detail-fav-btn" class="detail-fav-floating" onclick="event.stopPropagation(); toggleDetailFav();">
             <i data-feather="heart" id="detail-fav-icon"></i>
-        </button></div>
+        </button>
+
+        <i data-feather="heart" id="double-tap-heart" class="heart-animation"></i>
+
+      </div>
       <div class="detail-body">
         
         <h1 id="detail-title">Judul Artikel</h1>

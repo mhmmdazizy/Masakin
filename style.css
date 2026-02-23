@@ -1461,3 +1461,160 @@ body[data-theme="dark"] .logo-dark {
   color: #ff4757; /* Garis warna merah */
   stroke: #ff4757; /* Garis warna merah */
 }
+/* ==========================================
+   --- ANIMASI DOUBLE TAP TO LIKE ---
+   ========================================== */
+.heart-animation {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0); /* Mulai dari tak terlihat */
+  color: white;
+  fill: white; /* Bikin hatinya full putih */
+  width: 80px;
+  height: 80px;
+  opacity: 0;
+  z-index: 101;
+  pointer-events: none; /* Biar gak ngeblokir klik jari ke foto */
+}
+
+/* Class ini akan ditambahkan oleh JS saat double tap terjadi */
+.heart-animation.animate {
+  animation: popHeart 0.8s ease-out forwards;
+}
+
+@keyframes popHeart {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+  15% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0.8;
+  }
+  30% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  70% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0;
+  }
+}
+/* ==========================================
+   --- TOOLTIP BUBBLE MODE MASAK ---
+   ========================================== */
+.info-tooltip-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.info-bubble {
+  visibility: hidden;
+  opacity: 0;
+  background-color: rgba(30, 30, 30, 0.95);
+  color: #fff;
+  text-align: center;
+  border-radius: 8px;
+  padding: 10px 14px;
+  position: absolute;
+  z-index: 100;
+  bottom: 150%; /* Muncul melayang di atas icon */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+  font-size: 12px;
+  line-height: 1.5;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s ease;
+  pointer-events: none; /* Biar gak mengganggu klik */
+}
+
+/* Segitiga panah kecil di bawah bubble */
+.info-bubble::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -6px;
+  border-width: 6px;
+  border-style: solid;
+  border-color: rgba(30, 30, 30, 0.95) transparent transparent transparent;
+}
+
+/* Tampilkan bubble saat icon di-hover (PC) atau ditekan (HP) */
+.info-tooltip-container:hover .info-bubble,
+.info-tooltip-container:active .info-bubble {
+  visibility: visible;
+  opacity: 1;
+}
+/* ==========================================
+   --- UI TOGGLE SWITCH (ON/OFF ROUNDED) ---
+   ========================================== */
+
+/* 1. Wadah utama toggle */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 46px; /* Lebar keseluruhan toggle */
+  height: 26px; /* Tinggi toggle */
+  margin-bottom: 0;
+}
+
+/* 2. Sembunyikan checkbox HTML aslinya yang jelek */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* 3. Jalur (Background) Slider-nya */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #d1d5db; /* Warna abu-abu saat OFF */
+  transition: 0.3s;
+}
+
+/* 4. Lingkaran (Knob) putih di dalamnya */
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Biar tombolnya timbul */
+}
+
+/* 5. Perubahan warna saat ditekan (ON) */
+input:checked + .slider {
+  background-color: #ff6b6b; /* Warna saat nyala (Ganti dengan warna utama aplikasimu) */
+}
+
+/* 6. Animasi geser lingkaran ke kanan saat ON */
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+/* 7. Jurus Rahasia: Bikin ujungnya membulat (Rounded) */
+.slider.round {
+  border-radius: 26px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}

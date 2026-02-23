@@ -2332,3 +2332,102 @@ window.renderMenuGrid = () => {
   // Render ulang ke layar
   renderGrid("menu-container", allMenus);
 };
+// ==========================================
+// --- FITUR DOUBLE TAP TO LIKE (ALA IG) ---
+// ==========================================
+let lastTapTime = 0;
+
+window.handleImageTap = (e) => {
+  const currentTime = new Date().getTime();
+  const tapLength = currentTime - lastTapTime;
+
+  // Jika jarak ketukan kurang dari 300 milidetik (0.3 detik), anggap Double Tap!
+  if (tapLength < 300 && tapLength > 0) {
+    executeDoubleTapLike();
+    e.preventDefault(); // Mencegah layar nge-zoom otomatis di HP
+  }
+  lastTapTime = currentTime;
+};
+
+// Variable pengingat waktu (taruh di luar fungsi biar nggak lupa)
+let heartTimeout;
+
+window.executeDoubleTapLike = () => {
+  if (!window.currentDetailRecipe) return;
+
+  const heartIcon = document.getElementById("double-tap-heart");
+  if (!heartIcon) return;
+
+  // 1. RESET ANIMASI SECARA PAKSA
+  heartIcon.classList.remove("animate");
+  void heartIcon.offsetWidth; // Trik paksa reflow browser
+  heartIcon.classList.add("animate");
+
+  // 2. BERSIHKAN OTOMATIS SETELAH SELESAI
+  // Hapus timer lama kalau user nge-spam klik berkali-kali
+  clearTimeout(heartTimeout);
+  // Setel alarm 800ms (sesuai durasi animasi CSS-mu) untuk membersihkan class-nya
+  heartTimeout = setTimeout(() => {
+    if (heartIcon) heartIcon.classList.remove("animate");
+  }, 800);
+
+  // 3. TANDAI SEBAGAI FAVORIT
+  const item = window.currentDetailRecipe;
+  const existingIndex =
+    typeof favorites !== "undefined"
+      ? favorites.findIndex((f) => f.title === item.title)
+      : -1;
+
+  // Kalau belum di-fav, tembak fungsi Fav di pojok kanan atas!
+  if (existingIndex < 0) {
+    if (typeof toggleDetailFav === "function") {
+      toggleDetailFav();
+    }
+  }
+};
+// ==========================================
+// --- FITUR MODE MASAK (WAKE LOCK API) ---
+// ==========================================
+let wakeLock = null;
+
+window.toggleCookingMode = async (checkbox) => {
+  if (checkbox.checked) {
+    try {
+      if ("wakeLock" in navigator) {
+        wakeLock = await navigator.wakeLock.request("screen");
+        localStorage.setItem("cookingMode", "on");
+        console.log("Mode Masak Aktif!");
+      } else {
+        console.warn("Browser tidak mendukung WakeLock.");
+        checkbox.checked = false; // Batalkan centang kalau HP ga support
+      }
+    } catch (err) {
+      console.error("Gagal mengaktifkan:", err);
+      checkbox.checked = false;
+    }
+  } else {
+    if (wakeLock !== null) {
+      await wakeLock.release();
+      wakeLock = null;
+    }
+    localStorage.setItem("cookingMode", "off");
+  }
+};
+
+// Fitur Auto-Resume (Kalau user buka WA lalu balik lagi ke resep)
+document.addEventListener("visibilitychange", async () => {
+  if (wakeLock !== null && document.visibilityState === "visible") {
+    wakeLock = await navigator.wakeLock.request("screen");
+  }
+});
+
+// Ingat Pilihan Saat Buka Aplikasi
+document.addEventListener("DOMContentLoaded", () => {
+  const cookingState = localStorage.getItem("cookingMode");
+  const toggleBtn = document.getElementById("toggle-cooking-mode");
+
+  if (cookingState === "on" && toggleBtn) {
+    toggleBtn.checked = true;
+    toggleCookingMode(toggleBtn);
+  }
+});
