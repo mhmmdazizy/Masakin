@@ -64,6 +64,18 @@ document.addEventListener("DOMContentLoaded", () => {
     if (staticArticle) staticArticle.favCount = fav.favCount || 1;
   });
 
+  // === 1. BACA CACHE MEMORI LOKAL (ZERO DELAY) ===
+  const cachedCloudRecipes = localStorage.getItem("myCachedCloudRecipes");
+  if (cachedCloudRecipes) {
+    try {
+      // Isi variabel global dengan data sisa kemarin
+      allCloudRecipes = JSON.parse(cachedCloudRecipes);
+      console.log("⚡ Resep Cloud dimuat instan dari Cache Lokal!");
+    } catch (e) {
+      console.error("Gagal membaca cache resep:", e);
+    }
+  }
+
   // Render Data Statis Dulu (Supaya gak kosong)
   renderIngredients();
   renderGrid("explore-container", articles);
@@ -73,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Render Icon (Penting biar gak hilang)
   if (typeof feather !== "undefined") feather.replace();
 
-  // 1. Ambil Resep dari Cloud
+  // === 2. AMBIL RESEP DARI CLOUD (BERJALAN DIAM-DIAM DI BACKGROUND) ===
   db.collection("recipes")
     .orderBy("createdAt", "desc")
     .onSnapshot((snapshot) => {
@@ -96,11 +108,17 @@ document.addEventListener("DOMContentLoaded", () => {
           item.favCount = globalFavCounts[safeTitle] || 0;
         });
       }
+      // === 3. SIMPAN DATA FRESH KE CACHE UNTUK BUKA APLIKASI BESOK ===
+      localStorage.setItem(
+        "myCachedCloudRecipes",
+        JSON.stringify(allCloudRecipes),
+      );
 
       renderMyRecipes();
       // Render jika sedang di halaman menu
       if (typeof renderMenuGrid === "function") renderMenuGrid();
       if (typeof updateTotalLikesUI === "function") updateTotalLikesUI();
+      if (typeof feather !== "undefined") feather.replace(); // Pastikan icon gak hilang saat render ulang
     });
 
   // 2. SINKRONISASI ANGKA FAVORIT GLOBAL SE-DUNIA
