@@ -253,18 +253,67 @@ auth.onAuthStateChanged(async (user) => {
 });
 
 // --- 4. RENDER FUNCTIONS ---
-function renderIngredients() {
-  const el = document.getElementById("ingredients-container");
-  if (el)
-    el.innerHTML = ingredients
-      .map(
-        (ing) => `
-    <div class="ing-item" onclick="toggleIng('${ing.id}', this)">
-        <img src="${ing.icon}" alt="${ing.name}" class="ing-png-icon">
-        <span>${ing.name}</span>
-    </div>`,
-      )
-      .join("");
+// ==========================================
+// --- MESIN RENDER BAHAN (VERSI KOTAK RAPI) ---
+// ==========================================
+function renderIngredients(searchQuery = "") {
+  const container = document.getElementById("ingredients-container");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const query = searchQuery.toLowerCase().trim();
+  const categories = ["Protein", "Sayur", "Karbohidrat", "Bumbu"];
+
+  categories.forEach((catName) => {
+    const filteredItems = ingredients.filter(
+      (item) =>
+        item.category === catName && item.name.toLowerCase().includes(query),
+    );
+
+    if (filteredItems.length === 0) return;
+
+    // 1. Buat Wadah Kategori
+    const section = document.createElement("div");
+    section.className = "ingredient-category-section";
+
+    // 2. Buat Sub Judul
+    const title = document.createElement("div");
+    title.className = "category-title";
+    title.innerText = catName;
+    section.appendChild(title);
+
+    // 3. Buat Wadah Grid
+    const grid = document.createElement("div");
+    grid.className = "ingredients-grid";
+
+    // 4. Cetak Kotak Bahannya
+    filteredItems.forEach((item) => {
+      const isSelected = selectedIngredients.has(item.id);
+
+      const btn = document.createElement("div");
+      btn.className = `ingredient-item ${isSelected ? "selected" : ""}`;
+
+      btn.onclick = () => {
+        if (selectedIngredients.has(item.id)) {
+          selectedIngredients.delete(item.id);
+        } else {
+          selectedIngredients.add(item.id);
+        }
+        const searchBox = document.getElementById("search-ingredient");
+        renderIngredients(searchBox ? searchBox.value : "");
+      };
+
+      // HTML dalam kotaknya jadi jauh lebih bersih!
+      btn.innerHTML = `
+                <img src="${item.icon}" alt="${item.name}" class="ingredient-icon">
+                <span class="ingredient-name">${item.name}</span>
+            `;
+      grid.appendChild(btn);
+    });
+
+    section.appendChild(grid);
+    container.appendChild(section);
+  });
 }
 // --- FUNGSI UPDATE NOMOR URUT LANGKAH OTOMATIS ---
 window.updateStepNumbers = () => {

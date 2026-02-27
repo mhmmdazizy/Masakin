@@ -62,7 +62,11 @@
           <h1>Mau masak apa hari ini?</h1>
           <p>Pilih bahan yang tersedia, kami carikan resepnya.</p>
         </div>
-        <div class="ingredients-grid" id="ingredients-container"></div>
+        <div class="ingredient-search-box" style="display: flex; align-items: center; background: #f1f3f5; border-radius: 12px; padding: 10px 14px; margin-bottom: 20px;">
+            <i data-feather="search" style="color: #888; width: 18px;"></i>
+            <input type="text" id="search-ingredient" placeholder="Cari ayam, bayam, bawang..." onkeyup="renderIngredients(this.value)" style="border: none; background: transparent; outline: none; width: 100%; margin-left: 10px; font-size: 14px;">
+        </div>
+        <div id="ingredients-container"></div>
 
         <div class="floating-action">
           <button class="find-btn-cari" onclick="findRecipes()">
