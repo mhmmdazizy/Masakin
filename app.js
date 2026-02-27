@@ -1518,27 +1518,47 @@ window.shareArticle = () => {
 window.findRecipes = () => {
   // 1. Cek apakah ada bahan yang dicentang
   if (selectedIngredients.size === 0) {
-    openPopup("Belum ada yang dipilih");
+    // Pake pop-up aslimu
+    if (typeof openPopup === "function") {
+      openPopup("Belum ada yang dipilih");
+    } else {
+      alert("Belum ada yang dipilih");
+    }
     return;
   }
 
-  // === PERBAIKAN 1: Gunakan allCloudRecipes agar SELURUH resep Firebase ikut dicari ===
+  // 2. Gabungkan SELURUH resep (Static + Firebase)
   const staticMenus = typeof menus !== "undefined" ? menus : [];
   const cloudMenus =
     typeof allCloudRecipes !== "undefined" ? allCloudRecipes : [];
   const allRecipes = [...staticMenus, ...cloudMenus];
 
-  // 3. Ubah daftar bahan yang dicentang menjadi Array
-  const selectedArr = Array.from(selectedIngredients);
+  // === PERBAIKAN: TERJEMAHKAN ID KE NAMA BAHAN ===
+  // Mengubah ID "nasi_putih" kembali menjadi teks "nasi putih"
+  // Biar bisa ketemu di teks "200g nasi putih"
+  const searchTerms = Array.from(selectedIngredients).map((selectedId) => {
+    // Cari bahan di database.js berdasarkan ID-nya
+    const bahanObj = ingredients.find(
+      (item) => item.id === selectedId || item.name === selectedId,
+    );
+    // Ambil namanya, ubah ke huruf kecil semua
+    return bahanObj ? bahanObj.name.toLowerCase() : selectedId.toLowerCase();
+  });
 
   // 4. Deteksi & Filter Resep Otomatis
   const matchedRecipes = allRecipes.filter((recipe) => {
-    // === PERBAIKAN 2: Gabungkan Judul, Deskripsi, DAN Bahan-bahan ===
-    // Pakai fallback ("") biar gak error kalau ada data lama yang kosong
     const safeTitle = recipe.title || "";
     const safeDesc = recipe.desc || "";
-    const safeIngredients = recipe.ingredients || "";
 
+    // Amankan bentuk data bahan (jaga-jaga kalau ada yg bentuknya Array atau String)
+    let safeIngredients = "";
+    if (Array.isArray(recipe.ingredients)) {
+      safeIngredients = recipe.ingredients.join(" ");
+    } else {
+      safeIngredients = recipe.ingredients || "";
+    }
+
+    // Gabungkan semuanya jadi 1 teks raksasa
     const textToSearch = (
       safeTitle +
       " " +
@@ -1547,31 +1567,33 @@ window.findRecipes = () => {
       safeIngredients
     ).toLowerCase();
 
-    // Cek kecocokan
-    return selectedArr.some((bahan) =>
-      textToSearch.includes(bahan.toLowerCase()),
-    );
+    // Cek kecocokan menggunakan nama bahan yang sudah diterjemahkan
+    return searchTerms.some((term) => textToSearch.includes(term));
   });
 
   // 5. Tampilkan Hasilnya ke Layar
   const resultSection = document.getElementById("recipe-results");
   const container = document.getElementById("results-container");
 
-  container.classList.add("masonry-grid");
-  resultSection.style.display = "block";
+  if (container) container.classList.add("masonry-grid");
+  if (resultSection) resultSection.style.display = "block";
 
   if (matchedRecipes.length > 0) {
-    renderGrid("results-container", matchedRecipes);
+    if (typeof renderGrid === "function")
+      renderGrid("results-container", matchedRecipes);
   } else {
-    container.innerHTML = `
-      <p style="grid-column: 1 / -1; text-align:center; color:var(--text-muted); font-size:13px; margin-top:10px;">
-        Yah, belum ada resep yang cocok dengan bahan tersebut. Coba pilih bahan lain atau kurangi pilihannya!
-      </p>
-    `;
+    if (container) {
+      container.innerHTML = `
+          <p style="grid-column: 1 / -1; text-align:center; color:var(--text-muted); font-size:13px; margin-top:10px;">
+            Yah, belum ada resep yang cocok dengan bahan tersebut. Coba pilih bahan lain atau kurangi pilihannya!
+          </p>
+        `;
+    }
   }
 
   // 6. Gulir (scroll) layar otomatis ke bawah
-  resultSection.scrollIntoView({ behavior: "smooth", block: "start" });
+  if (resultSection)
+    resultSection.scrollIntoView({ behavior: "smooth", block: "start" });
 };
 // ==========================================
 // --- FITUR REACTION EMOTICON (FIREBASE) ---

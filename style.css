@@ -254,6 +254,10 @@ header {
   border-radius: 8px; /* Gambarnya dibikin agak kotak juga */
   object-fit: cover;
   margin-bottom: 8px;
+  transition:
+    transform 0.2s ease-out,
+    border 0.2s ease;
+  border: 1px solid transparent;
 }
 
 .ingredient-name {
@@ -264,6 +268,7 @@ header {
 
 /* Efek saat Kotak Dipilih */
 .ingredient-item.selected {
+  transform: scale(1.05);
   border: 2px solid #ff6b6b; /* Garis pinggir merah */
   background-color: #fff0f0; /* Latar belakang kemerahan */
   box-shadow: 0 4px 8px rgba(255, 107, 107, 0.15);

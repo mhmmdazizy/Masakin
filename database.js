@@ -10,7 +10,7 @@ const ingredients = [
     id: "ayam",
     name: "Ayam",
     category: "Protein",
-    icon: "https://ui-avatars.com/api/?name=Ayam&background=random&color=fff&rounded=true&bold=true",
+    icon: "icon/ayam.png",
   },
   {
     id: "daging_sapi",
@@ -100,7 +100,7 @@ const ingredients = [
     id: "tahu",
     name: "Tahu",
     category: "Protein",
-    icon: "https://ui-avatars.com/api/?name=Tahu&background=random&color=fff&rounded=true&bold=true",
+    icon: "icon/tahu.png",
   },
   {
     id: "tahu_sutera",
@@ -112,13 +112,13 @@ const ingredients = [
     id: "tahu_telur",
     name: "Tahu telur",
     category: "Protein",
-    icon: "https://ui-avatars.com/api/?name=Tahu+telur&background=random&color=fff&rounded=true&bold=true",
+    icon: "icon/telur.png",
   },
   {
     id: "tempe",
     name: "Tempe",
     category: "Protein",
-    icon: "https://ui-avatars.com/api/?name=Tempe&background=random&color=fff&rounded=true&bold=true",
+    icon: "icon/tempe.png",
   },
   {
     id: "oncom",
@@ -254,7 +254,7 @@ const ingredients = [
     id: "nasi_putih",
     name: "Nasi putih",
     category: "Karbohidrat",
-    icon: "https://ui-avatars.com/api/?name=Nasi+putih&background=random&color=fff&rounded=true&bold=true",
+    icon: "icon/nasi.png",
   },
   {
     id: "nasi_merah",
@@ -424,7 +424,7 @@ const ingredients = [
     id: "kecap_manis",
     name: "Kecap manis",
     category: "Bumbu",
-    icon: "https://ui-avatars.com/api/?name=Kecap+manis&background=random&color=fff&rounded=true&bold=true",
+    icon: "icon/kecap manis.png",
   },
   {
     id: "kecap_asin",
@@ -514,7 +514,7 @@ const ingredients = [
     id: "bawang_merah",
     name: "Bawang merah",
     category: "Bumbu",
-    icon: "https://ui-avatars.com/api/?name=Bawang+merah&background=random&color=fff&rounded=true&bold=true",
+    icon: "icon/bawang merah.png",
   },
   {
     id: "bawang_putih",
@@ -532,7 +532,7 @@ const ingredients = [
     id: "cabe_merah_besar",
     name: "Cabe merah besar",
     category: "Bumbu",
-    icon: "https://ui-avatars.com/api/?name=Cabe+merah+besar&background=random&color=fff&rounded=true&bold=true",
+    icon: "icon/cabe.png",
   },
   {
     id: "cabe_merah_keriting",
