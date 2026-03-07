@@ -227,6 +227,7 @@ let unsubscribeMyProfile = null; // Pastikan cuma ada satu baris ini di atas
 auth.onAuthStateChanged(async (user) => {
   currentUser = user;
 
+  if (typeof requestPushPermission === "function") requestPushPermission();
   if (typeof renderNotifications === "function") renderNotifications();
   if (typeof updateUI === "function") updateUI(user);
 
