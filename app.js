@@ -2495,15 +2495,24 @@ window.toggleFollowPublic = () => {
     });
 };
 // ==========================================
-// --- FITUR MENGHITUNG TOTAL LIKES ---
+// --- FITUR MENGHITUNG TOTAL LIKES (REALTIME SINKRON) ---
 // ==========================================
 window.updateTotalLikesUI = () => {
+  // Pastikan mesin memori globalnya sudah siap
+  const liveFavs =
+    typeof globalFavCounts !== "undefined" ? globalFavCounts : {};
+
   // 1. Update Likes di "Akun Saya"
   if (currentUser) {
-    // Cari resep buatan kita, lalu jumlahkan favCount-nya
-    const myTotalLikes = allCloudRecipes
-      .filter((r) => r.userId === currentUser.uid)
-      .reduce((sum, r) => sum + (r.favCount || 0), 0);
+    let myTotalLikes = 0;
+
+    allCloudRecipes.forEach((r) => {
+      if (r.userId === currentUser.uid) {
+        // Intip langsung ke angka global pakai judul resepnya
+        const safeTitle = r.title.replace(/[^a-zA-Z0-9]/g, "_");
+        myTotalLikes += liveFavs[safeTitle] || 0;
+      }
+    });
 
     const elMyLikes = document.getElementById("count-likes");
     if (elMyLikes) elMyLikes.innerText = myTotalLikes;
@@ -2511,10 +2520,15 @@ window.updateTotalLikesUI = () => {
 
   // 2. Update Likes di Profil Orang Lain
   if (typeof viewedPublicUid !== "undefined" && viewedPublicUid) {
-    // Cari resep buatan target, lalu jumlahkan favCount-nya
-    const publicTotalLikes = allCloudRecipes
-      .filter((r) => r.userId === viewedPublicUid)
-      .reduce((sum, r) => sum + (r.favCount || 0), 0);
+    let publicTotalLikes = 0;
+
+    allCloudRecipes.forEach((r) => {
+      if (r.userId === viewedPublicUid) {
+        // Intip langsung ke angka global pakai judul resepnya
+        const safeTitle = r.title.replace(/[^a-zA-Z0-9]/g, "_");
+        publicTotalLikes += liveFavs[safeTitle] || 0;
+      }
+    });
 
     const elPublicLikes = document.getElementById("public-likes");
     if (elPublicLikes) elPublicLikes.innerText = publicTotalLikes;
