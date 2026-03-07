@@ -186,6 +186,7 @@ auth.onAuthStateChanged(async (user) => {
 
   if (user) {
     // --- 2. JIKA SUDAH LOGIN ---
+    if (typeof listenToNotifications === "function") listenToNotifications();
     if (myStatsContainer) myStatsContainer.style.display = "flex";
 
     // A. Sinkronisasi Profil ke Database (Versi Agresif & Self-Healing)
@@ -1919,6 +1920,9 @@ window.submitComment = (btnElement) => {
   const title = document.getElementById("detail-title").innerText;
   const safeTitleId = title.replace(/[^a-zA-Z0-9]/g, "_");
 
+  // TANGKAP DATA RESEP DARI MEMORI GLOBAL
+  const currentRecipe = window.currentDetailRecipe;
+
   // Ubah teks tombol biar ada efek loading
   const originalBtnText = btnElement.innerText;
   btnElement.innerText = "Mengirim...";
@@ -1940,6 +1944,26 @@ window.submitComment = (btnElement) => {
       inputElement.value = "";
       btnElement.innerText = originalBtnText;
       btnElement.disabled = false;
+      // 2. KIRIM NOTIFIKASI KE PEMILIK RESEP (Dijalankan setelah komen sukses)
+      if (
+        currentRecipe &&
+        currentRecipe.userId &&
+        currentRecipe.userId !== currentUser.uid
+      ) {
+        db.collection("notifications")
+          .add({
+            recipientId: currentRecipe.userId,
+            senderId: currentUser.uid,
+            senderName: currentUser.displayName || "Seseorang",
+            recipeId: currentRecipe.id || safeTitleId,
+            recipeTitle: currentRecipe.title || title,
+            message: text, // Pakai variabel 'text' yang benar
+            type: "comment",
+            isRead: false,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          })
+          .catch((err) => console.error("❌ Gagal kirim notif:", err));
+      }
     })
     .catch((error) => {
       console.error("Gagal mengirim:", error);
@@ -1947,23 +1971,6 @@ window.submitComment = (btnElement) => {
       btnElement.innerText = originalBtnText;
       btnElement.disabled = false;
     });
-  if (recipeData.userId && recipeData.userId !== currentUser.uid) {
-    db.collection("notifications")
-      .add({
-        recipientId: recipeData.userId, // ID Pemilik Resep
-        senderId: currentUser.uid, // ID Yang Komen
-        senderName: currentUser.displayName || "Seseorang",
-        recipeId: recipeData.id, // ID Resep
-        recipeTitle: recipeData.title || "Resep",
-        message: commentText,
-        type: "comment",
-        isRead: false,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      })
-      .then(() => {
-        console.log("Notif berhasil dikirim ke pemilik resep!");
-      });
-  }
 };
 // ==========================================
 // --- FITUR FOLLOW / UNFOLLOW (FIREBASE) ---
