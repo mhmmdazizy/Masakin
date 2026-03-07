@@ -1700,41 +1700,106 @@ db.collection("notifications")
   });
 
 // 3. Render Notifikasi ke Layar
+// ==========================================
+// --- MESIN NOTIFIKASI GABUNGAN (GLOBAL + KOMENTAR) ---
+// ==========================================
+
+// 1. Render Notifikasi ke Layar
 function renderNotifications() {
   const container = document.getElementById("notif-list-container");
-  const dot = document.querySelector(".notif-dot"); // Titik merah di icon lonceng
+  const dot = document.querySelector(".notif-dot");
   if (!container) return;
 
-  // Filter: Hanya tampilkan notif yang ID-nya belum ada di daftar 'deletedNotifs'
-  const visibleNotifs = allNotifs.filter((n) => !deletedNotifs.includes(n.id));
+  // --- FILTER SAKTI ---
+  // 1. Pastikan belum dihapus user
+  // 2. Jika ini notif sistem (gak ada recipientId) -> Tampilkan ke semua orang
+  // 3. Jika ini notif komentar (ada recipientId) -> HANYA tampilkan ke user yang punya resep
+  const visibleNotifs = allNotifs.filter((n) => {
+    const notDeleted = !deletedNotifs.includes(n.id);
+    const isForMe =
+      !n.recipientId || (currentUser && n.recipientId === currentUser.uid);
+    return notDeleted && isForMe;
+  });
 
   if (visibleNotifs.length === 0) {
     container.innerHTML = `<p style="text-align:center; color:#888; font-size:12px; margin-top:20px;">Belum ada notifikasi baru.</p>`;
-    if (dot) dot.style.display = "none"; // Sembunyikan titik merah
+    if (dot) dot.style.display = "none";
     return;
   }
 
-  if (dot) dot.style.display = "block"; // Munculkan titik merah karena ada notif
+  if (dot) dot.style.display = "block"; // Munculkan titik merah
 
   container.innerHTML = visibleNotifs
-    .map(
-      (n) => `
-        <div class="notif-item unread">
-            <div class="notif-icon bg-blue" style="background:var(--primary);"><i data-feather="${n.icon || "bell"}"></i></div>
-            <div style="flex:1;">
-                <b style="font-size:13px;">${n.title}</b>
-                <p style="margin:2px 0 0; font-size:11px; color:var(--text-muted);">${n.desc}</p>
+    .map((n) => {
+      // === JIKA INI NOTIFIKASI KOMENTAR ===
+      if (n.type === "comment") {
+        const unreadClass = n.isRead ? "" : "unread"; // Kalau udah dibaca, class unread hilang
+        return `
+            <div class="notif-item ${unreadClass}" style="cursor:pointer; ${n.isRead ? "opacity:0.7;" : ""}" onclick="handleNotifClick('${n.id}', '${n.recipeId}')">
+                <div class="notif-icon bg-blue" style="background:var(--primary);"><i data-feather="message-circle"></i></div>
+                <div style="flex:1;">
+                    <b style="font-size:13px;">${n.senderName}</b> <span style="font-size:12px; color:var(--text-muted);">mengomentari resepmu</span>
+                    <p style="margin:2px 0 0; font-size:11px; color:var(--text-muted); font-style: italic;">"${n.message}"</p>
+                </div>
+                <button class="del-notif-btn" onclick="event.stopPropagation(); deleteNotif('${n.id}')">
+                    <i data-feather="x" style="width:16px; height:16px;"></i>
+                </button>
             </div>
-            <button class="del-notif-btn" onclick="deleteNotif('${n.id}')">
-                <i data-feather="x" style="width:16px; height:16px;"></i>
-            </button>
-        </div>
-    `,
-    )
+            `;
+      }
+      // === JIKA INI NOTIFIKASI SISTEM (BAWAAN ASLIMU) ===
+      else {
+        return `
+            <div class="notif-item unread">
+                <div class="notif-icon bg-blue" style="background:var(--primary);"><i data-feather="${n.icon || "bell"}"></i></div>
+                <div style="flex:1;">
+                    <b style="font-size:13px;">${n.title}</b>
+                    <p style="margin:2px 0 0; font-size:11px; color:var(--text-muted);">${n.desc}</p>
+                </div>
+                <button class="del-notif-btn" onclick="deleteNotif('${n.id}')">
+                    <i data-feather="x" style="width:16px; height:16px;"></i>
+                </button>
+            </div>
+            `;
+      }
+    })
     .join("");
 
   if (typeof feather !== "undefined") feather.replace();
 }
+
+// 2. Fungsi Klik Khusus Notif Komentar (Buka Resep)
+window.handleNotifClick = async (notifId, recipeId) => {
+  try {
+    // Tandai sudah dibaca di Firebase
+    db.collection("notifications").doc(notifId).update({ isRead: true });
+
+    // Tutup Notif Sheet
+    if (typeof toggleNotifSheet === "function") toggleNotifSheet();
+
+    // Cari data resepnya
+    const targetRecipe = allCloudRecipes.find((r) => r.id === recipeId);
+
+    if (targetRecipe) {
+      // Buka halaman resepnya
+      if (typeof openArticle === "function") {
+        openArticle(
+          targetRecipe.title,
+          targetRecipe.tag,
+          targetRecipe.img,
+          targetRecipe.desc,
+          targetRecipe.authorName,
+          targetRecipe.time,
+          targetRecipe.servings,
+        );
+      }
+    } else {
+      showToast("Yah, resep ini sepertinya sudah dihapus.");
+    }
+  } catch (error) {
+    console.error("Gagal membuka notifikasi:", error);
+  }
+};
 
 // 4. Fungsi Hapus Notifikasi (Hanya di HP user tersebut)
 window.deleteNotif = (notifId) => {
@@ -1962,7 +2027,7 @@ window.submitComment = (btnElement) => {
             isRead: false,
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
           })
-          .catch((err) => console.error("❌ Gagal kirim notif:", err));
+          .catch((err) => console.error("Error:", err));
       }
     })
     .catch((error) => {
@@ -2643,35 +2708,4 @@ window.listenToNotifications = () => {
         notifDot.style.display = hasUnread ? "block" : "none";
       }
     });
-};
-
-// Fungsi Klik: Tandai Dibaca & Buka Resepnya
-window.handleNotifClick = async (notifId, recipeId) => {
-  try {
-    // 1. Matikan tanda "belum dibaca" di Firebase
-    await db.collection("notifications").doc(notifId).update({ isRead: true });
-
-    // 2. Tutup Notif Sheet-mu
-    if (typeof toggleNotifSheet === "function") {
-      toggleNotifSheet();
-    }
-
-    // 3. Cari resepnya di dalam array memori
-    // Pastikan variabel ini sesuai dengan nama array resepmu (allCloudRecipes / myRecipes)
-    const targetRecipe = allCloudRecipes.find((r) => r.id === recipeId);
-
-    if (targetRecipe) {
-      // 4. Buka pop-up resepnya!
-      // GANTI INI dengan nama fungsi aslimu yang bertugas membuka detail resep (misal: openRecipeDetail)
-      if (typeof openRecipeDetail === "function") {
-        openRecipeDetail(targetRecipe);
-      } else if (typeof viewRecipe === "function") {
-        viewRecipe(targetRecipe);
-      }
-    } else {
-      alert("Yah, resep ini sepertinya sudah dihapus.");
-    }
-  } catch (error) {
-    console.error("Gagal membuka notifikasi:", error);
-  }
 };
