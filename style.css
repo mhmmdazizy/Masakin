@@ -1670,3 +1670,38 @@ input:checked + .slider:before {
   border-radius: 0 2px 2px 0;
   transition: width 0.1s ease-out; /* Biar pergerakannya mulus seperti air */
 }
+/* ==========================================
+   --- EFEK TOMBOL MELAYANG (STICKY) ---
+   ========================================== */
+
+.sticky-wrapper {
+  position: relative;
+  padding-bottom: 20px; /* Jarak aman sebelum menyentuh hasil resep */
+}
+
+/* 1. Aturan Melayang */
+.floating-action {
+  /* Kunci Rahasia: Otomatis floating, lalu mendarat mulus saat mentok */
+  position: sticky;
+  bottom: 100px; /* Melayang 25px dari bawah layar HP */
+  z-index: 99; /* Selalu di atas bahan makanan */
+
+  display: flex;
+  justify-content: center;
+  pointer-events: none; /* Biar area transparan di samping tombol tetap bisa di-scroll */
+}
+
+/* 2. Aturan Tombol */
+.find-btn-cari {
+  pointer-events: auto; /* Mengembalikan klik ke tombol */
+
+  /* Bikin bayangan menyebar biar efek "melayang" nya terasa nyata */
+  box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* 3. Animasi saat tombol ditekan */
+.find-btn-cari:active {
+  transform: scale(0.92) translateY(2px);
+  box-shadow: 0 4px 10px rgba(255, 107, 107, 0.3);
+}
