@@ -194,36 +194,45 @@ auth.onAuthStateChanged(async (user) => {
       const userRef = db.collection("users").doc(user.uid);
       const doc = await userRef.get();
 
-      // Tangkap nama asli dari akun Google-nya
       const realName = user.displayName || "Pengguna";
       const realPhoto =
         user.photoURL ||
         `https://ui-avatars.com/api/?name=${encodeURIComponent(realName)}&background=random`;
 
       if (!doc.exists) {
-        // 1. Jika belum ada sama sekali, buat baru
+        // 1. Jika pengguna baru
         await userRef.set({
           uid: user.uid,
           name: realName,
           photoURL: realPhoto,
           followers: [],
           following: [],
+          favorites: [], // Siapkan brankas favorit kosong
         });
       } else {
-        // 2. Jika dokumen sudah ada (misal karena pencet Follow duluan)
+        // 2. Jika pengguna lama
         const dataInDb = doc.data();
 
-        // Cek apakah di database namanya masih kosong, atau "Pengguna", atau tidak sinkron
         if (
           !dataInDb.name ||
           dataInDb.name === "Pengguna" ||
           dataInDb.name !== realName
         ) {
-          // Paksa timpa dengan nama asli Google-nya!
-          await userRef.update({
-            name: realName,
-            photoURL: realPhoto,
-          });
+          await userRef.update({ name: realName, photoURL: realPhoto });
+        }
+
+        // === TARIK DATA FAVORIT DARI FIREBASE KE HP ===
+        if (dataInDb.favorites) {
+          favorites = dataInDb.favorites;
+          localStorage.setItem("myFavorites", JSON.stringify(favorites)); // Backup ke lokal
+
+          // Render ulang halaman favorit jika sedang dibuka
+          if (
+            document.getElementById("favorit") &&
+            document.getElementById("favorit").classList.contains("active")
+          ) {
+            renderGrid("favorit-container", favorites);
+          }
         }
       }
     } catch (e) {
@@ -427,59 +436,61 @@ function renderGrid(containerId, data) {
 }
 
 window.toggleFavorite = (id, title, tag, img, desc, authorName, btn) => {
+  // Wajib login biar datanya aman di akun masing-masing
+  if (!currentUser) {
+    openPopup("login dulu");
+    return;
+  }
+
   const idx = favorites.findIndex((f) => f.title === title);
   const countSpan = btn.parentElement.querySelector(".fav-count");
   const safeTitleId = title.replace(/[^a-zA-Z0-9]/g, "_");
 
-  if (idx === -1) {
-    // LAKUKAN LIKE
-    favorites.push({ id, title, tag, img, desc, authorName });
-    btn.classList.add("active");
+  // Format data mini biar hemat database
+  const compactItem = { id, title, tag, img, desc, authorName };
 
-    // Update angka di layar secepat kilat
+  if (idx === -1) {
+    // === LAKUKAN LIKE ===
+    favorites.push(compactItem);
+    btn.classList.add("active");
     if (countSpan)
       countSpan.innerText = (parseInt(countSpan.innerText) || 0) + 1;
 
-    // Kirim perintah +1 ke Firebase
     db.collection("counters")
       .doc(safeTitleId)
       .set(
-        {
-          favCount: firebase.firestore.FieldValue.increment(1),
-        },
+        { favCount: firebase.firestore.FieldValue.increment(1) },
         { merge: true },
       )
       .catch(console.error);
   } else {
-    // BATALKAN LIKE (UNLIKE)
+    // === BATALKAN LIKE ===
     favorites.splice(idx, 1);
     btn.classList.remove("active");
-
-    // Update angka di layar secepat kilat (minimal 0)
     if (countSpan)
       countSpan.innerText = Math.max(
         0,
         (parseInt(countSpan.innerText) || 0) - 1,
       );
 
-    // Kirim perintah -1 ke Firebase
     db.collection("counters")
       .doc(safeTitleId)
       .set(
-        {
-          favCount: firebase.firestore.FieldValue.increment(-1),
-        },
+        { favCount: firebase.firestore.FieldValue.increment(-1) },
         { merge: true },
       )
       .catch(console.error);
   }
 
-  // Refresh halaman favorit kalau lagi dibuka
+  // === SIMPAN KE FIREBASE & LOKAL ===
+  localStorage.setItem("myFavorites", JSON.stringify(favorites));
+  db.collection("users")
+    .doc(currentUser.uid)
+    .set({ favorites: favorites }, { merge: true });
+
   if (document.getElementById("favorit").classList.contains("active")) {
     renderGrid("favorit-container", favorites);
   }
-
-  localStorage.setItem("myFavorites", JSON.stringify(favorites));
   if (typeof feather !== "undefined") feather.replace();
 };
 
@@ -1018,62 +1029,65 @@ window.openArticle = (
 };
 // === FUNGSI EKSEKUSI TOMBOL FAV (SINKRON GLOBAL) ===
 window.toggleDetailFav = async () => {
+  if (!currentUser) {
+    openPopup("login dulu");
+    return;
+  }
   if (!window.currentDetailRecipe) return;
 
   const item = window.currentDetailRecipe;
   const favBtn = document.getElementById("detail-fav-btn");
-
-  // KUNCI GLOBAL: Buat ID unik berdasarkan judul (Sama persis dengan mesin Fav-mu)
   const safeTitle = item.title.replace(/[^a-zA-Z0-9]/g, "_");
-
-  // Cek apakah resep ini sudah ada di daftar Favorit lokal
   const existingIndex =
     typeof favorites !== "undefined"
       ? favorites.findIndex((f) => f.title === item.title)
       : -1;
 
+  // Bikin versi mini biar yang disimpan ke akun cuma info pentingnya aja (hemat kuota database)
+  const compactItem = {
+    id: item.id || "",
+    title: item.title,
+    tag: item.tag || "",
+    img: item.img || "",
+    desc: item.desc || "",
+    authorName: item.authorName || "Admin",
+  };
+
   try {
     if (existingIndex >= 0) {
-      // --- 1. BATALKAN FAV (KURANGI ANGKA GLOBAL) ---
+      // === BATALKAN FAV ===
       favorites.splice(existingIndex, 1);
       favBtn.classList.remove("active");
-
-      // Tembak langsung ke mesin Global Firebase
       db.collection("counters")
         .doc(safeTitle)
         .set(
-          {
-            favCount: firebase.firestore.FieldValue.increment(-1),
-          },
+          { favCount: firebase.firestore.FieldValue.increment(-1) },
           { merge: true },
         );
     } else {
-      // --- 2. JADIKAN FAV (TAMBAH ANGKA GLOBAL) ---
-      favorites.push(item);
+      // === JADIKAN FAV ===
+      favorites.push(compactItem);
       favBtn.classList.add("active");
-
-      // Tembak langsung ke mesin Global Firebase
       db.collection("counters")
         .doc(safeTitle)
         .set(
-          {
-            favCount: firebase.firestore.FieldValue.increment(1),
-          },
+          { favCount: firebase.firestore.FieldValue.increment(1) },
           { merge: true },
         );
     }
 
-    // Simpan ke memori HP (Local Storage)
+    // === SIMPAN KE FIREBASE & LOKAL ===
     localStorage.setItem("myFavorites", JSON.stringify(favorites));
+    db.collection("users")
+      .doc(currentUser.uid)
+      .set({ favorites: favorites }, { merge: true });
 
-    // Sinkronisasi paksa kartu-kartu di latar belakang
     if (typeof renderMenuGrid === "function") renderMenuGrid();
     if (typeof renderGrid === "function") {
       renderGrid("favorit-container", favorites);
       if (typeof articles !== "undefined")
         renderGrid("explore-container", articles);
     }
-
     if (typeof feather !== "undefined") feather.replace();
   } catch (error) {
     console.error("Gagal mengubah status favorit:", error);
