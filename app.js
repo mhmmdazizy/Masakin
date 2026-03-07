@@ -1384,7 +1384,7 @@ window.openPopup = (type) => {
             <button class="find-btn" onclick="closePopup()" style="width:100%;">Oke, Siap!</button>
         `;
   } else if (type === "login dulu") {
-    title = "Tidak bisa tambah resep";
+    title = "Kamu belum login";
     icon = "info"; // Icon peringatan
     content = `
             <p style="text-align:center; margin-bottom:15px;">Silakan login terlebih dahulu.</p>
