@@ -66,13 +66,15 @@
             <i data-feather="search" style="color: #888; width: 18px;"></i>
             <input type="text" id="search-ingredient" placeholder="Cari ayam, bayam, bawang..." onkeyup="renderIngredients(this.value)" style="border: none; background: transparent; outline: none; width: 100%; margin-left: 10px; font-size: 14px;">
         </div>
-        <div id="ingredients-container"></div>
+        <div class="sticky-wrapper">
+            
+            <div id="ingredients-container"></div>
 
-        <div class="floating-action">
-          <button class="find-btn-cari" onclick="findRecipes()">
-            Cari Resep <i data-feather="arrow-right"></i>
-          </button>
-        </div>
+            <div class="floating-action">
+              <button class="find-btn-cari" onclick="findRecipes()">
+                Cari Resep <i data-feather="arrow-right"></i>
+              </button>
+            </div>
 
         <div
           id="recipe-results"
