@@ -2335,7 +2335,7 @@ window.renderPublicRecipes = () => {
   if (userRecipes.length > 0) {
     renderGrid("public-profile-recipes", userRecipes);
   } else {
-    container.innerHTML = `<p style="text-align:center; width:100%; color:#888; font-size:12px;">Pengguna ini belum membagikan resep.</p>`;
+    container.innerHTML = `<p style="text-align:center; width:100%; color:#888; font-size:12px;">Belum ada resep.</p>`;
   }
 };
 
