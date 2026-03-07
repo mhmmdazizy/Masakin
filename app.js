@@ -37,6 +37,58 @@ db.enablePersistence().catch((err) => {
     console.log("Browser ini tidak mendukung memori offline Firebase.");
   }
 });
+// ==========================================
+// --- FITUR PUSH NOTIFICATION ANDROID (FCM) ---
+// ==========================================
+
+// Inisialisasi Messaging
+let messaging;
+if (firebase.messaging.isSupported()) {
+  messaging = firebase.messaging();
+}
+
+// Fungsi meminta izin dan mengambil Token HP
+window.requestPushPermission = async () => {
+  if (!messaging || !currentUser) return;
+
+  try {
+    console.log("Meminta izin notifikasi Android...");
+    const permission = await Notification.requestPermission();
+
+    if (permission === "granted") {
+      console.log("Izin diberikan! Mengambil token HP...");
+      // PASTE VAPID KEY KAMU DI SINI
+      const currentToken = await messaging.getToken({
+        vapidKey:
+          "BN-cqFAdf1KoXdimq6Na2ZEvPxrWfXNd0o2Bc4TM5l6BOloJTNTdEmNmGBvL84Tw2HM8lU1nJo96UjtFpsneJnQ",
+      });
+
+      if (currentToken) {
+        console.log("Token didapat:", currentToken);
+        // Simpan token ke dokumen user di Firestore
+        await db.collection("users").doc(currentUser.uid).set(
+          {
+            fcmToken: currentToken,
+          },
+          { merge: true },
+        );
+      }
+    } else {
+      console.log("User menolak izin notifikasi.");
+    }
+  } catch (error) {
+    console.error("Gagal mendapatkan token:", error);
+  }
+};
+
+// Tangkap notif saat aplikasi sedang TERBUKA di layar (Foreground)
+if (messaging) {
+  messaging.onMessage((payload) => {
+    console.log("Notif masuk saat app terbuka:", payload);
+    // Munculkan Pop-up Toast bawaanmu
+    showToast(`🔔 ${payload.notification.title}: ${payload.notification.body}`);
+  });
+}
 
 // Variables
 let selectedIngredients = new Set();
@@ -2102,6 +2154,17 @@ window.submitComment = (btnElement) => {
       btnElement.innerText = originalBtnText;
       btnElement.disabled = false;
     });
+  fetch("https://masakin-notif.vercel.app/api/send", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      recipientId: currentRecipe.userId,
+      title: "Komentar Baru!",
+      body: `${currentUser.displayName} membalas: "${text}"`,
+    }),
+  })
+    .then((res) => console.log("Perintah push notif terkirim ke Vercel!"))
+    .catch((err) => console.error("Gagal bangunin Vercel:", err));
 };
 // ==========================================
 // --- FITUR FOLLOW / UNFOLLOW (FIREBASE) ---
