@@ -20,10 +20,9 @@ const messaging = firebase.messaging();
 // Tangkap notif saat aplikasi DITUTUP (Background)
 messaging.onBackgroundMessage((payload) => {
   console.log("Notif Background diterima:", payload);
-
-  const notificationTitle = payload.data.title;
+  const notificationTitle = payload.notification.title;
   const notificationOptions = {
-    body: payload.data.body,
+    body: payload.notification.body,
     icon: "/icon.png",
     badge: "/icon.png",
   };
