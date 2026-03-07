@@ -171,6 +171,7 @@ let unsubscribeMyProfile = null; // Pastikan cuma ada satu baris ini di atas
 auth.onAuthStateChanged(async (user) => {
   // === 1. KEMBALIKAN KODE UI ASLIMU YANG TERBUKTI AMAN ===
   currentUser = user;
+  if (typeof renderNotifications === "function") renderNotifications();
   if (typeof updateUI === "function") {
     updateUI(user);
   }
@@ -186,7 +187,6 @@ auth.onAuthStateChanged(async (user) => {
 
   if (user) {
     // --- 2. JIKA SUDAH LOGIN ---
-    if (typeof listenToNotifications === "function") listenToNotifications();
     if (myStatsContainer) myStatsContainer.style.display = "flex";
 
     // A. Sinkronisasi Profil ke Database (Versi Agresif & Self-Healing)
