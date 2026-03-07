@@ -21,12 +21,11 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
   console.log("Notif Background diterima:", payload);
 
-  const notificationTitle = payload.notification.title;
+  const notificationTitle = payload.data.title;
   const notificationOptions = {
-    body: payload.notification.body,
-    icon: "icon.png", // Ganti dengan path logo aplikasimu
-    badge: "icon.png", // Logo kecil untuk di status bar Android (putih transparan)
-    data: payload.data, // Bawa data url/id resep buat di-klik
+    body: payload.data.body,
+    icon: "/icon.png",
+    badge: "/icon.png",
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
