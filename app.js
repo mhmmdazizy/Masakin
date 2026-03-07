@@ -62,6 +62,7 @@ window.requestPushPermission = async () => {
       const registration = await navigator.serviceWorker.register(
         "/firebase-messaging-sw.js",
       );
+      await navigator.serviceWorker.ready;
 
       // Masukkan registrasi satpam ke dalam proses cetak token
       const currentToken = await messaging.getToken({
