@@ -769,11 +769,13 @@ window.toggleNotifSheet = () => {
     sheet.classList.remove("active");
     backdrop.classList.remove("active");
     setTimeout(() => (backdrop.style.display = "none"), 300);
+    document.body.style.overflow = "";
   } else {
     backdrop.style.display = "block";
     backdrop.offsetHeight;
     backdrop.classList.add("active");
     sheet.classList.add("active");
+    document.body.style.overflow = "hidden";
   }
 };
 
@@ -903,6 +905,7 @@ window.openRecipeForm = (index = -1) => {
   }
 
   form.style.display = "flex";
+  document.body.style.overflow = "hidden";
   history.pushState({ modal: "form" }, null, "");
 };
 // --- FUNGSI MEMBUKA HALAMAN DETAIL RESEP (SUDAH DIPERBAIKI) ---
@@ -1050,6 +1053,7 @@ window.openArticle = (
 
   // Tampilkan Pop-up
   document.getElementById("article-view").classList.add("active");
+  document.body.style.overflow = "hidden";
   history.pushState({ modal: "article" }, null, "");
 
   if (typeof feather !== "undefined") feather.replace();
@@ -1402,6 +1406,7 @@ window.openPopup = (type) => {
   document.getElementById("popup-icon").setAttribute("data-feather", icon);
   document.getElementById("popup-body").innerHTML = content;
   document.getElementById("info-popup").classList.add("active");
+  document.body.style.overflow = "hidden";
   if (typeof feather !== "undefined") feather.replace();
   history.pushState({ modal: "popup" }, null, "");
 };
@@ -1425,6 +1430,7 @@ window.addEventListener("popstate", () => {
       el.classList.remove("active"); // Ini yang membuat animasinya turun/menghilang
     }
   });
+  document.body.style.overflow = "";
 });
 
 // UI Auth Update
@@ -2274,6 +2280,7 @@ window.openPublicProfile = (uid, name, photoUrl) => {
   const profilePage = document.getElementById("public-profile-page");
   profilePage.style.display = ""; // Bersihkan sisa display none jika ada
   profilePage.classList.add("active");
+  document.body.style.overflow = "hidden";
   history.pushState({ modal: "public-profile" }, null, "");
   // ==============================================
 
