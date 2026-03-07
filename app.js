@@ -168,28 +168,27 @@ document.addEventListener("DOMContentLoaded", () => {
 // Cek Login & Load Data Cloud
 let unsubscribeMyProfile = null; // Pastikan cuma ada satu baris ini di atas
 
+// ==========================================
+// --- MESIN LOGIN & SINKRONISASI AKUN ---
+// ==========================================
+
 auth.onAuthStateChanged(async (user) => {
-  // === 1. KEMBALIKAN KODE UI ASLIMU YANG TERBUKTI AMAN ===
   currentUser = user;
+
   if (typeof renderNotifications === "function") renderNotifications();
-  if (typeof updateUI === "function") {
-    updateUI(user);
-  }
-  // ========================================================
+  if (typeof updateUI === "function") updateUI(user);
 
   const myStatsContainer = document.getElementById("my-profile-stats");
 
-  // Matikan radar lama biar memori HP nggak bocor
   if (unsubscribeMyProfile) {
     unsubscribeMyProfile();
     unsubscribeMyProfile = null;
   }
 
   if (user) {
-    // --- 2. JIKA SUDAH LOGIN ---
+    // --- 1. JIKA SUDAH LOGIN ---
     if (myStatsContainer) myStatsContainer.style.display = "flex";
 
-    // A. Sinkronisasi Profil ke Database (Versi Agresif & Self-Healing)
     try {
       const userRef = db.collection("users").doc(user.uid);
       const doc = await userRef.get();
@@ -200,17 +199,18 @@ auth.onAuthStateChanged(async (user) => {
         `https://ui-avatars.com/api/?name=${encodeURIComponent(realName)}&background=random`;
 
       if (!doc.exists) {
-        // 1. Jika pengguna baru
+        // A. Pengguna Baru
         await userRef.set({
           uid: user.uid,
           name: realName,
           photoURL: realPhoto,
           followers: [],
           following: [],
-          favorites: [], // Siapkan brankas favorit kosong
+          favorites: [],
         });
+        favorites = []; // Mulai dengan brankas kosong
       } else {
-        // 2. Jika pengguna lama
+        // B. Pengguna Lama
         const dataInDb = doc.data();
 
         if (
@@ -221,44 +221,60 @@ auth.onAuthStateChanged(async (user) => {
           await userRef.update({ name: realName, photoURL: realPhoto });
         }
 
-        // === TARIK DATA FAVORIT DARI FIREBASE KE HP ===
-        if (dataInDb.favorites) {
-          favorites = dataInDb.favorites;
-          localStorage.setItem("myFavorites", JSON.stringify(favorites)); // Backup ke lokal
-
-          // Render ulang halaman favorit jika sedang dibuka
-          if (
-            document.getElementById("favorit") &&
-            document.getElementById("favorit").classList.contains("active")
-          ) {
-            renderGrid("favorit-container", favorites);
-          }
-        }
+        // === TARIK FAVORIT KHUSUS AKUN INI ===
+        favorites = dataInDb.favorites || [];
       }
+
+      // Simpan ke memori lokal biar pas refresh gak hilang
+      localStorage.setItem("myFavorites", JSON.stringify(favorites));
+
+      // Refresh semua layar biar ikon "Love" menyesuaikan dengan resep akun ini
+      if (
+        document.getElementById("favorit") &&
+        document.getElementById("favorit").classList.contains("active")
+      ) {
+        renderGrid("favorit-container", favorites);
+      }
+      if (typeof renderMenuGrid === "function") renderMenuGrid();
+      if (typeof articles !== "undefined")
+        renderGrid("explore-container", articles);
+      if (typeof feather !== "undefined") feather.replace();
     } catch (e) {
       console.error("Gagal sinkron data user:", e);
     }
 
-    // B. Pasang Radar Realtime untuk Angka Follower & Following
+    // Pasang radar follower (Bawaan aslimu)
     unsubscribeMyProfile = db
       .collection("users")
       .doc(user.uid)
       .onSnapshot((doc) => {
         const data = doc.exists ? doc.data() : {};
-        const followers = data.followers || [];
-        const following = data.following || [];
         const elFollowers = document.getElementById("count-followers");
         const elFollowing = document.getElementById("count-following");
-        if (elFollowers) elFollowers.innerText = followers.length;
-        if (elFollowing) elFollowing.innerText = following.length;
+        if (elFollowers) elFollowers.innerText = (data.followers || []).length;
+        if (elFollowing) elFollowing.innerText = (data.following || []).length;
       });
   } else {
-    // --- 3. JIKA BELUM LOGIN (GUEST) ---
+    // --- 2. JIKA BELUM LOGIN (GUEST / LOGOUT) ---
     if (myStatsContainer) myStatsContainer.style.display = "none";
+
     const elFollowers = document.getElementById("count-followers");
     const elFollowing = document.getElementById("count-following");
     if (elFollowers) elFollowers.innerText = "0";
     if (elFollowing) elFollowing.innerText = "0";
+
+    // === KUNCI RAHASIA: BERSIHKAN BRANKAS SAAT LOGOUT ===
+    favorites = [];
+    localStorage.removeItem("myFavorites");
+
+    // Refresh layar biar semua ikon "Love" kembali abu-abu dan halaman favorit kosong
+    if (document.getElementById("favorit")) {
+      renderGrid("favorit-container", favorites);
+    }
+    if (typeof renderMenuGrid === "function") renderMenuGrid();
+    if (typeof articles !== "undefined")
+      renderGrid("explore-container", articles);
+    if (typeof feather !== "undefined") feather.replace();
   }
 });
 
