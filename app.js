@@ -66,7 +66,7 @@ window.requestPushPermission = async () => {
       // Masukkan registrasi satpam ke dalam proses cetak token
       const currentToken = await messaging.getToken({
         vapidKey:
-          "BN-cqFAdf1KoXdimq6Na2ZEvPxrWfXNd0o2Bc4TM5l6BOloJTNTdEmNmGBvL84Tw2HM8lU1nJo96UjtFpsneJnQ;",
+          "BN-cqFAdf1KoXdimq6Na2ZEvPxrWfXNd0o2Bc4TM5l6BOloJTNTdEmNmGBvL84Tw2HM8lU1nJo96UjtFpsneJnQ",
         serviceWorkerRegistration: registration,
       });
 
@@ -2792,3 +2792,4 @@ if (detailOverlay) {
     }
   });
 }
+
