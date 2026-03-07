@@ -109,8 +109,8 @@ const ingredients = [
     icon: "https://ui-avatars.com/api/?name=Tahu+sutera&background=random&color=fff&rounded=true&bold=true",
   },
   {
-    id: "tahu_telur",
-    name: "Tahu telur",
+    id: "telur",
+    name: "Telur",
     category: "Protein",
     icon: "icon/telur.png",
   },
