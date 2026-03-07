@@ -297,6 +297,7 @@ function renderIngredients(searchQuery = "") {
     );
 
     if (filteredItems.length === 0) return;
+    filteredItems.sort((a, b) => a.name.localeCompare(b.name));
 
     // 1. Buat Wadah Kategori
     const section = document.createElement("div");
