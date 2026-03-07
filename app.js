@@ -401,8 +401,18 @@ function renderGrid(containerId, data) {
         .replace(/"/g, "&quot;")
         .replace(/\n/g, "<br>")
         .replace(/\r/g, "");
+      // GANTI JADI INI:
       const authorName = item.authorName || "Admin";
-      const favCount = item.favCount || 0;
+
+      // === TRIK ANTI KUDET: INTIP ANGKA GLOBAL LANGSUNG ===
+      const safeTitleId = item.title.replace(/[^a-zA-Z0-9]/g, "_");
+      const favCount =
+        typeof globalFavCounts !== "undefined" &&
+        globalFavCounts[safeTitleId] !== undefined
+          ? globalFavCounts[safeTitleId]
+          : item.favCount || 0;
+      // ====================================================
+
       const docId = item.id || "undefined";
       const time = item.time || "- Menit";
       const servings = item.servings || "- Porsi";
