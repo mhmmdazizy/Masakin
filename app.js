@@ -52,20 +52,26 @@ window.requestPushPermission = async () => {
   if (!messaging || !currentUser) return;
 
   try {
-    console.log("Meminta izin notifikasi Android...");
+    console.log("Meminta izin notifikasi...");
     const permission = await Notification.requestPermission();
 
     if (permission === "granted") {
-      console.log("Izin diberikan! Mengambil token HP...");
-      // PASTE VAPID KEY KAMU DI SINI
+      console.log("Izin diberikan! Memanggil satpam background...");
+
+      // === KUNCI ANTI-GAGAL: DAFTARKAN SATPAMNYA SECARA EKSPLISIT ===
+      const registration = await navigator.serviceWorker.register(
+        "/firebase-messaging-sw.js",
+      );
+
+      // Masukkan registrasi satpam ke dalam proses cetak token
       const currentToken = await messaging.getToken({
         vapidKey:
-          "BN-cqFAdf1KoXdimq6Na2ZEvPxrWfXNd0o2Bc4TM5l6BOloJTNTdEmNmGBvL84Tw2HM8lU1nJo96UjtFpsneJnQ",
+          "BN-cqFAdf1KoXdimq6Na2ZEvPxrWfXNd0o2Bc4TM5l6BOloJTNTdEmNmGBvL84Tw2HM8lU1nJo96UjtFpsneJnQ;",
+        serviceWorkerRegistration: registration,
       });
 
       if (currentToken) {
         console.log("Token didapat:", currentToken);
-        // Simpan token ke dokumen user di Firestore
         await db.collection("users").doc(currentUser.uid).set(
           {
             fcmToken: currentToken,
@@ -74,10 +80,12 @@ window.requestPushPermission = async () => {
         );
       }
     } else {
-      console.log("User menolak izin notifikasi.");
+      alert("Izin notifikasi ditolak.");
     }
   } catch (error) {
     console.error("Gagal mendapatkan token:", error);
+    // MUNCULKAN POP-UP ERROR BIAR KITA BISA JADI DETEKTIF
+    alert("🚨 Gagal cetak token: " + error.message);
   }
 };
 
