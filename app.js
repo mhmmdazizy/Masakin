@@ -1802,15 +1802,34 @@ window.handleNotifClick = async (notifId, recipeId) => {
 };
 
 // 4. Fungsi Hapus Notifikasi (Hanya di HP user tersebut)
-window.deleteNotif = (notifId) => {
-  // Masukkan ID ke daftar hitam
+// ==========================================
+// --- FUNGSI HAPUS NOTIFIKASI PERMANEN ---
+// ==========================================
+
+window.deleteNotif = async (notifId) => {
+  // 1. Sembunyikan secara lokal dulu (Biar layarnya langsung merespons detik itu juga tanpa loading)
   deletedNotifs.push(notifId);
-
-  // Simpan ke memori HP
   localStorage.setItem("deletedNotifs", JSON.stringify(deletedNotifs));
+  renderNotifications(); // Cetak ulang layarnya
 
-  // Render ulang biar langsung hilang
-  renderNotifications();
+  // 2. Eksekusi hapus permanen ke Firebase
+  try {
+    // Cari tahu ini jenis notif apa
+    const targetNotif = allNotifs.find((n) => n.id === notifId);
+
+    if (targetNotif) {
+      // JIKA INI NOTIF PRIBADI (Komentar dari orang lain ke resepmu)
+      // Ciri-cirinya: Dia punya 'recipientId'
+      if (targetNotif.recipientId) {
+        await db.collection("notifications").doc(notifId).delete();
+      }
+      // JIKA INI NOTIF SISTEM/ADMIN (Global untuk semua orang)
+      else {
+      }
+    }
+  } catch (error) {
+    console.error("Rrror:", error);
+  }
 };
 window.searchFaq = () => {
   const input = document.getElementById("faq-search");
