@@ -1947,6 +1947,23 @@ window.submitComment = (btnElement) => {
       btnElement.innerText = originalBtnText;
       btnElement.disabled = false;
     });
+  if (recipeData.userId && recipeData.userId !== currentUser.uid) {
+    db.collection("notifications")
+      .add({
+        recipientId: recipeData.userId, // ID Pemilik Resep
+        senderId: currentUser.uid, // ID Yang Komen
+        senderName: currentUser.displayName || "Seseorang",
+        recipeId: recipeData.id, // ID Resep
+        recipeTitle: recipeData.title || "Resep",
+        message: commentText,
+        type: "comment",
+        isRead: false,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      })
+      .then(() => {
+        console.log("Notif berhasil dikirim ke pemilik resep!");
+      });
+  }
 };
 // ==========================================
 // --- FITUR FOLLOW / UNFOLLOW (FIREBASE) ---
@@ -2550,3 +2567,104 @@ if (detailOverlay) {
     }
   });
 }
+// ==========================================
+// --- MESIN NOTIFIKASI (TERHUBUNG KE UI ASLI) ---
+// ==========================================
+
+window.listenToNotifications = () => {
+  if (!currentUser) return;
+
+  // Pantau koleksi notif khusus untuk user yang lagi login
+  db.collection("notifications")
+    .where("recipientId", "==", currentUser.uid)
+    .orderBy("createdAt", "desc")
+    .onSnapshot((snapshot) => {
+      const notifContainer = document.getElementById("notif-list-container");
+      const notifDot = document.querySelector(".notif-dot"); // Ambil class dot bawaanmu
+
+      let hasUnread = false;
+
+      if (notifContainer) notifContainer.innerHTML = ""; // Bersihkan list
+
+      // Kalau kosong
+      if (snapshot.empty) {
+        if (notifDot) notifDot.style.display = "none";
+        if (notifContainer) {
+          notifContainer.innerHTML = `<div style="text-align:center; padding: 20px; color:#888; font-size:13px;">Belum ada notifikasi nih.</div>`;
+        }
+        return;
+      }
+
+      // Cetak satu per satu
+      snapshot.forEach((doc) => {
+        const notif = doc.data();
+        notif.id = doc.id;
+
+        if (!notif.isRead) hasUnread = true;
+
+        if (notifContainer) {
+          const item = document.createElement("div");
+          // Styling kotaknya (kalau belum dibaca, latarnya beda dikit)
+          item.style.padding = "12px";
+          item.style.borderBottom = "1px solid #f0f0f0";
+          item.style.backgroundColor = notif.isRead ? "transparent" : "#fff5f5";
+          item.style.cursor = "pointer";
+          item.style.display = "flex";
+          item.style.flexDirection = "column";
+          item.style.gap = "4px";
+
+          item.innerHTML = `
+                    <span style="font-size: 13px; color: #333;">
+                        <strong>${notif.senderName}</strong> mengomentari resep <strong>${notif.recipeTitle}</strong>
+                    </span>
+                    <span style="font-size: 12px; color: #666; font-style: italic;">
+                        "${notif.message}"
+                    </span>
+                  `;
+
+          // === AKSI SAAT DIKLIK: BUKA RESEP ===
+          item.onclick = () => {
+            handleNotifClick(notif.id, notif.recipeId);
+          };
+
+          notifContainer.appendChild(item);
+        }
+      });
+
+      // Nyalakan atau Matikan Titik Merah bawaanmu!
+      if (notifDot) {
+        notifDot.style.display = hasUnread ? "block" : "none";
+      }
+    });
+};
+
+// Fungsi Klik: Tandai Dibaca & Buka Resepnya
+window.handleNotifClick = async (notifId, recipeId) => {
+  try {
+    // 1. Matikan tanda "belum dibaca" di Firebase
+    await db.collection("notifications").doc(notifId).update({ isRead: true });
+
+    // 2. Tutup Notif Sheet-mu
+    if (typeof toggleNotifSheet === "function") {
+      toggleNotifSheet();
+    }
+
+    // 3. Cari resepnya di dalam array memori
+    // Pastikan variabel ini sesuai dengan nama array resepmu (allCloudRecipes / myRecipes)
+    const targetRecipe = allCloudRecipes.find((r) => r.id === recipeId);
+
+    if (targetRecipe) {
+      // 4. Buka pop-up resepnya!
+      // GANTI INI dengan nama fungsi aslimu yang bertugas membuka detail resep (misal: openRecipeDetail)
+      if (typeof openRecipeDetail === "function") {
+        openRecipeDetail(targetRecipe);
+      } else if (typeof viewRecipe === "function") {
+        viewRecipe(targetRecipe);
+      }
+    } else {
+      alert("Yah, resep ini sepertinya sudah dihapus.");
+    }
+  } catch (error) {
+    console.error("Gagal membuka notifikasi:", error);
+  }
+};
