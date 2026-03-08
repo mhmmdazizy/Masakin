@@ -1821,10 +1821,6 @@ function renderNotifications() {
   const dot = document.querySelector(".notif-dot");
   if (!container) return;
 
-  // --- FILTER SAKTI ---
-  // 1. Pastikan belum dihapus user
-  // 2. Jika ini notif sistem (gak ada recipientId) -> Tampilkan ke semua orang
-  // 3. Jika ini notif komentar (ada recipientId) -> HANYA tampilkan ke user yang punya resep
   const visibleNotifs = allNotifs.filter((n) => {
     const notDeleted = !deletedNotifs.includes(n.id);
     const isForMe =
@@ -1842,36 +1838,68 @@ function renderNotifications() {
 
   container.innerHTML = visibleNotifs
     .map((n) => {
+      // 👇👇👇 MESIN PENGHITUNG WAKTU (TIME AGO) 👇👇👇
+      let timeText = "Baru saja";
+      if (n.createdAt) {
+        // Cek format waktu dari Firebase
+        const date =
+          typeof n.createdAt.toDate === "function"
+            ? n.createdAt.toDate()
+            : new Date(n.createdAt);
+        const now = new Date();
+        const diffSec = Math.floor((now - date) / 1000); // Selisih dalam detik
+
+        if (diffSec < 60) {
+          timeText = "Baru saja";
+        } else if (diffSec < 3600) {
+          timeText = Math.floor(diffSec / 60) + "m"; // Menit
+        } else if (diffSec < 86400) {
+          timeText = Math.floor(diffSec / 3600) + "j"; // Jam
+        } else if (diffSec < 604800) {
+          timeText = Math.floor(diffSec / 86400) + "h"; // Hari
+        } else {
+          timeText = Math.floor(diffSec / 604800) + "mgg"; // Minggu
+        }
+      }
+      // 👆👆👆 ===================================== 👆👆👆
+
       // === JIKA INI NOTIFIKASI KOMENTAR ===
       if (n.type === "comment") {
-        const unreadClass = n.isRead ? "" : "unread"; // Kalau udah dibaca, class unread hilang
+        const unreadClass = n.isRead ? "" : "unread";
         return `
             <div class="notif-item ${unreadClass}" style="cursor:pointer; ${n.isRead ? "opacity:0.7;" : ""}" onclick="handleNotifClick('${n.id}', '${n.recipeId}')">
                 <div class="notif-icon bg-blue" style="background:var(--primary);"><i data-feather="message-circle"></i></div>
                 <div style="flex:1;">
-                    <b style="font-size:13px;">${n.senderName}</b> <span style="font-size:12px; color:var(--text-muted);">mengomentari resepmu</span>
+                    <b style="font-size:13px;">${n.senderName}</b> 
+                    <span style="font-size:12px; color:var(--text-muted);">mengomentari resepmu</span>
+                    
+                    <span style="font-size:11px; color:var(--text-muted); opacity: 0.7; margin-left: 4px;">• ${timeText}</span>
+                    
                     <p style="margin:2px 0 0; font-size:11px; color:var(--text-muted); font-style: italic;">"${n.message}"</p>
                 </div>
                 <button class="del-notif-btn" onclick="event.stopPropagation(); deleteNotif('${n.id}')">
                     <i data-feather="x" style="width:16px; height:16px;"></i>
                 </button>
             </div>
-            `;
+        `;
       }
-      // === JIKA INI NOTIFIKASI SISTEM (BAWAAN ASLIMU) ===
+      // === JIKA INI NOTIFIKASI SISTEM ===
       else {
         return `
             <div class="notif-item unread">
                 <div class="notif-icon bg-blue" style="background:var(--primary);"><i data-feather="${n.icon || "bell"}"></i></div>
                 <div style="flex:1;">
                     <b style="font-size:13px;">${n.title}</b>
+                    
+                    <span style="font-size:11px; color:var(--text-muted); opacity: 0.7; margin-left: 4px;">• ${timeText}</span>
+                    
                     <p style="margin:2px 0 0; font-size:11px; color:var(--text-muted);">${n.desc}</p>
                 </div>
                 <button class="del-notif-btn" onclick="deleteNotif('${n.id}')">
                     <i data-feather="x" style="width:16px; height:16px;"></i>
                 </button>
             </div>
-            `;
+        `;
       }
     })
     .join("");
