@@ -25,7 +25,7 @@ messaging.onBackgroundMessage((payload) => {
   const notificationOptions = {
     body: payload.data.body,
     icon: "icon.png", // Ganti dengan path logo aplikasimu
-    badge: "icon.png", // Logo kecil untuk di status bar Android (putih transparan)
+    badge: "badge.png", // Logo kecil untuk di status bar Android (putih transparan)
     data: payload.data, // Bawa data url/id resep buat di-klik
   };
 
@@ -40,3 +40,4 @@ self.addEventListener("notificationclick", function (event) {
     clients.openWindow("/"), // Bisa diarahkan ke link spesifik resep nanti
   );
 });
+
