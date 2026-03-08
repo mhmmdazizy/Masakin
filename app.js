@@ -1891,9 +1891,11 @@ function renderNotifications() {
                 <div style="flex:1;">
                     <b style="font-size:13px;">${n.title}</b>
                     
-                    <span style="font-size:11px; color:var(--text-muted); opacity: 0.7; margin-left: 4px;">• ${timeText}</span>
+                    <div style="font-size:12px; color:var(--text-muted); margin-top: 2px;">
+                        ${n.sub || "Pemberitahuan Sistem"} <span style="opacity: 0.7; margin-left: 2px;">• ${timeText}</span>
+                    </div>
                     
-                    <p style="margin:2px 0 0; font-size:11px; color:var(--text-muted);">${n.desc}</p>
+                    <p style="margin:4px 0 0; font-size:11px; color:var(--text-muted); font-style: italic;">"${n.desc}"</p>
                 </div>
                 <button class="del-notif-btn" onclick="deleteNotif('${n.id}')">
                     <i data-feather="x" style="width:16px; height:16px;"></i>
