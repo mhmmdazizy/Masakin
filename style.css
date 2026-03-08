@@ -416,6 +416,15 @@ header {
   z-index: 101;
   transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   box-shadow: 0 -5px 30px rgba(0, 0, 0, 0.15);
+  max-height: 350px;
+  overflow-y: auto;
+}
+.bottom-sheet::-webkit-scrollbar {
+  width: 6px;
+}
+.bottom-sheet::-webkit-scrollbar-thumb {
+  background-color: #ff8c00; /* Warna oranye atau sesuaikan temamu */
+  border-radius: 10px;
 }
 .bottom-sheet.active {
   bottom: 0;
