@@ -1,6 +1,7 @@
 {
   "name": "Masakin",
   "short_name": "Masakin",
+  "gcm_sender_id": "103953800507",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#F9FAFB",
@@ -20,3 +21,4 @@
     }
   ]
 }
+
