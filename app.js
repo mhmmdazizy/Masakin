@@ -239,6 +239,7 @@ auth.onAuthStateChanged(async (user) => {
   if (typeof renderNotifications === "function") renderNotifications();
   if (typeof updateUI === "function") updateUI(user);
 
+  if (typeof updateTotalLikesUI === "function") updateTotalLikesUI();
   const myStatsContainer = document.getElementById("my-profile-stats");
 
   if (unsubscribeMyProfile) {
