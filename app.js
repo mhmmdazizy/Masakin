@@ -57,10 +57,18 @@ window.requestPushPermission = async () => {
 
     if (permission === "granted") {
       console.log("Izin diberikan! Mengambil token HP...");
-      // PASTE VAPID KEY KAMU DI SINI
+
+      // 👇👇👇 TAMBAHKAN KUNCI ANTI-GAGAL INI LAGI 👇👇👇
+      const registration = await navigator.serviceWorker.register(
+        "/firebase-messaging-sw.js",
+      );
+      await navigator.serviceWorker.ready;
+      // 👆👆👆 ========================================= 👆👆👆
+
       const currentToken = await messaging.getToken({
         vapidKey:
           "BN-cqFAdf1KoXdimq6Na2ZEvPxrWfXNd0o2Bc4TM5l6BOloJTNTdEmNmGBvL84Tw2HM8lU1nJo96UjtFpsneJnQ",
+        serviceWorkerRegistration: registration, // <--- JANGAN LUPA TAMBAHIN BARIS INI
       });
 
       if (currentToken) {
@@ -2147,6 +2155,17 @@ window.submitComment = (btnElement) => {
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
           })
           .catch((err) => console.error("Error:", err));
+        fetch("https://masakin-notif.vercel.app/api/send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            recipientId: currentRecipe.userId,
+            title: "Komentar Baru!",
+            body: `${currentUser.displayName} membalas: "${text}"`,
+          }),
+        })
+          .then((res) => console.log("Perintah push notif terkirim ke Vercel!"))
+          .catch((err) => console.error("Gagal bangunin Vercel:", err));
       }
     })
     .catch((error) => {
@@ -2155,17 +2174,6 @@ window.submitComment = (btnElement) => {
       btnElement.innerText = originalBtnText;
       btnElement.disabled = false;
     });
-  fetch("https://masakin-notif.vercel.app/api/send", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      recipientId: currentRecipe.userId,
-      title: "Komentar Baru!",
-      body: `${currentUser.displayName} membalas: "${text}"`,
-    }),
-  })
-    .then((res) => console.log("Perintah push notif terkirim ke Vercel!"))
-    .catch((err) => console.error("Gagal bangunin Vercel:", err));
 };
 // ==========================================
 // --- FITUR FOLLOW / UNFOLLOW (FIREBASE) ---
