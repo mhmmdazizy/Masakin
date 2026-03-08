@@ -2798,60 +2798,61 @@ if (detailOverlay) {
 // ==========================================
 // --- FITUR DRAG / SWIPE DOWN NOTIF SHEET ---
 // ==========================================
-const notifSheet = document.getElementById("notif-sheet");
-const sheetHandleArea = document.querySelector(".sheet-handle");
-const sheetHeaderArea = notifSheet.querySelector("div:nth-child(2)");
+document.addEventListener("DOMContentLoaded", () => {
+  const notifSheet = document.getElementById("notif-sheet");
+  const sheetHandleArea = document.querySelector(".sheet-handle");
+  const sheetHeaderArea = notifSheet
+    ? notifSheet.querySelector("div:nth-child(2)")
+    : null;
 
-let startY = 0;
-let currentY = 0;
-let isDragging = false;
+  if (!notifSheet || !sheetHandleArea || !sheetHeaderArea) return;
 
-// 1. Saat jari mulai nyentuh handle/judul
-const startDrag = (e) => {
-  // Ambil posisi awal jari (Support untuk Touch di HP dan Mouse di PC)
-  startY = e.touches ? e.touches[0].clientY : e.clientY;
-  isDragging = true;
-  notifSheet.style.transition = "none"; // Matikan animasi sementara biar tarikannya mulus
-};
+  let startY = 0;
+  let currentY = 0;
+  let isDragging = false;
 
-// 2. Saat jari mulai menggeser
-const onDrag = (e) => {
-  if (!isDragging) return;
-  const y = e.touches ? e.touches[0].clientY : e.clientY;
-  currentY = y - startY;
+  // 1. Saat jari mulai menyentuh handle/judul
+  const startDrag = (e) => {
+    startY = e.touches ? e.touches[0].clientY : e.clientY;
+    isDragging = true;
+    notifSheet.style.transition = "none"; // Matikan animasi sementara
+  };
 
-  // Hanya izinkan ditarik ke bawah (currentY > 0)
-  if (currentY > 0) {
-    notifSheet.style.transform = `translateY(${currentY}px)`;
-  }
-};
+  // 2. Saat jari mulai menggeser
+  const onDrag = (e) => {
+    if (!isDragging) return;
+    const y = e.touches ? e.touches[0].clientY : e.clientY;
+    currentY = y - startY;
 
-// 3. Saat jari dilepas
-const endDrag = () => {
-  if (!isDragging) return;
-  isDragging = false;
-  notifSheet.style.transition = "transform 0.3s ease-out, bottom 0.3s ease-out"; // Nyalakan animasi lagi
+    // Hanya izinkan sheet ditarik ke arah BAWAH
+    if (currentY > 0) {
+      notifSheet.style.transform = `translateY(${currentY}px)`;
+    }
+  };
 
-  if (currentY > 120) {
-    // Kalau ditariknya udah lumayan jauh ke bawah, langsung TUTUP sheet-nya!
-    toggleNotifSheet();
-  } else {
-    // Kalau nariknya nanggung, kembalikan ke posisi semula (membal ke atas)
-    notifSheet.style.transform = "translateY(0)";
-  }
-  currentY = 0;
-};
+  // 3. Saat jari dilepas
+  const endDrag = () => {
+    if (!isDragging) return;
+    isDragging = false;
+    notifSheet.style.transition =
+      "transform 0.3s ease-out, bottom 0.3s ease-out"; // Nyalakan animasi lagi
 
-// Pasang sensornya ke Garis Handle
-if (sheetHandleArea) {
+    if (currentY > 100) {
+      // Kalau ditariknya udah lumayan jauh (>100px), tutup sheet-nya!
+      if (typeof toggleNotifSheet === "function") toggleNotifSheet();
+    } else {
+      // Kalau nariknya nanggung, kembalikan posisi sheet membal ke atas
+      notifSheet.style.transform = "translateY(0)";
+    }
+    currentY = 0;
+  };
+
+  // Pasang sensor jari
   sheetHandleArea.addEventListener("touchstart", startDrag, { passive: true });
   sheetHandleArea.addEventListener("touchmove", onDrag, { passive: true });
   sheetHandleArea.addEventListener("touchend", endDrag);
-}
 
-// Pasang sensornya ke Judul "Notifikasi" juga (biar area tariknya lebih luas)
-if (sheetHeaderArea) {
   sheetHeaderArea.addEventListener("touchstart", startDrag, { passive: true });
   sheetHeaderArea.addEventListener("touchmove", onDrag, { passive: true });
   sheetHeaderArea.addEventListener("touchend", endDrag);
-}
+});
