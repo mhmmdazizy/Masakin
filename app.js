@@ -2006,44 +2006,45 @@ window.searchFaq = () => {
     }
   }
 };
+// ==========================================
 // --- FITUR INSTALL PWA CERDAS ---
+// ==========================================
 let deferredPrompt;
 const installBtn = document.getElementById("install-btn");
 
-// 1. Browser mendeteksi web bisa diinstall & belum terinstall
+// 1. Browser mendeteksi web bisa diinstall
 window.addEventListener("beforeinstallprompt", (e) => {
-  // Cegah browser memunculkan popup install bawaan yang tiba-tiba
   e.preventDefault();
-  // Simpan event-nya untuk dipanggil saat tombol diklik
   deferredPrompt = e;
-
-  // Munculkan tombol "Unduh Aplikasi" di menu Preferensi
-  if (installBtn) {
-    installBtn.style.display = "flex"; // atau 'block' sesuai style kamu
-  }
+  if (installBtn) installBtn.style.display = "flex";
 });
 
 // 2. Saat user mengklik tombol "Unduh Aplikasi"
 if (installBtn) {
   installBtn.addEventListener("click", async () => {
     if (deferredPrompt) {
-      // Munculkan popup konfirmasi install
       deferredPrompt.prompt();
-
-      // Tunggu user milih "Install" atau "Cancel"
       const { outcome } = await deferredPrompt.userChoice;
 
       if (outcome === "accepted") {
-        console.log("User setuju menginstall aplikasi");
+        console.log("Proses install dimulai...");
+        // 🚨 KUNCI: JANGAN TARUH TOAST DI SINI BIAR GAK DOBEL! 🚨
       }
 
-      // Hapus event yang sudah dipakai
       deferredPrompt = null;
-      // Sembunyikan tombolnya lagi
       installBtn.style.display = "none";
     }
   });
 }
+
+// 3. Sensor saat aplikasi BENAR-BENAR SELESAI diinstall oleh HP
+window.addEventListener("appinstalled", () => {
+  if (installBtn) installBtn.style.display = "none";
+  deferredPrompt = null;
+
+  // 👇 TARUH TOAST-NYA CUKUP DI SINI SAJA (MUNCUL 1x) 👇
+  showToast("Aplikasi berhasil diinstall! 🎉");
+});
 
 // 3. Jika aplikasi sukses terinstall, pastikan tombol hilang
 window.addEventListener("appinstalled", () => {
