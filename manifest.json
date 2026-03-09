@@ -18,5 +18,28 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
+  ],
+  "shortcuts": [
+    {
+      "name": "Cari Resep",
+      "short_name": "Pencarian",
+      "description": "Cari resep masakan dari bahan dapur",
+      "url": "/?tab=home",
+      "icons": [{ "src": "icon-search.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Menu Favorit",
+      "short_name": "Favorit",
+      "description": "Lihat daftar resep favoritmu",
+      "url": "/?tab=favorit",
+      "icons": [{ "src": "icon-fav.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Tulis Resep",
+      "short_name": "Tulis Resep",
+      "description": "Bagikan resep andalanmu",
+      "url": "/?action=tulis",
+      "icons": [{ "src": "icon-write.png", "sizes": "192x192" }]
+    }
   ]
 }

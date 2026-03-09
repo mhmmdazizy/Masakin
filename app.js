@@ -108,6 +108,23 @@ let allCloudRecipes = [];
 // --- 3. START APP ---
 document.addEventListener("DOMContentLoaded", () => {
   console.log("App Started...");
+  const urlParams = new URLSearchParams(window.location.search);
+  const targetTab = urlParams.get("tab");
+  const targetAction = urlParams.get("action");
+
+  // Kalau ada perintah pindah tab
+  if (targetTab) {
+    setTimeout(() => {
+      if (typeof switchPage === "function") switchPage(targetTab);
+    }, 300); // Jeda dikit biar rendering awal webnya selesai
+  }
+
+  // Kalau ada perintah buka form tulis resep
+  if (targetAction === "tulis") {
+    setTimeout(() => {
+      if (typeof openRecipeForm === "function") openRecipeForm();
+    }, 1000); // Jeda 1 detik nunggu proses pengecekan Login kelar
+  }
 
   // Update teks tombol tema kalau sebelumnya mode gelap
   const themeBtn = document.getElementById("theme-btn");
