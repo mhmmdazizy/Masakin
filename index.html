@@ -206,7 +206,10 @@
 
         <div class="profile-header-large">
           <div class="avatar-large" id="profile-avatar-large">G</div>
-          <h2 id="profile-name-large">Guest User</h2>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+    <h2 id="profile-name-large" style="margin: 0;">Guest User</h2>
+    <span id="user-badge" onclick="showBadgeInfo()" style="display: none;"></span>
+</div>
           <p id="profile-email-large">Silakan Login</p>
           <div id="my-profile-stats" class="profile-stats" style="display: none; gap: 20px; justify-content: center; margin-top: 10px;">
             <div onclick="showFollowList('followers', true)" style="text-align: center; cursor: pointer; padding: 5px;">
@@ -522,7 +525,7 @@
 
         <div style="padding: 20px; text-align: center;">
             <img id="public-profile-avatar" src="" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; border: 2px solid var(--primary, #ff6b6b);">
-            <h2 id="public-profile-name" style="margin: 0 0 5px 0; font-size: 18px;">Nama Pengguna<span id="user-badge" onclick="showBadgeInfo()"></span></h2>
+            <h2 id="public-profile-name" style="margin: 0 0 5px 0; font-size: 18px;">Nama Pengguna</h2>
             
             <div style="display: flex; gap: 30px; justify-content: center; margin: 15px 0;">
                 <div onclick="showFollowList('followers')" style="cursor: pointer; padding: 5px;">
@@ -708,4 +711,3 @@
 </div>
 </body>
 </html>
-
