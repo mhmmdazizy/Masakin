@@ -224,6 +224,25 @@
         </div>
           <div id="auth-btn-container" style="margin-top:15px;"></div>
         </div>
+        <button id="ai-chat-btn" onclick="toggleAIChat()">
+    <i data-feather="message-square"></i> Tanya Chef AI
+</button>
+
+<div id="ai-chat-box" class="hidden">
+    <div class="chat-header">
+        <b style="font-size: 14px;">🧑‍🍳 Chef AI Masakin</b>
+        <button onclick="toggleAIChat()"><i data-feather="chevron-down"></i></button>
+    </div>
+    
+    <div id="ai-chat-messages">
+        <div class="chat-msg ai">Halo! Aku Chef AI. Ada bahan nganggur di kulkas atau lagi bingung mau masak resep apa yang ada di Masakin hari ini? 🍳</div>
+    </div>
+    
+    <div class="chat-input-area">
+        <input type="text" id="ai-chat-input" placeholder="Tanya resep di sini..." onkeypress="handleAIChatEnter(event)">
+        <button onclick="sendAIChat()"><i data-feather="send"></i></button>
+    </div>
+</div>
 
         <div class="my-recipes-section" style="padding: 0 20px 20px">
           <div
@@ -650,4 +669,5 @@
     <div id="toast-notif"></div>
   </body>
 </html>
+
 
