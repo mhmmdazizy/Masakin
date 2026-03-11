@@ -206,10 +206,9 @@
 
         <div class="profile-header-large">
           <div class="avatar-large" id="profile-avatar-large">G</div>
-          <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
-    <h2 id="profile-name-large" style="margin: 0;">Guest User</h2>
-    <span id="user-badge" onclick="showBadgeInfo()" style="display: none;"></span>
-</div>
+          <h2 id="profile-name-large" style="margin: 0;">Guest User</h2>
+          
+          <div id="user-badge" onclick="showBadgeInfo()" style="display: none;"></div>
           <p id="profile-email-large">Silakan Login</p>
           <div id="my-profile-stats" class="profile-stats" style="display: none; gap: 20px; justify-content: center; margin-top: 10px;">
             <div onclick="showFollowList('followers', true)" style="text-align: center; cursor: pointer; padding: 5px;">
@@ -671,7 +670,7 @@
 <script src="database.js"></script>
 <script src="app.min.js"></script>
     <div id="badge-info-modal" class="popup-overlay" style="display: none; z-index: 10000; align-items: center; justify-content: center;">
-    <div class="popup-card" style="max-width: 320px; text-align: center; border-radius: 20px; width: 90%;">
+    <div class="popup-card" style="max-width: 320px; text-align: center; border-radius: 20px; width: 90%; padding-bottom: 35px; padding-top: 35px;">
         <div class="popup-header" style="justify-content: center; position: relative; margin-bottom: 15px;">
             <h3 style="margin: 0;">Sistem Level Masakin 🏅</h3>
             <button class="close-popup" onclick="hideBadgeInfo()" style="position: absolute; right: 0; top: -5px;">
