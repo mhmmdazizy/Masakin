@@ -1905,17 +1905,25 @@ input:checked + .slider:before {
   transform: scale(0.9);
 }
 
-/* Warna Level */
+/* Ganti warna background badge di sebelah nama jadi lebih netral biar SVG-nya nge-pop! */
 .bg-lv1 {
-  background: #a4b0be;
-} /* Abu-abu (Pemula) */
+  background: #4a403a;
+  color: #fdfdfd;
+} /* Dark Brown buat Bronze */
 .bg-lv2 {
-  background: #ff7f50;
-} /* Orange (Andal) */
+  background: #3d4a54;
+  color: #fdfdfd;
+} /* Dark Blue/Grey buat Silver */
 .bg-lv3 {
-  background: linear-gradient(45deg, #ffd32a, #ffa502);
-  color: #2f3542 !important;
-} /* Emas (Master) */
+  background: #5c4c0b;
+  color: #ffd32a;
+  border: 1px solid #f1c40f;
+} /* Dark Gold mewah */
+
+/* Bikin SVG sejajar sama teks */
+#user-badge svg {
+  display: block;
+}
 
 /* Icon di dalam Modal */
 .badge-icon {
