@@ -1882,3 +1882,58 @@ input:checked + .slider:before {
   justify-content: center;
   align-items: center;
 }
+/* ========================================== */
+/* STYLE BADGE LEVELING */
+/* ========================================== */
+#user-badge {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  color: white;
+  margin-left: 6px;
+  cursor: pointer;
+  vertical-align: middle;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: bold;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+#user-badge:active {
+  transform: scale(0.9);
+}
+
+/* Warna Level */
+.bg-lv1 {
+  background: #a4b0be;
+} /* Abu-abu (Pemula) */
+.bg-lv2 {
+  background: #ff7f50;
+} /* Orange (Andal) */
+.bg-lv3 {
+  background: linear-gradient(45deg, #ffd32a, #ffa502);
+  color: #2f3542 !important;
+} /* Emas (Master) */
+
+/* Icon di dalam Modal */
+.badge-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  color: white;
+}
+.badge-icon.badge-lv1 {
+  background: #a4b0be;
+}
+.badge-icon.badge-lv2 {
+  background: #ff7f50;
+}
+.badge-icon.badge-lv3 {
+  background: linear-gradient(45deg, #ffd32a, #ffa502);
+}

@@ -522,7 +522,7 @@
 
         <div style="padding: 20px; text-align: center;">
             <img id="public-profile-avatar" src="" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; border: 2px solid var(--primary, #ff6b6b);">
-            <h2 id="public-profile-name" style="margin: 0 0 5px 0; font-size: 18px;">Nama Pengguna</h2>
+            <h2 id="public-profile-name" style="margin: 0 0 5px 0; font-size: 18px;">Nama Pengguna<span id="user-badge" onclick="showBadgeInfo()"></span></h2>
             
             <div style="display: flex; gap: 30px; justify-content: center; margin: 15px 0;">
                 <div onclick="showFollowList('followers')" style="cursor: pointer; padding: 5px;">
@@ -664,10 +664,43 @@
       </div>
     </div>
 
+
     <script src="database.js"></script>
-    <script src="app.min.js"></script>
+    <script src="app.js"></script>
     <div id="toast-notif"></div>
+    <div id="badge-info-modal" class="modal hidden" style="z-index: 10000;">
+    <div class="modal-content" style="max-width: 320px; text-align: center; border-radius: 20px;">
+        <h3 style="margin-top: 0;">Sistem Level Masakin 🏅</h3>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Bagikan resep andalanmu untuk menaikkan level dan pamerkan gelarmu!</p>
+        
+        <div style="text-align: left; display: flex; flex-direction: column; gap: 15px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="badge-icon badge-lv1">🍳</div>
+                <div>
+                    <b style="font-size: 14px;">Koki Pemula</b>
+                    <div style="font-size: 11px; color: gray;">Syarat: 0 - 2 Resep</div>
+                </div>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="badge-icon badge-lv2">🥘</div>
+                <div>
+                    <b style="font-size: 14px;">Koki Andal</b>
+                    <div style="font-size: 11px; color: gray;">Syarat: 3 - 9 Resep</div>
+                </div>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="badge-icon badge-lv3">👑</div>
+                <div>
+                    <b style="font-size: 14px;">Master Chef</b>
+                    <div style="font-size: 11px; color: gray;">Syarat: 10+ Resep</div>
+                </div>
+            </div>
+        </div>
+        
+        <button onclick="hideBadgeInfo()" style="margin-top: 25px; width: 100%; padding: 12px; border-radius: 10px; background: var(--primary, #ff4757); color: white; border: none; font-weight: bold; cursor: pointer;">Paham, Chef! 👨‍🍳</button>
+    </div>
+</div>
   </body>
 </html>
-
-
