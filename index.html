@@ -348,7 +348,7 @@
                 window.open('https://trakteer.id/mhmmdazizy/tip', '_blank')
               "
             >
-              <i data-feather="coffee"></i> Traktir Kopi Developer
+              <i data-feather="coffee"></i> Traktir Kopi
             </button>
             <button class="reset-btn" onclick="resetData()">
               <i data-feather="trash-2"></i> Reset Aplikasi
@@ -383,35 +383,51 @@
         </div>
       </section>
       <section id="admin-page" class="page">
-        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
             <button onclick="switchPage('profile-page')" style="background:none; border:none; font-size:20px; cursor:pointer;">
                 <i data-feather="arrow-left"></i>
             </button>
             <h2 style="margin: 0;">Panel Admin</h2>
         </div>
-        <div style="background: var(--surface); padding: 15px; border-radius: 12px; border: 1px solid #0095f6; margin-bottom: 20px;">
-            <h4 style="margin: 0 0 15px 0; color: #0095f6; display: flex; align-items: center; gap: 8px;">
-                <i data-feather="check-circle" style="width: 18px;"></i> Permintaan Centang Biru
-            </h4>
-            <div id="admin-premium-requests" style="display: flex; flex-direction: column; gap: 10px;"></div>
+
+        <div style="display: flex; gap: 10px; margin-bottom: 20px; background: var(--surface); padding: 6px; border-radius: 12px; border: 1px solid var(--border);">
+            <button id="tab-btn-recipes" onclick="switchAdminTab('recipes')" style="flex: 1; padding: 10px; border-radius: 8px; border: none; background: var(--primary); color: white; font-weight: bold; cursor: pointer; transition: 0.3s;">
+                <i data-feather="book-open" style="width: 14px; margin-right: 5px; vertical-align: -2px;"></i> Resep
+            </button>
+            <button id="tab-btn-premium" onclick="switchAdminTab('premium')" style="flex: 1; padding: 10px; border-radius: 8px; border: none; background: transparent; color: var(--text-muted); font-weight: bold; cursor: pointer; transition: 0.3s;">
+                <i data-feather="check-circle" style="width: 14px; margin-right: 5px; vertical-align: -2px;"></i> Langganan
+            </button>
         </div>
 
-        <div style="background: var(--surface); padding: 15px; border-radius: 12px; border: 1px solid var(--primary);">
-            <h4 style="margin: 0 0 15px 0;">Manajemen Semua Resep</h4>
-            
-            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                <div style="flex: 1; position: relative;">
-                    <i data-feather="search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; color: var(--text-muted);"></i>
-                    <input type="text" id="admin-search" onkeyup="filterAdminRecipes()" placeholder="Cari resep atau nama author..." style="width: 100%; padding: 8px 10px 8px 30px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); outline: none; font-size: 12px;">
+        <div id="admin-content-recipes">
+            <div style="background: var(--surface); padding: 15px; border-radius: 12px; border: 1px solid var(--primary);">
+                <h4 style="margin: 0 0 15px 0;">Manajemen Semua Resep</h4>
+                
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <div style="flex: 1; position: relative;">
+                        <i data-feather="search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; color: var(--text-muted);"></i>
+                        <input type="text" id="admin-search" onkeyup="filterAdminRecipes()" placeholder="Cari resep atau nama..." style="width: 100%; padding: 8px 10px 8px 30px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); outline: none; font-size: 12px;">
+                    </div>
+                    <select id="admin-filter" onchange="filterAdminRecipes()" style="padding: 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); outline: none; font-size: 12px; cursor: pointer;">
+                        <option value="all">Semua Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="approved">Live</option>
+                    </select>
                 </div>
-                <select id="admin-filter" onchange="filterAdminRecipes()" style="padding: 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); outline: none; font-size: 12px; cursor: pointer;">
-                    <option value="all">Semua Status</option>
-                    <option value="pending">Pending</option>
-                    <option value="approved">Live</option>
-                </select>
+                
+                <div id="admin-pending-recipes" style="display: flex; flex-direction: column; gap: 15px;"></div>
             </div>
-            <div id="admin-pending-recipes" style="display: flex; flex-direction: column; gap: 15px;"></div>
         </div>
+
+        <div id="admin-content-premium" style="display: none;">
+            <div style="background: var(--surface); padding: 15px; border-radius: 12px; border: 1px solid #0095f6;">
+                <h4 style="margin: 0 0 15px 0; color: #0095f6; display: flex; align-items: center; gap: 8px;">
+                    Manajemen Centang Biru
+                </h4>
+                <div id="admin-premium-requests" style="display: flex; flex-direction: column; gap: 10px;"></div>
+            </div>
+        </div>
+
       </section>
     </main>
 
