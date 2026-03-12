@@ -551,6 +551,9 @@ header {
 }
 
 /* --- POPUP JADI BOTTOM SHEET --- */
+#popup-icon svg {
+  display: block;
+}
 .popup-overlay {
   position: fixed;
   top: 0;
