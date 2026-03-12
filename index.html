@@ -227,7 +227,7 @@
         </div>
         <div id="auth-btn-container" style="margin-top:15px;"></div>
           
-          <button id="admin-panel-btn" onclick="switchPage('admin-page')" style="display: none; width: 100%; margin-top: 15px; background: #2f3542; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; cursor: pointer;">
+          <button id="admin-panel-btn" onclick="switchPage('admin-page')" style="display: none; width: 100%; margin-top: 10px; margin-bottom: 10px; background: #2f3542; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; cursor: pointer;">
               <i data-feather="settings" style="width: 16px; margin-right: 5px; vertical-align: middle;"></i> Masuk Panel Admin
           </button>
         <button id="ai-chat-btn" onclick="toggleAIChat()">
@@ -376,12 +376,23 @@
             <button onclick="switchPage('profile-page')" style="background:none; border:none; font-size:20px; cursor:pointer;">
                 <i data-feather="arrow-left"></i>
             </button>
-            <h2 style="margin: 0;">Panel Admin 👑</h2>
+            <h2 style="margin: 0;">Panel Admin</h2>
         </div>
 
         <div style="background: var(--surface); padding: 15px; border-radius: 12px; border: 1px solid var(--primary);">
             <h4 style="margin: 0 0 15px 0;">Manajemen Semua Resep</h4>
             
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <div style="flex: 1; position: relative;">
+                    <i data-feather="search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; color: var(--text-muted);"></i>
+                    <input type="text" id="admin-search" onkeyup="filterAdminRecipes()" placeholder="Cari resep atau nama author..." style="width: 100%; padding: 8px 10px 8px 30px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); outline: none; font-size: 12px;">
+                </div>
+                <select id="admin-filter" onchange="filterAdminRecipes()" style="padding: 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); outline: none; font-size: 12px; cursor: pointer;">
+                    <option value="all">Semua Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Live</option>
+                </select>
+            </div>
             <div id="admin-pending-recipes" style="display: flex; flex-direction: column; gap: 15px;"></div>
         </div>
       </section>
