@@ -225,6 +225,11 @@
         </div>
           <div id="auth-btn-container" style="margin-top:15px;"></div>
         </div>
+        <div id="auth-btn-container" style="margin-top:15px;"></div>
+          
+          <button id="admin-panel-btn" onclick="switchPage('admin-page')" style="display: none; width: 100%; margin-top: 15px; background: #2f3542; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; cursor: pointer;">
+              <i data-feather="settings" style="width: 16px; margin-right: 5px; vertical-align: middle;"></i> Masuk Panel Admin
+          </button>
         <button id="ai-chat-btn" onclick="toggleAIChat()">
     <i data-feather="message-square"></i> Tanya Chef AI
 </button>
@@ -364,6 +369,19 @@
               >Muhammad Azizy</a
             >
           </div>
+        </div>
+      </section>
+      <section id="admin-page" class="page">
+        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+            <button onclick="switchPage('profile-page')" style="background:none; border:none; font-size:20px; cursor:pointer;">
+                <i data-feather="arrow-left"></i>
+            </button>
+            <h2 style="margin: 0;">Panel Admin 👑</h2>
+        </div>
+
+        <div style="background: var(--surface); padding: 15px; border-radius: 12px; border: 1px solid var(--primary);">
+            <h4 style="margin: 0 0 15px 0;">Menunggu Persetujuan (Pending)</h4>
+            <div id="admin-pending-recipes" style="display: flex; flex-direction: column; gap: 15px;"></div>
         </div>
       </section>
     </main>

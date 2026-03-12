@@ -1227,7 +1227,7 @@ body[data-theme="dark"] .logo-dark {
 
 .logo-tentang img {
   width: 250px;
-  max-width: 90%;
+  max-width: 50%;
   object-fit: contain;
 }
 /* --- DESAIN FORM LANGKAH (CAROUSEL) --- */
