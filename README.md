@@ -34,9 +34,3 @@ Pengguna cukup memilih bahan yang dimiliki, dan aplikasi akan merekomendasikan r
 - Firebase rules dikonfigurasi untuk membatasi akses publik.
 
 ---
-
-## Cara Menjalankan Project
-
-1. Clone repository:
-   ```bash
-   git clone https://github.com/username/masakin.git
