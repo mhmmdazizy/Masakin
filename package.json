@@ -1,0 +1,11 @@
+{
+  "name": "masakin-backend",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node api/get-token.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.0.0",
+    "midtrans-client": "^1.3.1"
+  }
+}
