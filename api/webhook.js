@@ -7,20 +7,20 @@ if (!admin.apps.length) {
         credential: admin.credential.cert({
             projectId: process.env.FIREBASE_PROJECT_ID,
             clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-            // Akali karakter newline agar terbaca benar oleh Vercel
-            privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'), 
+            privateKey: process.env.FIREBASE_PRIVATE_KEY ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n') : undefined, 
         })
     });
 }
 
 const db = admin.firestore();
 
-export default async function handler(req, res) {
+module.exports = async function(req, res) {
+    // Tolak kalau diakses lewat browser (GET)
     if (req.method !== 'POST') return res.status(405).json({ message: 'Jalur dilarang' });
 
     const data = req.body;
 
-    // 2. Pengecekan Keamanan (Pastikan yang ngirim ini beneran Midtrans, bukan Hacker)
+    // 2. Pengecekan Keamanan
     const hash = crypto.createHash('sha512').update(`${data.order_id}${data.status_code}${data.gross_amount}${process.env.MIDTRANS_SERVER_KEY}`).digest('hex');
     
     if (data.signature_key !== hash) {
@@ -30,14 +30,13 @@ export default async function handler(req, res) {
     // 3. Cek Status Pembayaran
     const transactionStatus = data.transaction_status;
     const fraudStatus = data.fraud_status;
-    const uid = data.custom_field1; // Mengambil UID yang kita titipkan tadi
+    const uid = data.custom_field1; 
 
     if (!uid) return res.status(400).json({ message: 'UID tidak ditemukan' });
 
     if (transactionStatus == 'capture' || transactionStatus == 'settlement') {
         if (fraudStatus == 'accept' || !fraudStatus) {
             
-            // 🔥 UANG MASUK! AKTIFKAN CENTANG BIRU SELAMA 30 HARI 🔥
             const expiryDate = new Date();
             expiryDate.setDate(expiryDate.getDate() + 30); 
 
@@ -48,12 +47,11 @@ export default async function handler(req, res) {
             });
         }
     } else if (transactionStatus == 'cancel' || transactionStatus == 'deny' || transactionStatus == 'expire') {
-        // Kalau batal/kadaluarsa, kembalikan statusnya
         await db.collection('users').doc(uid).update({
             premiumStatus: "failed"
         });
     }
 
-    // Wajib balas "OK" biar Midtrans berhenti ngirim notifikasi
+    // Wajib balas "OK" ke Midtrans
     res.status(200).json({ message: 'OK' });
-}
+};
