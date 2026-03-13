@@ -1,6 +1,6 @@
 const midtransClient = require('midtrans-client');
 
-export default async function handler(req, res) {
+module.exports = async function(req, res) {
     // Cuma terima jalur POST
     if (req.method !== 'POST') return res.status(405).json({ message: 'Jalur dilarang' });
 
@@ -8,7 +8,7 @@ export default async function handler(req, res) {
 
     // Inisialisasi Midtrans Snap
     let snap = new midtransClient.Snap({
-        isProduction: true, // Ubah ke true kalau aplikasimu udah rilis ke publik!
+        isProduction: true, 
         serverKey: process.env.MIDTRANS_SERVER_KEY
     });
 
@@ -23,7 +23,7 @@ export default async function handler(req, res) {
             "first_name": name,
             "email": email
         },
-        "custom_field1": uid // Kita titipkan UID Firebase di sini buat dipake nanti!
+        "custom_field1": uid 
     };
 
     try {
@@ -33,4 +33,4 @@ export default async function handler(req, res) {
         console.error("Gagal buat token:", error);
         res.status(500).json({ error: 'Gagal membuat token pembayaran' });
     }
-}
+};
