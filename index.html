@@ -882,5 +882,34 @@
 
         </div>
     </div>
+    <div id="admin-delete-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999; background: rgba(0,0,0,0.65); align-items: center; justify-content: center; flex-direction: column;">
+        <div style="background: var(--surface); width: 85%; max-width: 320px; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 4px 25px rgba(0,0,0,0.5); border: 1px solid var(--border);">
+            
+            <div style="padding: 25px 20px; text-align: center;">
+                <h3 style="margin: 0 0 10px 0; color: var(--text); font-size: 17px;">Hapus permanen?</h3>
+                <p style="margin: 0; color: var(--text-muted); font-size: 13px; line-height: 1.4;">
+                    Story ini akan dihapus permanen dari server. Tindakan ini tidak bisa dibatalkan.
+                </p>
+            </div>
+
+            <button id="btn-confirm-delete" style="background: transparent; border: none; border-top: 1px solid var(--border); color: #ed4956; padding: 14px; font-weight: bold; font-size: 15px; cursor: pointer; width: 100%;">Hapus Story</button>
+            <button onclick="document.getElementById('admin-delete-modal').style.display='none'" style="background: transparent; border: none; border-top: 1px solid var(--border); color: var(--text); padding: 14px; font-size: 15px; cursor: pointer; width: 100%;">Batal</button>
+        </div>
+    </div>
+
+    <div id="admin-ignore-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999; background: rgba(0,0,0,0.65); align-items: center; justify-content: center; flex-direction: column;">
+        <div style="background: var(--surface); width: 85%; max-width: 320px; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 4px 25px rgba(0,0,0,0.5); border: 1px solid var(--border);">
+            
+            <div style="padding: 25px 20px; text-align: center;">
+                <h3 style="margin: 0 0 10px 0; color: var(--text); font-size: 17px;">Abaikan laporan?</h3>
+                <p style="margin: 0; color: var(--text-muted); font-size: 13px; line-height: 1.4;">
+                    Laporan ini akan ditandai selesai dan Story akan tetap tayang.
+                </p>
+            </div>
+
+            <button id="btn-confirm-ignore" style="background: transparent; border: none; border-top: 1px solid var(--border); color: #0095f6; padding: 14px; font-weight: bold; font-size: 15px; cursor: pointer; width: 100%;">Abaikan Laporan</button>
+            <button onclick="document.getElementById('admin-ignore-modal').style.display='none'" style="background: transparent; border: none; border-top: 1px solid var(--border); color: var(--text); padding: 14px; font-size: 15px; cursor: pointer; width: 100%;">Batal</button>
+        </div>
+    </div>
 </body>
 </html>
