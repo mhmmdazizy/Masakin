@@ -45,6 +45,11 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js"></script>
   </head>
   <body>
+<script>
+      if (localStorage.getItem("appTheme") === "dark") {
+        document.body.setAttribute("data-theme", "dark");
+      }
+    </script>
     <header id="main-header" style="display: flex; justify-content: space-between; align-items: center;">
       <div class="app-logo" style="display: flex; align-items: center;">
         <img src="icon/logo-header-terang.png" alt="Masakin" class="logo-light" style="height: 32px;">
