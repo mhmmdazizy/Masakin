@@ -27,6 +27,14 @@
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <style>
+        /* Hilangkan garis tepi putih */
+        .cropper-view-box { outline: none !important; }
+        /* Hilangkan titik sudut, garis putus-putus, dan tanda plus di tengah */
+        .cropper-line, .cropper-point, .cropper-dashed, .cropper-center { display: none !important; }
+        /* Gelapkan area luar foto biar fokus */
+        .cropper-modal { background: #111 !important; opacity: 0.8 !important; }
+    </style>
     <link rel="manifest" href="manifest.json" />
     <script src="https://unpkg.com/feather-icons"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
