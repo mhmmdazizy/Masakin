@@ -1968,7 +1968,6 @@ input:checked + .slider:before {
   overflow-x: auto;
   padding: 15px;
   background: var(--bg);
-  border-bottom: 1px solid var(--border);
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
