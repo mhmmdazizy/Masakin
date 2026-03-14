@@ -925,5 +925,25 @@
             <button onclick="document.getElementById('admin-ignore-modal').style.display='none'" style="background: transparent; border: none; border-top: 1px solid var(--border); color: var(--text); padding: 14px; font-size: 15px; cursor: pointer; width: 100%;">Batal</button>
         </div>
     </div>
+    <div id="ai-clear-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999; background: rgba(0,0,0,0.65); align-items: center; justify-content: center; flex-direction: column;">
+        <div style="background: var(--surface); width: 85%; max-width: 320px; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 4px 25px rgba(0,0,0,0.5); border: 1px solid #363636;">
+            
+            <div style="padding: 25px 20px; text-align: center;">
+                <h3 style="margin: 0 0 10px 0; color: var(--text); font-size: 17px;">Hapus riwayat chat?</h3>
+                <p style="margin: 0; color: var(--text-muted); font-size: 13px; line-height: 1.4;">
+                    Semua riwayat obrolanmu dengan Chef AI akan dihapus secara permanen. Tindakan ini tidak bisa dibatalkan.
+                </p>
+            </div>
+
+            <button onclick="window.executeClearAIChat()" style="background: transparent; border: none; border-top: 1px solid #363636; color: #ed4956; padding: 14px; font-weight: bold; font-size: 15px; cursor: pointer; width: 100%;">
+                Hapus
+            </button>
+
+            <button onclick="document.getElementById('ai-clear-modal').style.display='none'" style="background: transparent; border: none; border-top: 1px solid #363636; color: white; padding: 14px; font-size: 15px; cursor: pointer; width: 100%;">
+                Batal
+            </button>
+
+        </div>
+    </div>
 </body>
 </html>
