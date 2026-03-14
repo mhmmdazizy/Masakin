@@ -836,5 +836,25 @@
             <span id="sv-caption" style="color: white; font-weight: bold; font-size: 15px; text-shadow: 1px 1px 4px rgba(0,0,0,0.8); background: rgba(0,0,0,0.4); padding: 8px 16px; border-radius: 20px; display: inline-block;"></span>
         </div>
     </div>
+    <div id="ig-delete-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999999; background: rgba(0,0,0,0.65); align-items: center; justify-content: center; flex-direction: column;">
+        <div style="background: #262626; width: 85%; max-width: 320px; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 4px 25px rgba(0,0,0,0.5);">
+            
+            <div style="padding: 25px 20px; text-align: center;">
+                <h3 style="margin: 0 0 10px 0; color: white; font-size: 17px;">Hapus cerita ini?</h3>
+                <p style="margin: 0; color: #a8a8a8; font-size: 13px; line-height: 1.4;">
+                    Cerita ini akan dihapus secara permanen dari Masakin. Setelah dihapus, Anda tidak dapat memulihkannya kembali.
+                </p>
+            </div>
+
+            <button onclick="window.executeDeleteStory()" style="background: transparent; border: none; border-top: 1px solid #363636; color: #ed4956; padding: 14px; font-weight: bold; font-size: 15px; cursor: pointer; width: 100%;">
+                Hapus
+            </button>
+
+            <button onclick="window.cancelDeleteStory()" style="background: transparent; border: none; border-top: 1px solid #363636; color: white; padding: 14px; font-size: 15px; cursor: pointer; width: 100%;">
+                Batal
+            </button>
+
+        </div>
+    </div>
 </body>
 </html>
