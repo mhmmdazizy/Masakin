@@ -2017,6 +2017,15 @@ input:checked + .slider:before {
   text-overflow: ellipsis;
   text-align: center;
 }
+/* Anti-Colong & Anti-Klik Kanan di Story */
+#story-viewer-modal {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+#sv-image {
+  pointer-events: none; /* Biar sentuhan jari tembus ke modal utamanya */
+}
 
 /* Progress Bar Story */
 .story-progress-item {
