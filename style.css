@@ -1980,11 +1980,11 @@ input:checked + .slider:before {
   gap: 5px;
   cursor: pointer;
   flex-shrink: 0;
-  width: 66px;
+  width: 84px;
 }
 .story-ring {
-  width: 62px;
-  height: 62px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   padding: 2px;
   background: linear-gradient(
