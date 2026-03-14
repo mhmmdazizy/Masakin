@@ -1963,6 +1963,9 @@ input:checked + .slider:before {
 }
 /* --- Styling Story ala Instagram --- */
 #story-tray {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
   display: flex;
   gap: 10px;
   margin-bottom: 15px;
