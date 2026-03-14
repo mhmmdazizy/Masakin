@@ -824,8 +824,8 @@
             </div>
             <div style="display: flex; gap: 15px; align-items: center;">
                 <i data-feather="alert-triangle" onclick="showToast('Fitur laporkan akan segera hadir!')" style="width: 20px; cursor: pointer; filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.8));"></i>
-                <i id="sv-delete-btn" data-feather="trash-2" onclick="deleteActiveStory()" style="width: 20px; cursor: pointer; color: #ff6b6b; display: none; filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.8));"></i>
-                <i data-feather="x" onclick="closeStoryViewer()" style="width: 26px; cursor: pointer; filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.8));"></i>
+                <i id="sv-delete-btn" data-feather="trash-2" onclick="window.deleteActiveStory(event)" style="width: 20px; cursor: pointer; color: #ff6b6b; display: none; filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.8));"></i>
+                <i data-feather="x" onclick="window.closeStoryViewer(event)" style="width: 26px; cursor: pointer; filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.8));"></i>
             </div>
         </div>
         <div style="position: absolute; top: 70px; bottom: 70px; left: 0; width: 30%; z-index: 5;" onclick="window.prevStory()"></div>
