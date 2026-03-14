@@ -257,7 +257,10 @@
 <div id="ai-chat-box" class="hidden">
     <div class="chat-header">
         <b style="font-size: 14px;">🧑‍🍳 Chef AI Masakin</b>
-        <button onclick="toggleAIChat()"><i data-feather="chevron-down"></i></button>
+        <div style="display: flex; gap: 15px;">
+            <button onclick="clearAIChatHistory()" title="Hapus Obrolan"><i data-feather="trash-2" style="width: 16px;"></i></button>
+            <button onclick="toggleAIChat()"><i data-feather="chevron-down"></i></button>
+        </div>
     </div>
     
     <div id="ai-chat-messages" style="overscroll-behavior: contain;">
