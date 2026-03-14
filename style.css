@@ -1997,7 +1997,7 @@ input:checked + .slider:before {
   );
   display: flex;
   justify-content: center;
-  align-items: flex-end;
+  align-items: center;
   position: relative;
 }
 .story-ring img {
