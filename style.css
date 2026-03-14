@@ -1964,12 +1964,11 @@ input:checked + .slider:before {
 /* --- Styling Story ala Instagram --- */
 #story-tray {
   display: flex;
-  gap: 15px;
+  gap: 10px;
+  margin-bottom: 15px;
   overflow-x: auto;
-  padding: 15px;
-  background: var(--bg);
   scrollbar-width: none;
-  -ms-overflow-style: none;
+  padding: 0px;
 }
 #story-tray::-webkit-scrollbar {
   display: none;
