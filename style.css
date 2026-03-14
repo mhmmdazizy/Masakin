@@ -1963,9 +1963,6 @@ input:checked + .slider:before {
 }
 /* --- Styling Story ala Instagram --- */
 #story-tray {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
   display: flex;
   gap: 10px;
   margin-bottom: 15px;
@@ -2035,4 +2032,14 @@ input:checked + .slider:before {
   background: white;
   width: 0%;
   transition: width linear;
+}
+.story-footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  padding: 15px;
+  display: none;
+  flex-direction: column;
+  gap: 15px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
 }
